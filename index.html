@@ -365,7 +365,7 @@
         const key = el.getAttribute('data-i18n');
         if (t[key]) el.innerHTML = t[key];
       });
-      document.getElementById('langBtn').innerText = currentLang === 'zh' ? 'EN / 中' : 'CN / EN';
+      document.getElementById('langBtn').innerText = currentLang === 'zh' ? 'EN / 中' : '中 / EN';
     }
 
     function goToView(targetId) {
