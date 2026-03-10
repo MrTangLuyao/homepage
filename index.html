@@ -1,0 +1,423 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <title>LOUIE // HOMEPAGE</title>
+  <script src="lib/tailwindcss.js"></script>
+  <script src="lib/luxon.min.js"></script>
+  <style>
+    @font-face {
+      font-family: 'JetBrains Mono';
+      src: url('lib/JetBrainsMono-Bold.woff2') format('woff2');
+      font-weight: normal;
+      font-style: normal;
+    }
+
+    body {
+      font-family: 'JetBrains Mono', "Microsoft YaHei", "PingFang SC", "Helvetica Neue", Helvetica, Arial, sans-serif;
+      background-color: #020617;
+      color: #e2e8f0;
+      overflow-x: hidden;
+      -webkit-tap-highlight-color: transparent;
+      -webkit-font-smoothing: antialiased;
+      -moz-osx-font-smoothing: grayscale;
+      font-weight: 400;
+    }
+
+    @keyframes fadeInUp {
+      from {
+        opacity: 0;
+        transform: translateY(20px);
+      }
+
+      to {
+        opacity: 1;
+        transform: translateY(0);
+      }
+    }
+
+    @keyframes blink {
+
+      0%,
+      100% {
+        opacity: 1;
+      }
+
+      50% {
+        opacity: 0;
+      }
+    }
+
+    @keyframes smallBounce {
+
+      0%,
+      100% {
+        transform: translateY(0);
+      }
+
+      50% {
+        transform: translateY(-4px);
+      }
+    }
+
+    .view-section {
+      display: none;
+      opacity: 0;
+    }
+
+    .view-section.active {
+      display: block;
+      animation: fadeInUp 0.5s cubic-bezier(0.22, 1, 0.36, 1) forwards;
+    }
+
+    .cursor-blink::after {
+      content: '█';
+      animation: blink 1s step-end infinite;
+      margin-left: 4px;
+      color: #3b82f6;
+    }
+
+    .animate-small-bounce {
+      animation: smallBounce 0.4s infinite ease-in-out;
+    }
+
+    .header-btn {
+      text-transform: uppercase;
+      font-size: 10px;
+      border: 1px solid #334155;
+      background: #0f172a;
+      border-radius: 4px;
+      padding: 4px 8px;
+      color: #94a3b8;
+      font-weight: bold;
+      letter-spacing: 0.05em;
+      transition: all 0.2s;
+    }
+
+    .header-btn:hover {
+      color: #3b82f6;
+      border-color: #3b82f6;
+    }
+
+    .hard-card {
+      background-color: #0f172a;
+      border: 1px solid #334155;
+    }
+
+    .node-border {
+      border-left: 4px solid #3b82f6;
+    }
+
+    .data-block {
+      background: #0f172a;
+      border: 1px solid #334155;
+      padding: 1.25rem;
+      border-radius: 6px;
+      margin-bottom: 1rem;
+    }
+
+    .data-title {
+      color: #facc15;
+      font-weight: bold;
+      font-size: 0.95rem;
+      margin-bottom: 0.75rem;
+      display: flex;
+      align-items: center;
+      border-bottom: 1px solid #1e293b;
+      padding-bottom: 6px;
+      text-transform: uppercase;
+    }
+
+    .data-content {
+      color: #94a3b8;
+      font-size: 0.85rem;
+      line-height: 1.6;
+    }
+
+    .data-highlight {
+      color: #60a5fa;
+      font-family: 'JetBrains Mono', monospace;
+      font-weight: bold;
+    }
+
+    .link-item {
+      display: inline-block;
+      padding: 8px 12px;
+      border: 1px solid #3b82f6;
+      color: #3b82f6;
+      text-decoration: none;
+      font-size: 0.8rem;
+      font-weight: bold;
+      text-transform: uppercase;
+      transition: all 0.2s;
+      margin-top: 8px;
+      margin-right: 8px;
+    }
+
+    .link-item:hover {
+      background-color: #3b82f6;
+      color: #020617;
+    }
+
+    .kb-header {
+      color: #3b82f6;
+      font-weight: bold;
+      font-size: 0.8rem;
+      border-bottom: 1px solid #334155;
+      padding-bottom: 0.5rem;
+      margin-bottom: 1rem;
+    }
+
+    .action-btn {
+      width: 100%;
+      background-color: #1e293b;
+      color: #94a3b8;
+      font-weight: bold;
+      padding: 1rem;
+      text-transform: uppercase;
+      letter-spacing: 0.1em;
+      transition: all 0.2s;
+      border: 1px solid #334155;
+      margin-top: 2rem;
+    }
+
+    .action-btn:hover {
+      background-color: #334155;
+      color: white;
+    }
+
+    .pixel-avatar {
+      image-rendering: pixelated;
+    }
+  </style>
+</head>
+
+<body class="min-h-screen flex flex-col items-center justify-start pt-4 pb-12 px-4 md:pt-12">
+
+  <div class="w-full max-w-4xl relative">
+    <div id="view-boot" class="view-section active max-w-2xl mx-auto mt-20">
+      <h1 class="text-3xl md:text-4xl font-bold text-blue-500 tracking-tighter uppercase text-center mb-8">Welcome to
+        Louie's Homepage</h1>
+      <div class="hard-card p-6 font-mono text-sm shadow-[0_0_30px_rgba(0,0,0,0.8)] border-slate-700">
+        <div id="term-1" class="hidden text-slate-400 mb-2">> LOC: MELBOURNE_VIC_AU</div>
+        <div id="term-2" class="hidden text-slate-400 mb-2">> TIME: <span id="boot-time"></span></div>
+        <div id="term-root" class="hidden text-slate-400 mb-2">> Login as root</div>
+        <div id="term-3" class="hidden text-yellow-500 mb-2">> Authorizing... [<span id="countdown">3</span>]</div>
+        <div id="term-4" class="hidden text-[#00ff00] font-bold drop-shadow-[0_0_5px_rgba(0,255,0,0.8)]">> Authorization
+          approved.</div>
+        <div id="term-cursor" class="cursor-blink text-blue-500 h-4"></div>
+      </div>
+      <div id="login-btn-container" class="hidden mt-8 text-center">
+        <button onclick="goToView('view-main')"
+          class="bg-blue-600 text-white font-bold py-3 px-8 uppercase tracking-widest hover:bg-blue-500 transition-all animate-small-bounce shadow-[0_0_15px_rgba(59,130,246,0.5)]"
+          data-i18n="btn_login">登录到路易的主页--></button>
+      </div>
+    </div>
+
+    <div id="view-main" class="view-section">
+      <div class="flex justify-between items-start mb-8 border-b border-slate-800 pb-4 w-full">
+        <div>
+          <h1 class="text-2xl md:text-3xl font-bold text-blue-500 tracking-tighter uppercase">LOUIE'S HOMEPAGE <span
+              class="text-slate-500 text-[10px] md:text-xs ml-1 align-bottom font-mono">Log in as root</span></h1>
+          <p class="text-[10px] text-slate-500 mt-1 tracking-widest">PERSONAL IDENTIFICATION NODE</p>
+        </div>
+        <div class="flex gap-2">
+          <button id="licenseBtn" onclick="goToView('view-license')" class="header-btn">LICENSES</button>
+          <button id="langBtn" onclick="toggleLanguage()" class="header-btn">EN / 中</button>
+        </div>
+      </div>
+
+      <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+        <div class="data-block md:col-span-2 node-border">
+          <div class="data-title" data-i18n="t_identity">PROFILE_MATRIX // 基础信息</div>
+          <div class="flex flex-col sm:flex-row gap-6 items-center sm:items-start data-content">
+            <div class="flex-shrink-0">
+              <img src="lib/po.webp" alt="Avatar"
+                class="w-28 h-28 rounded border border-slate-700 shadow-[0_0_15px_rgba(0,0,0,0.5)] pixel-avatar object-cover bg-slate-800">
+            </div>
+            <div class="grid grid-cols-1 sm:grid-cols-2 gap-4 w-full">
+              <div>
+                <span class="text-slate-500">ID:</span> <span class="data-highlight">Louie</span><br>
+                <span class="text-slate-500">YOB:</span> <span class="text-white font-mono">2006</span><br>
+                <span class="text-slate-500" data-i18n="l_trait">TRAIT:</span> <span class="text-white"
+                  data-i18n="v_trait">电子产品爱好者</span>
+              </div>
+              <div>
+                <span class="text-slate-500">LOC:</span> <span class="text-white font-mono">Melbourne, VIC,
+                  AU</span><br>
+                <span class="text-slate-500" data-i18n="l_edu">EDU:</span> <span class="text-white"
+                  data-i18n="v_edu">墨尔本大学 (Unimelb)</span><br>
+                <span class="text-slate-500" data-i18n="l_major">MAJOR:</span> <span class="text-white"
+                  data-i18n="v_major">计算机科学 (Class of 2025)</span>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="data-block">
+          <div class="data-title" data-i18n="t_about">ABOUT_ME // 关于我</div>
+          <div class="data-content space-y-3">
+            <p data-i18n="v_about">我是墨尔本大学本科2025级计算机专业在读生，来自中国武汉，正在学习C语言，对科技感兴趣。澳大利亚L牌驾照持有者，学车中。</p>
+          </div>
+        </div>
+
+        <div class="data-block">
+          <div class="data-title" data-i18n="t_links">LINKS // 友情链接</div>
+          <div class="data-content space-y-4">
+            <div>
+              <div class="font-bold text-white uppercase tracking-wider text-sm mb-1">Jetlag_Commander</div>
+              <div class="text-xs text-slate-400 mb-2" data-i18n="p_1_desc">科学时差调节系统 / 跨国生物钟覆写协议</div>
+              <a href="https://jetlag.louie1.com" target="_blank" class="link-item">jetlag.louie1.com</a>
+              <a href="https://github.com/louie1-com/Jetlag_Commander" target="_blank"
+                class="link-item text-slate-400 border-slate-600 hover:bg-slate-700 hover:text-white">GitHub Repo</a>
+            </div>
+            <div>
+              <div class="font-bold text-white uppercase tracking-wider text-sm mb-1">Personal Profiles</div>
+              <div class="text-xs text-slate-400 mb-2" data-i18n="p_2_desc">社交媒体与代码库</div>
+              <a href="https://github.com/louie1-com" target="_blank"
+                class="link-item text-slate-400 border-slate-600 hover:bg-slate-700 hover:text-white">GitHub</a>
+              <a href="#" target="_blank"
+                class="link-item text-slate-400 border-slate-600 hover:bg-slate-700 hover:text-white"
+                data-i18n="p_blog">古怪的路易博客（敬请期待）</a>
+              <a href="https://www.linkedin.com/in/luyao-tang-b8b6353b5" target="_blank"
+                class="link-item border-[#0a66c2] text-[#0a66c2] hover:bg-[#0a66c2] hover:text-white">领英LinkedIn</a>
+              <a href="https://space.bilibili.com/501015028" target="_blank"
+                class="link-item border-[#fb7299] text-[#fb7299] hover:bg-[#fb7299] hover:text-white"
+                data-i18n="p_bili">哔哩哔哩 (古怪的路易)</a>
+              <a href="https://xhslink.com/m/7yaJ9ssWxsW" target="_blank"
+                class="link-item border-[#ff2142] text-[#ff2142] hover:bg-[#ff2142] hover:text-white"
+                data-i18n="p_rednote">小红书 (古怪的路易)</a>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div id="view-license" class="view-section max-w-2xl mx-auto pt-4">
+      <h2 class="kb-header">COMPLIANCE // OPEN SOURCE LICENSES</h2>
+      <div class="space-y-6">
+        <div>
+          <h4 class="text-white font-bold text-sm mb-2">Tailwind CSS</h4>
+          <p class="text-[10px] text-slate-500 font-mono">MIT License | Copyright (c) Tailwind Labs, Inc.</p>
+        </div>
+        <div>
+          <h4 class="text-white font-bold text-sm mb-2">Luxon.js</h4>
+          <p class="text-[10px] text-slate-500 font-mono">MIT License | Copyright (c) 2017 Isaac Cambron</p>
+        </div>
+        <div>
+          <h4 class="text-white font-bold text-sm mb-2">JetBrains Mono</h4>
+          <p class="text-[10px] text-slate-500 font-mono">SIL Open Font License 1.1 | Copyright (c) 2020 JetBrains
+            s.r.o.</p>
+        </div>
+      </div>
+      <button onclick="goToView('view-main')" class="action-btn">
+        << RETURN</button>
+    </div>
+  </div>
+
+  <script>
+    const DateTime = luxon.DateTime;
+    let currentLang = 'zh';
+
+    const translations = {
+      zh: {
+        btn_login: "登录到路易的主页-->",
+        t_identity: "PROFILE_MATRIX // 基础信息",
+        l_trait: "爱好:", v_trait: "游戏，摆弄电子产品",
+        l_edu: "教育:", v_edu: "墨尔本大学",
+        l_major: "专业:", v_major: "计算机科学",
+        t_about: "ABOUT_ME // 关于我",
+        v_about: "我是墨尔本大学本科2025级计算机专业在读生，来自中国武汉，正在学习C语言，对科技感兴趣。澳大利亚L牌驾照持有者，学车中。",
+        t_links: "LINKS // 友情链接",
+        p_1_desc: "科学时差调节系统 / 跨国生物钟覆写协议",
+        p_2_desc: "社交媒体与代码库",
+        p_blog: "古怪的路易博客（敬请期待）",
+        p_bili: "哔哩哔哩 (古怪的路易)",
+        p_rednote: "小红书 (古怪的路易)"
+      },
+      en: {
+        btn_login: "Login to Louie's Homepage-->",
+        t_identity: "PROFILE_MATRIX // CORE INFO",
+        l_trait: "CLASS:", v_trait: "Gaming, Electronics Enthusiast",
+        l_edu: "AFFIL:", v_edu: "University of Melbourne",
+        l_major: "MAJOR:", v_major: "Computer Science",
+        t_about: "ABOUT_ME // ABOUT ME",
+        v_about: "I am an undergraduate student majoring in Computer Science at the University of Melbourne, Class of 2025. I am from Wuhan, China, currently learning C, and highly interested in technology. Holder of an Australian L-plate driver's license, currently learning to drive.",
+        t_links: "LINKS // LINKS",
+        p_1_desc: "Circadian Rhythm Override Protocol / Scientific Jetlag Adjustment",
+        p_2_desc: "Social Media & Repositories",
+        p_blog: "Louie is Strange's Blog (Coming Soon)",
+        p_bili: "Bilibili (古怪的路易)",
+        p_rednote: "Rednote (古怪的路易)"
+      }
+    };
+
+    function toggleLanguage() {
+      currentLang = currentLang === 'zh' ? 'en' : 'zh';
+      applyLanguage();
+    }
+
+    function applyLanguage() {
+      const t = translations[currentLang];
+      document.querySelectorAll('[data-i18n]').forEach(el => {
+        const key = el.getAttribute('data-i18n');
+        if (t[key]) el.innerHTML = t[key];
+      });
+      document.getElementById('langBtn').innerText = currentLang === 'zh' ? 'EN / 中' : 'CN / EN';
+    }
+
+    function goToView(targetId) {
+      document.querySelectorAll('.view-section').forEach(el => el.classList.remove('active'));
+      document.getElementById(targetId).classList.add('active');
+      window.scrollTo(0, 0);
+    }
+
+    function runBootSequence() {
+      const t1 = document.getElementById('term-1');
+      const t2 = document.getElementById('term-2');
+      const troot = document.getElementById('term-root');
+      const t3 = document.getElementById('term-3');
+      const t4 = document.getElementById('term-4');
+      const cursor = document.getElementById('term-cursor');
+      const timeDisplay = document.getElementById('boot-time');
+      const countdown = document.getElementById('countdown');
+      const loginBtn = document.getElementById('login-btn-container');
+
+      timeDisplay.innerText = DateTime.now().setZone('Australia/Melbourne').toFormat('yyyy-MM-dd HH:mm:ss') + ' AEDT';
+
+      setTimeout(() => t1.classList.remove('hidden'), 300);
+      setTimeout(() => t2.classList.remove('hidden'), 600);
+      setTimeout(() => troot.classList.remove('hidden'), 900);
+      setTimeout(() => {
+        t3.classList.remove('hidden');
+        let count = 3;
+        const interval = setInterval(() => {
+          count--;
+          if (count >= 0) {
+            countdown.innerText = count;
+          } else {
+            clearInterval(interval);
+            t4.classList.remove('hidden');
+            setTimeout(() => {
+              loginBtn.classList.remove('hidden');
+            }, 500);
+          }
+        }, 1000);
+      }, 1200);
+    }
+
+    const browserLang = navigator.language || navigator.userLanguage;
+    if (browserLang.toLowerCase().startsWith('zh')) {
+      currentLang = 'zh';
+    } else {
+      currentLang = 'en';
+    }
+
+    applyLanguage();
+    runBootSequence();
+  </script>
+</body>
+
+</html>
