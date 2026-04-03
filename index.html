@@ -17,7 +17,7 @@
 
     body {
       background-color: #008080;
-      font-family: 'Tahoma', 'Microsoft YaHei', sans-serif;
+      font-family: 'Tahoma', system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
       overflow: hidden;
       margin: 0;
       padding: 0;
@@ -124,11 +124,13 @@
 
     @media (min-width: 768px) {
       .win-window {
-        width: 450px;
+        width: 420px;
       }
 
+      #win-project,
+      #win-blog,
       #win-settings {
-        width: 250px;
+        width: 350px;
       }
 
       #win-terminal {
@@ -418,9 +420,17 @@
         <img src="lib/po.webp" alt="Profile">
         <span>Person INFO.exe</span>
       </div>
-      <div class="desktop-icon" onclick="openWindow('win-links')">
-        <div class="icon-ph">LNK</div>
-        <span>Links.exe</span>
+      <div class="desktop-icon" onclick="openWindow('win-social')">
+        <div class="icon-ph">SOC</div>
+        <span data-i18n="icon_social">Social media.exe</span>
+      </div>
+      <div class="desktop-icon" onclick="openWindow('win-project')">
+        <div class="icon-ph">PRJ</div>
+        <span data-i18n="icon_project">My project.exe</span>
+      </div>
+      <div class="desktop-icon" onclick="openWindow('win-blog')">
+        <div class="icon-ph">BLG</div>
+        <span data-i18n="icon_blog">古怪的路易博客.exe</span>
       </div>
       <div class="desktop-icon" onclick="openWindow('win-settings')">
         <div class="icon-ph" style="color:#000;">CFG</div>
@@ -436,7 +446,7 @@
       </div>
     </div>
 
-    <div id="win-profile" class="win-window" style="top: 40px; left: 100px;">
+    <div id="win-profile" class="win-window" style="top: 30px; left: 100px;">
       <div class="win-titlebar" onmousedown="startDrag(event, 'win-profile')">
         <span><img src="lib/po.webp" class="inline w-3 h-3 mr-1" alt="icon">Person INFO.exe</span>
         <button class="win-btn-close" onclick="closeWindow('win-profile')">X</button>
@@ -464,24 +474,17 @@
       </div>
     </div>
 
-    <div id="win-links" class="win-window" style="top: 360px; left: 100px;">
-      <div class="win-titlebar" onmousedown="startDrag(event, 'win-links')">
-        <span>Links.exe</span>
-        <button class="win-btn-close" onclick="closeWindow('win-links')">X</button>
+    <div id="win-social" class="win-window" style="top: 380px; left: 100px;">
+      <div class="win-titlebar" onmousedown="startDrag(event, 'win-social')">
+        <span data-i18n="icon_social">Social media.exe</span>
+        <button class="win-btn-close" onclick="closeWindow('win-social')">X</button>
       </div>
-      <div class="win-content space-y-4" onmousedown="bringToFront('win-links')">
-        <div class="win-inset">
-          <div class="font-bold text-[#000080] mb-1">Jetlag_Commander</div>
-          <div class="text-xs mb-2" data-i18n="p_1_desc">科学时差调节系统 / 跨国生物钟覆写协议</div>
-          <a href="https://jetlag.louie1.com" target="_blank" class="win-button">Execute (web)</a>
-          <a href="https://github.com/mrtangluyao/Jetlag_Commander" target="_blank" class="win-button">GitHub Repo</a>
-        </div>
+      <div class="win-content space-y-4" onmousedown="bringToFront('win-social')">
         <div class="win-inset">
           <div class="font-bold text-[#000080] mb-1">Personal Profiles</div>
           <div class="text-xs mb-2" data-i18n="p_2_desc">社交媒体与代码库</div>
           <div class="flex flex-wrap gap-2">
             <a href="https://github.com/mrtangluyao/" target="_blank" class="win-button">GitHub</a>
-            <a href="https://blog.louie1.com" target="_blank" class="win-button" data-i18n="p_blog">古怪的路易博客</a>
             <a href="https://www.linkedin.com/in/luyao-tang-b8b6353b5" target="_blank" class="win-button">LinkedIn</a>
             <a href="https://space.bilibili.com/501015028" target="_blank" class="win-button"
               data-i18n="p_bili">哔哩哔哩</a>
@@ -491,7 +494,36 @@
       </div>
     </div>
 
-    <div id="win-settings" class="win-window" style="top: 40px; left: 580px;">
+    <div id="win-project" class="win-window" style="top: 30px; left: 540px;">
+      <div class="win-titlebar" onmousedown="startDrag(event, 'win-project')">
+        <span data-i18n="icon_project">My project.exe</span>
+        <button class="win-btn-close" onclick="closeWindow('win-project')">X</button>
+      </div>
+      <div class="win-content space-y-4" onmousedown="bringToFront('win-project')">
+        <div class="win-inset">
+          <div class="font-bold text-[#000080] mb-1">Jetlag_Commander</div>
+          <div class="text-xs mb-2" data-i18n="p_1_desc">科学时差调节系统 / 跨国生物钟覆写协议</div>
+          <a href="https://jetlag.louie1.com" target="_blank" class="win-button">Visit!</a>
+          <a href="https://github.com/mrtangluyao/Jetlag_Commander" target="_blank" class="win-button">GitHub Repo</a>
+        </div>
+      </div>
+    </div>
+
+    <div id="win-blog" class="win-window" style="top: 220px; left: 540px;">
+      <div class="win-titlebar" onmousedown="startDrag(event, 'win-blog')">
+        <span data-i18n="icon_blog">古怪的路易博客.exe</span>
+        <button class="win-btn-close" onclick="closeWindow('win-blog')">X</button>
+      </div>
+      <div class="win-content space-y-4" onmousedown="bringToFront('win-blog')">
+        <div class="win-inset">
+          <div class="font-bold text-[#000080] mb-1" data-i18n="icon_blog">古怪的路易博客.exe</div>
+          <div class="text-xs mb-2" data-i18n="p_blog_desc">记录技术、生活与杂谈的个人自留地。</div>
+          <a href="https://blog.louie1.com" target="_blank" class="win-button">Visit!</a>
+        </div>
+      </div>
+    </div>
+
+    <div id="win-settings" class="win-window" style="top: 410px; left: 540px;">
       <div class="win-titlebar" onmousedown="startDrag(event, 'win-settings')">
         <span>Control Panel</span>
         <button class="win-btn-close" onclick="closeWindow('win-settings')">X</button>
@@ -510,7 +542,7 @@
       </div>
     </div>
 
-    <div id="win-terminal" class="win-window" style="top: 140px; left: 350px;">
+    <div id="win-terminal" class="win-window" style="top: 100px; left: 300px;">
       <div class="win-titlebar" onmousedown="startDrag(event, 'win-terminal')">
         <span>Terminal.exe - SYSTEM OVERRIDE</span>
         <button class="win-btn-close" onclick="closeWindow('win-terminal')">X</button>
@@ -530,16 +562,22 @@
       <div class="start-menu-item" onclick="openWindow('win-profile'); toggleStartMenu()">
         <span class="font-bold">P</span>erson INFO
       </div>
-      <div class="start-menu-item" onclick="openWindow('win-links'); toggleStartMenu()">
-        <span class="font-bold">L</span>inks
+      <div class="start-menu-item" onclick="openWindow('win-social'); toggleStartMenu()">
+        <span class="font-bold">S</span>ocial media
+      </div>
+      <div class="start-menu-item" onclick="openWindow('win-project'); toggleStartMenu()">
+        <span class="font-bold">M</span>y project
+      </div>
+      <div class="start-menu-item" onclick="openWindow('win-blog'); toggleStartMenu()">
+        <span class="font-bold">B</span>log
       </div>
       <div class="start-menu-item" onclick="openWindow('win-settings'); toggleStartMenu()">
         <span class="font-bold">C</span>ontrol Panel
       </div>
+      <div class="start-divider"></div>
       <div class="start-menu-item" onclick="openWindow('win-terminal'); toggleStartMenu()">
         <span class="font-bold">T</span>erminal
       </div>
-      <div class="start-divider"></div>
       <div class="start-menu-item" onclick="location.reload()">
         <span class="font-bold">R</span>eboot System
       </div>
@@ -586,9 +624,12 @@
         v_about: "生于江城武汉，现旅居南半球的墨尔本。游走在0与1的边界，探寻计算机科学的微观宇宙。指尖正尝试用C语言雕刻底层逻辑的轮廓，目光长久停留在科技变迁的潮汐中。",
         p_1_desc: "科学时差调节系统 / 跨国生物钟覆写协议",
         p_2_desc: "社交媒体与代码库",
-        p_blog: "古怪的路易博客",
         p_bili: "哔哩哔哩",
-        p_rednote: "小红书"
+        p_rednote: "小红书",
+        icon_blog: "古怪的路易博客.exe",
+        icon_project: "My project.exe",
+        icon_social: "Social media.exe",
+        p_blog_desc: "记录技术、生活与杂谈的个人自留地。"
       },
       en: {
         l_trait: "CLASS:", v_trait: "Gaming, Electronics Enthusiast",
@@ -598,9 +639,12 @@
         v_about: "Born in Wuhan, currently residing in Melbourne. Navigating the boundary between 0 and 1, exploring the microcosm of computer science. Carving the outlines of low-level logic with C, while keeping a long-term gaze on the tides of technological evolution.",
         p_1_desc: "Circadian Rhythm Override Protocol / Scientific Jetlag Adjustment",
         p_2_desc: "Social Media & Repositories",
-        p_blog: "Louie is Strange's Blog",
         p_bili: "Bilibili",
-        p_rednote: "Rednote"
+        p_rednote: "Rednote",
+        icon_blog: "Strange Louie's blog.exe",
+        icon_project: "My project.exe",
+        icon_social: "Social media.exe",
+        p_blog_desc: "A personal space for technology, life, and thoughts."
       }
     };
 
@@ -796,7 +840,9 @@
               updateClock();
 
               openWindow('win-profile');
-              openWindow('win-links');
+              openWindow('win-social');
+              openWindow('win-project');
+              openWindow('win-blog');
               openWindow('win-settings');
             }, 800);
           }
