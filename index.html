@@ -221,7 +221,7 @@
     }
 
     .taskbar {
-      position: absolute;
+      position: fixed;
       bottom: 0;
       left: 0;
       width: 100%;
@@ -338,7 +338,7 @@
 
     .bsod {
       display: none;
-      position: absolute;
+      position: fixed;
       top: 0;
       left: 0;
       width: 100vw;
@@ -349,6 +349,51 @@
       padding: 50px;
       z-index: 20000;
       box-sizing: border-box;
+    }
+
+    /* 移动端适配逻辑 */
+    @media (max-width: 767px) {
+
+      body,
+      #view-main {
+        height: 100%;
+        height: 100dvh;
+      }
+
+      #view-main {
+        overflow-y: auto;
+        overflow-x: hidden;
+        padding-bottom: 30px;
+      }
+
+      .absolute.top-4.left-4.z-10 {
+        position: relative;
+        top: 0;
+        left: 0;
+        flex-direction: row;
+        flex-wrap: wrap;
+        padding: 10px;
+        justify-content: flex-start;
+      }
+
+      .desktop-icon {
+        width: 72px;
+        margin-bottom: 10px;
+      }
+
+      .win-window {
+        position: relative !important;
+        top: 0 !important;
+        left: 0 !important;
+        width: calc(100% - 20px) !important;
+        margin: 10px;
+        box-sizing: border-box;
+      }
+
+      .bsod {
+        padding: 20px;
+        font-size: 12px;
+      }
     }
   </style>
 </head>
@@ -419,7 +464,7 @@
       </div>
     </div>
 
-    <div id="win-links" class="win-window" style="top: 410px; left: 100px;">
+    <div id="win-links" class="win-window" style="top: 360px; left: 100px;">
       <div class="win-titlebar" onmousedown="startDrag(event, 'win-links')">
         <span>Links.exe</span>
         <button class="win-btn-close" onclick="closeWindow('win-links')">X</button>
@@ -465,7 +510,7 @@
       </div>
     </div>
 
-    <div id="win-terminal" class="win-window" style="top: 200px; left: 300px;">
+    <div id="win-terminal" class="win-window" style="top: 140px; left: 350px;">
       <div class="win-titlebar" onmousedown="startDrag(event, 'win-terminal')">
         <span>Terminal.exe - SYSTEM OVERRIDE</span>
         <button class="win-btn-close" onclick="closeWindow('win-terminal')">X</button>
@@ -596,6 +641,10 @@
       win.style.display = 'block';
       bringToFront(id);
 
+      if (window.innerWidth < 768) {
+        win.scrollIntoView({ behavior: 'smooth', block: 'start' });
+      }
+
       if (id === 'win-terminal' && !terminalRan) {
         runTerminalScript();
         terminalRan = true;
@@ -617,6 +666,7 @@
     }
 
     function startDrag(e, id) {
+      if (window.innerWidth < 768) return;
       if (e.target.tagName.toLowerCase() === 'button') return;
       isDragging = true;
       dragTarget = document.getElementById(id);
@@ -633,7 +683,7 @@
     }
 
     function doDrag(e) {
-      if (!isDragging || !dragTarget) return;
+      if (!isDragging || !dragTarget || window.innerWidth < 768) return;
       const clientX = e.type.includes('mouse') ? e.clientX : e.touches[0].clientX;
       const clientY = e.type.includes('mouse') ? e.clientY : e.touches[0].clientY;
 
