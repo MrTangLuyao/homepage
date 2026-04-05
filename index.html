@@ -42,10 +42,10 @@
 
     .dos-cursor::after {
       content: '_';
-      animation: blink 1s step-end infinite;
+      animation: dos-blink 1s step-end infinite;
     }
 
-    @keyframes blink {
+    @keyframes dos-blink {
 
       0%,
       100% {
@@ -104,10 +104,32 @@
       text-shadow: 1px 1px 0 #000;
     }
 
-    .desktop-icon:active span {
+    .desktop-icon:active span,
+    .clicked-effect span {
       background-color: #000080;
       border: 1px dotted #fff;
       text-shadow: none;
+    }
+
+    @keyframes clickFlash {
+
+      0%,
+      33%,
+      66%,
+      100% {
+        filter: invert(0);
+      }
+
+      16%,
+      50%,
+      83% {
+        filter: invert(1);
+      }
+    }
+
+    .clicked-effect .icon-ph,
+    .clicked-effect img {
+      animation: clickFlash 0.3s steps(1, end);
     }
 
     .win-window {
@@ -128,7 +150,7 @@
       }
 
       #win-project,
-      #win-blog,
+      #win-friends,
       #win-settings {
         width: 350px;
       }
@@ -353,7 +375,6 @@
       box-sizing: border-box;
     }
 
-    /* 移动端适配逻辑 */
     @media (max-width: 767px) {
 
       body,
@@ -414,29 +435,28 @@
   </div>
 
   <div id="view-main">
-
     <div class="absolute top-4 left-4 z-10 flex flex-col">
-      <div class="desktop-icon" onclick="openWindow('win-profile')">
+      <div class="desktop-icon" onclick="handleIconClick(this, 'win-profile')">
         <img src="lib/po.webp" alt="Profile">
         <span>Person INFO.exe</span>
       </div>
-      <div class="desktop-icon" onclick="openWindow('win-social')">
+      <div class="desktop-icon" onclick="handleIconClick(this, 'win-social')">
         <div class="icon-ph">SOC</div>
         <span data-i18n="icon_social">Social media.exe</span>
       </div>
-      <div class="desktop-icon" onclick="openWindow('win-project')">
+      <div class="desktop-icon" onclick="handleIconClick(this, 'win-project')">
         <div class="icon-ph">PRJ</div>
         <span data-i18n="icon_project">My project.exe</span>
       </div>
-      <div class="desktop-icon" onclick="openWindow('win-blog')">
-        <div class="icon-ph">BLG</div>
-        <span data-i18n="icon_blog">古怪的路易博客.exe</span>
+      <div class="desktop-icon" onclick="handleIconClick(this, 'win-friends')">
+        <div class="icon-ph" style="color:#008000;">LNK</div>
+        <span data-i18n="icon_friends">友情链接.exe</span>
       </div>
-      <div class="desktop-icon" onclick="openWindow('win-settings')">
+      <div class="desktop-icon" onclick="handleIconClick(this, 'win-settings')">
         <div class="icon-ph" style="color:#000;">CFG</div>
         <span>Control Panel</span>
       </div>
-      <div class="desktop-icon" onclick="openWindow('win-terminal')">
+      <div class="desktop-icon" onclick="handleIconClick(this, 'win-terminal')">
         <div class="icon-ph" style="background:#000; color:#0f0;">CMD</div>
         <span>Terminal.exe</span>
       </div>
@@ -474,7 +494,7 @@
       </div>
     </div>
 
-    <div id="win-social" class="win-window" style="top: 380px; left: 100px;">
+    <div id="win-social" class="win-window" style="top: 400px; left: 100px;">
       <div class="win-titlebar" onmousedown="startDrag(event, 'win-social')">
         <span data-i18n="icon_social">Social media.exe</span>
         <button class="win-btn-close" onclick="closeWindow('win-social')">X</button>
@@ -509,21 +529,26 @@
       </div>
     </div>
 
-    <div id="win-blog" class="win-window" style="top: 220px; left: 540px;">
-      <div class="win-titlebar" onmousedown="startDrag(event, 'win-blog')">
-        <span data-i18n="icon_blog">古怪的路易博客.exe</span>
-        <button class="win-btn-close" onclick="closeWindow('win-blog')">X</button>
+    <div id="win-friends" class="win-window" style="top: 180px; left: 540px;">
+      <div class="win-titlebar" onmousedown="startDrag(event, 'win-friends')">
+        <span data-i18n="icon_friends">友情链接.exe</span>
+        <button class="win-btn-close" onclick="closeWindow('win-friends')">X</button>
       </div>
-      <div class="win-content space-y-4" onmousedown="bringToFront('win-blog')">
+      <div class="win-content space-y-4" onmousedown="bringToFront('win-friends')">
         <div class="win-inset">
-          <div class="font-bold text-[#000080] mb-1" data-i18n="icon_blog">古怪的路易博客.exe</div>
+          <div class="font-bold text-[#000080] mb-1" data-i18n="title_blog">古怪的路易博客</div>
           <div class="text-xs mb-2" data-i18n="p_blog_desc">记录技术、生活与杂谈的个人自留地。</div>
           <a href="https://blog.louie1.com" target="_blank" class="win-button">Visit!</a>
+        </div>
+        <div class="win-inset">
+          <div class="font-bold text-[#000080] mb-1">Cohenjikan 的主页</div>
+          <div class="text-xs mb-2">View Cohen's Homepage</div>
+          <a href="https://cohenjikan.com" target="_blank" class="win-button">Visit!</a>
         </div>
       </div>
     </div>
 
-    <div id="win-settings" class="win-window" style="top: 410px; left: 540px;">
+    <div id="win-settings" class="win-window" style="top: 130px; left: 910px;">
       <div class="win-titlebar" onmousedown="startDrag(event, 'win-settings')">
         <span>Control Panel</span>
         <button class="win-btn-close" onclick="closeWindow('win-settings')">X</button>
@@ -568,8 +593,8 @@
       <div class="start-menu-item" onclick="openWindow('win-project'); toggleStartMenu()">
         <span class="font-bold">M</span>y project
       </div>
-      <div class="start-menu-item" onclick="openWindow('win-blog'); toggleStartMenu()">
-        <span class="font-bold">B</span>log
+      <div class="start-menu-item" onclick="openWindow('win-friends'); toggleStartMenu()">
+        <span class="font-bold">F</span>riends
       </div>
       <div class="start-menu-item" onclick="openWindow('win-settings'); toggleStartMenu()">
         <span class="font-bold">C</span>ontrol Panel
@@ -608,12 +633,7 @@
     const DateTime = luxon.DateTime;
     let currentLang = 'zh';
     let zIndexCounter = 100;
-
-    let isDragging = false;
-    let dragTarget = null;
-    let offsetX = 0;
-    let offsetY = 0;
-    let terminalRan = false;
+    let isDragging = false, dragTarget = null, offsetX = 0, offsetY = 0, terminalRan = false;
 
     const translations = {
       zh: {
@@ -626,9 +646,10 @@
         p_2_desc: "社交媒体与代码库",
         p_bili: "哔哩哔哩",
         p_rednote: "小红书",
-        icon_blog: "古怪的路易博客.exe",
         icon_project: "My project.exe",
         icon_social: "Social media.exe",
+        icon_friends: "友情链接.exe",
+        title_blog: "古怪的路易博客",
         p_blog_desc: "记录技术、生活与杂谈的个人自留地。"
       },
       en: {
@@ -641,9 +662,10 @@
         p_2_desc: "Social Media & Repositories",
         p_bili: "Bilibili",
         p_rednote: "Rednote",
-        icon_blog: "Strange Louie's blog.exe",
         icon_project: "My project.exe",
         icon_social: "Social media.exe",
+        icon_friends: "Friend Links.exe",
+        title_blog: "Strange Louie's blog",
         p_blog_desc: "A personal space for technology, life, and thoughts."
       }
     };
@@ -663,66 +685,59 @@
     }
 
     function updateClock() {
-      const timeStr = DateTime.now().setZone('Australia/Melbourne').toFormat('hh:mm a');
-      document.getElementById('win-time').innerText = timeStr;
+      document.getElementById('win-time').innerText = DateTime.now().setZone('Australia/Melbourne').toFormat('hh:mm a');
     }
 
     function toggleStartMenu() {
       const menu = document.getElementById('start-menu');
       const btn = document.getElementById('btn-start');
-      if (menu.style.display === 'block') {
-        menu.style.display = 'none';
-        btn.classList.remove('active');
-      } else {
-        menu.style.display = 'block';
-        btn.classList.add('active');
-        bringToFront('start-menu');
-      }
+      const isHidden = menu.style.display === 'none' || menu.style.display === '';
+      menu.style.display = isHidden ? 'block' : 'none';
+      btn.classList.toggle('active', isHidden);
+      if (isHidden) bringToFront('start-menu');
+    }
+
+    function handleIconClick(element, winId) {
+      element.classList.add('clicked-effect');
+      setTimeout(() => {
+        element.classList.remove('clicked-effect');
+        openWindow(winId);
+      }, 300);
     }
 
     function openWindow(id) {
       const win = document.getElementById(id);
+      if (!win) return;
       win.style.display = 'block';
       bringToFront(id);
-
-      if (window.innerWidth < 768) {
-        win.scrollIntoView({ behavior: 'smooth', block: 'start' });
-      }
-
+      if (window.innerWidth < 768) win.scrollIntoView({ behavior: 'smooth', block: 'start' });
       if (id === 'win-terminal' && !terminalRan) {
         runTerminalScript();
         terminalRan = true;
       }
     }
 
-    function closeWindow(id) {
-      document.getElementById(id).style.display = 'none';
-    }
+    function closeWindow(id) { document.getElementById(id).style.display = 'none'; }
 
     function bringToFront(id) {
-      zIndexCounter++;
-      document.getElementById(id).style.zIndex = zIndexCounter;
-      document.querySelectorAll('.win-titlebar').forEach(tb => tb.classList.add('inactive'));
       const targetWin = document.getElementById(id);
-      if (targetWin.querySelector('.win-titlebar')) {
-        targetWin.querySelector('.win-titlebar').classList.remove('inactive');
-      }
+      if (!targetWin) return;
+      targetWin.style.zIndex = ++zIndexCounter;
+      document.querySelectorAll('.win-titlebar').forEach(tb => tb.classList.add('inactive'));
+      const tb = targetWin.querySelector('.win-titlebar');
+      if (tb) tb.classList.remove('inactive');
     }
 
     function startDrag(e, id) {
-      if (window.innerWidth < 768) return;
-      if (e.target.tagName.toLowerCase() === 'button') return;
+      if (window.innerWidth < 768 || e.target.tagName.toLowerCase() === 'button') return;
       isDragging = true;
       dragTarget = document.getElementById(id);
       bringToFront(id);
-
       const rect = dragTarget.getBoundingClientRect();
       const clientX = e.type.includes('mouse') ? e.clientX : e.touches[0].clientX;
       const clientY = e.type.includes('mouse') ? e.clientY : e.touches[0].clientY;
-
       offsetX = clientX - rect.left;
       offsetY = clientY - rect.top;
-
       e.preventDefault();
     }
 
@@ -730,68 +745,45 @@
       if (!isDragging || !dragTarget || window.innerWidth < 768) return;
       const clientX = e.type.includes('mouse') ? e.clientX : e.touches[0].clientX;
       const clientY = e.type.includes('mouse') ? e.clientY : e.touches[0].clientY;
-
       dragTarget.style.left = (clientX - offsetX) + 'px';
       dragTarget.style.top = (clientY - offsetY) + 'px';
     }
 
-    function stopDrag() {
-      isDragging = false;
-      dragTarget = null;
-    }
+    function stopDrag() { isDragging = false; dragTarget = null; }
 
     document.addEventListener('mousemove', doDrag);
     document.addEventListener('mouseup', stopDrag);
     document.addEventListener('touchmove', doDrag, { passive: false });
     document.addEventListener('touchend', stopDrag);
 
-    document.addEventListener('click', function (e) {
-      const startMenu = document.getElementById('start-menu');
-      const startBtn = document.getElementById('btn-start');
-      if (startMenu.style.display === 'block' && !startMenu.contains(e.target) && !startBtn.contains(e.target)) {
-        startMenu.style.display = 'none';
-        startBtn.classList.remove('active');
+    document.addEventListener('click', e => {
+      const menu = document.getElementById('start-menu');
+      const btn = document.getElementById('btn-start');
+      if (menu.style.display === 'block' && !menu.contains(e.target) && !btn.contains(e.target)) {
+        menu.style.display = 'none';
+        btn.classList.remove('active');
       }
     });
 
-    function triggerBSOD() {
-      document.getElementById('bsod').style.display = 'block';
-    }
-
-    document.getElementById('bsod').addEventListener('click', function () {
-      this.style.display = 'none';
-    });
+    function triggerBSOD() { document.getElementById('bsod').style.display = 'block'; }
+    document.getElementById('bsod').addEventListener('click', function () { this.style.display = 'none'; });
 
     function runTerminalScript() {
       const term = document.getElementById('terminal-output');
       const lines = [
-        "Connecting to local host...",
-        "Verifying system integrity...",
-        "Accessing local node.",
-        "System initialization sequence triggered.",
-        "WARNING: Unauthorized inspection of source code detected.",
-        "> System Message: Who is there?",
-        "> Logging incident...",
-        "Connection closed. Terminal terminated."
+        "Connecting to local host...", "Verifying system integrity...", "Accessing local node.",
+        "System initialization sequence triggered.", "WARNING: Unauthorized inspection of source code detected.",
+        "> System Message: Who is there?", "> Logging incident...", "Connection closed. Terminal terminated."
       ];
-
       term.innerHTML = '';
       let lineIdx = 0;
-
       function typeLine() {
-        if (lineIdx >= lines.length) {
-          term.innerHTML += '<span class="dos-cursor"></span>';
-          return;
-        }
-
-        const lineText = lines[lineIdx];
-        const p = document.createElement('div');
+        if (lineIdx >= lines.length) return term.innerHTML += '<span class="dos-cursor"></span>';
+        const lineText = lines[lineIdx], p = document.createElement('div');
         term.appendChild(p);
-
         let charIdx = 0;
         const typeChar = setInterval(() => {
-          p.textContent += lineText[charIdx];
-          charIdx++;
+          p.textContent += lineText[charIdx++];
           term.scrollTop = term.scrollHeight;
           if (charIdx >= lineText.length) {
             clearInterval(typeChar);
@@ -800,59 +792,36 @@
           }
         }, 30);
       }
-
       typeLine();
     }
 
     function runBootSequence() {
-      const bootView = document.getElementById('view-boot');
-      const mainView = document.getElementById('view-main');
-      const taskbar = document.getElementById('taskbar');
+      const els = ['term-1', 'term-2', 'term-root', 'term-3'].map(id => document.getElementById(id));
+      document.getElementById('boot-time').innerText = DateTime.now().setZone('Australia/Melbourne').toFormat('yyyy-MM-dd HH:mm:ss') + ' AEDT';
 
-      const t1 = document.getElementById('term-1');
-      const t2 = document.getElementById('term-2');
-      const troot = document.getElementById('term-root');
-      const t3 = document.getElementById('term-3');
-      const t4 = document.getElementById('term-4');
-      const countdown = document.getElementById('countdown');
-      const timeDisplay = document.getElementById('boot-time');
+      els.forEach((el, i) => setTimeout(() => el.classList.remove('hidden'), 300 * (i + 1)));
 
-      timeDisplay.innerText = DateTime.now().setZone('Australia/Melbourne').toFormat('yyyy-MM-dd HH:mm:ss') + ' AEDT';
-
-      setTimeout(() => t1.classList.remove('hidden'), 300);
-      setTimeout(() => t2.classList.remove('hidden'), 600);
-      setTimeout(() => troot.classList.remove('hidden'), 900);
       setTimeout(() => {
-        t3.classList.remove('hidden');
         let count = 3;
         const interval = setInterval(() => {
-          count--;
-          if (count >= 0) {
-            countdown.innerText = count;
-          } else {
+          if (--count >= 0) document.getElementById('countdown').innerText = count;
+          else {
             clearInterval(interval);
-            t4.classList.remove('hidden');
+            document.getElementById('term-4').classList.remove('hidden');
             setTimeout(() => {
-              bootView.style.display = 'none';
-              mainView.style.display = 'block';
-              taskbar.classList.remove('hidden');
+              document.getElementById('view-boot').style.display = 'none';
+              document.getElementById('view-main').style.display = 'block';
+              document.getElementById('taskbar').classList.remove('hidden');
               setInterval(updateClock, 1000);
               updateClock();
-
-              openWindow('win-profile');
-              openWindow('win-social');
-              openWindow('win-project');
-              openWindow('win-blog');
-              openWindow('win-settings');
+              ['win-profile', 'win-social', 'win-project', 'win-friends', 'win-settings'].forEach(openWindow);
             }, 800);
           }
         }, 1000);
       }, 1200);
     }
 
-    const browserLang = navigator.language || navigator.userLanguage;
-    currentLang = browserLang.toLowerCase().startsWith('zh') ? 'zh' : 'en';
-
+    currentLang = (navigator.language || navigator.userLanguage).toLowerCase().startsWith('zh') ? 'zh' : 'en';
     applyLanguage();
     runBootSequence();
   </script>
