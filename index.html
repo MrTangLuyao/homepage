@@ -429,7 +429,7 @@
     <div id="term-1" class="hidden">C:\> LOC: MELBOURNE_VIC_AU</div>
     <div id="term-2" class="hidden">C:\> TIME: <span id="boot-time"></span></div>
     <div id="term-root" class="hidden">C:\> Login as root</div>
-    <div id="term-3" class="hidden">Authorizing... [<span id="countdown">3</span>]</div>
+    <div id="term-3" class="hidden">Authorizing... Approved.</div>
     <div id="term-4" class="hidden">Authorization approved. Loading Louie's 95...</div>
     <div id="term-cursor" class="dos-cursor mt-2"></div>
   </div>
@@ -804,29 +804,19 @@
     }
 
     function runBootSequence() {
-      const els = ['term-1', 'term-2', 'term-root', 'term-3'].map(id => document.getElementById(id));
+      const els = ['term-1', 'term-2', 'term-root', 'term-3', 'term-4'].map(id => document.getElementById(id));
       document.getElementById('boot-time').innerText = DateTime.now().setZone('Australia/Melbourne').toFormat('yyyy-MM-dd HH:mm:ss') + ' AEDT';
 
-      els.forEach((el, i) => setTimeout(() => el.classList.remove('hidden'), 300 * (i + 1)));
+      els.forEach((el, i) => setTimeout(() => el.classList.remove('hidden'), 250 * (i + 1)));
 
       setTimeout(() => {
-        let count = 3;
-        const interval = setInterval(() => {
-          if (--count >= 0) document.getElementById('countdown').innerText = count;
-          else {
-            clearInterval(interval);
-            document.getElementById('term-4').classList.remove('hidden');
-            setTimeout(() => {
-              document.getElementById('view-boot').style.display = 'none';
-              document.getElementById('view-main').style.display = 'block';
-              document.getElementById('taskbar').classList.remove('hidden');
-              setInterval(updateClock, 1000);
-              updateClock();
-              ['win-profile', 'win-social', 'win-project', 'win-friends', 'win-settings'].forEach(openWindow);
-            }, 800);
-          }
-        }, 1000);
-      }, 1200);
+        document.getElementById('view-boot').style.display = 'none';
+        document.getElementById('view-main').style.display = 'block';
+        document.getElementById('taskbar').classList.remove('hidden');
+        setInterval(updateClock, 1000);
+        updateClock();
+        ['win-profile', 'win-social', 'win-project', 'win-friends', 'win-settings'].forEach(openWindow);
+      }, 1500);
     }
 
     currentLang = (navigator.language || navigator.userLanguage).toLowerCase().startsWith('zh') ? 'zh' : 'en';
