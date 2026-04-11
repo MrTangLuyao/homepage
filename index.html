@@ -3,419 +3,543 @@
 
 <head>
   <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-  <title>LOUIE'S 95 // HOMEPAGE</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Louie — Portfolio</title>
+  <link rel="stylesheet" href="lib/fonts.css">
   <script src="lib/tailwindcss.js"></script>
-  <script src="lib/luxon.min.js"></script>
   <style>
-    @font-face {
-      font-family: 'JetBrains Mono';
-      src: url('lib/JetBrainsMono-Bold.woff2') format('woff2');
-      font-weight: normal;
-      font-style: normal;
+    *,
+    *::before,
+    *::after {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    :root {
+      --bg: #050505;
+      --surface: #111111;
+      --border: #222222;
+      --text: #e8e8e8;
+      --muted: #888;
+      --accent: #d98c70;
+      --accent-dim: rgba(217, 140, 112, 0.08);
+    }
+
+    html {
+      scroll-behavior: smooth;
+      background-color: var(--bg);
     }
 
     body {
-      background-color: #008080;
-      font-family: 'Tahoma', system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
-      overflow: hidden;
-      margin: 0;
-      padding: 0;
-      height: 100vh;
-      -webkit-font-smoothing: none;
-      user-select: none;
+      background-color: transparent;
+      color: var(--text);
+      font-family: 'JetBrains Mono', 'HarmonyOS Sans', 'PingFang SC', 'Microsoft YaHei', sans-serif;
+      font-size: 16px;
+      line-height: 1.8;
+      -webkit-font-smoothing: antialiased;
+      -moz-osx-font-smoothing: grayscale;
+      text-rendering: optimizeLegibility;
+      overflow-x: hidden;
     }
 
-    #view-boot {
-      background-color: #000;
-      color: #c0c0c0;
-      font-family: 'JetBrains Mono', monospace;
-      height: 100vh;
-      width: 100vw;
-      padding: 20px;
-      box-sizing: border-box;
-      position: absolute;
+    ::-webkit-scrollbar {
+      width: 4px;
+    }
+
+    ::-webkit-scrollbar-track {
+      background: var(--bg);
+    }
+
+    ::-webkit-scrollbar-thumb {
+      background: var(--border);
+      border-radius: 2px;
+    }
+
+    #canvas-container {
+      position: fixed;
       top: 0;
       left: 0;
-      z-index: 9999;
-    }
-
-    .dos-cursor::after {
-      content: '_';
-      animation: dos-blink 1s step-end infinite;
-    }
-
-    @keyframes dos-blink {
-
-      0%,
-      100% {
-        opacity: 1;
-      }
-
-      50% {
-        opacity: 0;
-      }
-    }
-
-    #view-main {
-      display: none;
-      height: 100vh;
       width: 100vw;
+      height: 100vh;
+      z-index: -1;
+      pointer-events: none;
+      background: radial-gradient(circle at center, #0a0a0a 0%, #000000 100%);
+      filter: blur(1.5px);
+      transform: scale(1.05);
+    }
+
+    .magnetic-wrap {
+      display: inline-block;
       position: relative;
     }
 
-    .desktop-icon {
-      width: 64px;
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      gap: 4px;
-      cursor: pointer;
-      margin-bottom: 16px;
-    }
-
-    .desktop-icon img,
-    .desktop-icon .icon-ph {
-      width: 32px;
-      height: 32px;
-      image-rendering: pixelated;
-    }
-
-    .desktop-icon .icon-ph {
-      background: #fff;
-      border-top: 1px solid #808080;
-      border-left: 1px solid #808080;
-      border-right: 1px solid #fff;
-      border-bottom: 1px solid #fff;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      font-weight: bold;
-      font-size: 10px;
-      color: #000080;
-    }
-
-    .desktop-icon span {
-      color: #fff;
-      font-size: 11px;
-      padding: 1px 2px;
-      text-align: center;
-      word-break: break-word;
-      text-shadow: 1px 1px 0 #000;
-    }
-
-    .desktop-icon:active span,
-    .clicked-effect span {
-      background-color: #000080;
-      border: 1px dotted #fff;
-      text-shadow: none;
-    }
-
-    @keyframes clickFlash {
-
-      0%,
-      33%,
-      66%,
-      100% {
-        filter: invert(0);
-      }
-
-      16%,
-      50%,
-      83% {
-        filter: invert(1);
-      }
-    }
-
-    .clicked-effect .icon-ph,
-    .clicked-effect img {
-      animation: clickFlash 0.3s steps(1, end);
-    }
-
-    .win-window {
-      background: #c0c0c0;
-      border-top: 1px solid #fff;
-      border-left: 1px solid #fff;
-      border-right: 1px solid #000;
-      border-bottom: 1px solid #000;
-      box-shadow: inset 1px 1px #dfdfdf, inset -1px -1px #808080;
-      position: absolute;
-      display: none;
-      width: 300px;
-    }
-
-    @media (min-width: 768px) {
-      .win-window {
-        width: 420px;
-      }
-
-      #win-project,
-      #win-friends,
-      #win-settings {
-        width: 350px;
-      }
-
-      #win-terminal {
-        width: 500px;
-      }
-    }
-
-    .win-titlebar {
-      background: linear-gradient(90deg, #000080, #1084d0);
-      color: #fff;
-      font-weight: bold;
-      padding: 2px 4px;
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      font-size: 12px;
-      cursor: default;
-    }
-
-    .win-titlebar.inactive {
-      background: #808080;
-    }
-
-    .win-btn-close {
-      background: #c0c0c0;
-      border-top: 1px solid #fff;
-      border-left: 1px solid #fff;
-      border-right: 1px solid #000;
-      border-bottom: 1px solid #000;
-      box-shadow: inset 1px 1px #dfdfdf, inset -1px -1px #808080;
-      color: #000;
-      font-weight: bold;
-      width: 16px;
-      height: 14px;
-      line-height: 10px;
-      text-align: center;
-      font-size: 10px;
-      cursor: pointer;
-    }
-
-    .win-btn-close:active {
-      border-top: 1px solid #000;
-      border-left: 1px solid #000;
-      border-right: 1px solid #fff;
-      border-bottom: 1px solid #fff;
-      box-shadow: inset 1px 1px #808080, inset -1px -1px #dfdfdf;
-    }
-
-    .win-content {
-      padding: 10px;
-      font-size: 13px;
-      color: #000;
-      user-select: text;
-    }
-
-    .win-inset {
-      background: #fff;
-      border-top: 1px solid #808080;
-      border-left: 1px solid #808080;
-      border-right: 1px solid #fff;
-      border-bottom: 1px solid #fff;
-      box-shadow: inset 1px 1px #000;
-      padding: 8px;
-    }
-
-    .win-button {
-      background: #c0c0c0;
-      border-top: 1px solid #fff;
-      border-left: 1px solid #fff;
-      border-right: 1px solid #000;
-      border-bottom: 1px solid #000;
-      box-shadow: inset 1px 1px #dfdfdf, inset -1px -1px #808080;
-      padding: 4px 12px;
-      font-size: 12px;
-      color: #000;
-      cursor: pointer;
+    .magnetic-inner {
       display: inline-block;
-      text-align: center;
-      text-decoration: none;
-      margin-top: 4px;
+      transition: transform 0.3s cubic-bezier(0.25, 1, 0.5, 1);
+      will-change: transform;
     }
 
-    .win-button:active {
-      border-top: 1px solid #000;
-      border-left: 1px solid #000;
-      border-right: 1px solid #fff;
-      border-bottom: 1px solid #fff;
-      box-shadow: inset 1px 1px #808080, inset -1px -1px #dfdfdf;
-      padding: 5px 11px 3px 13px;
+    .magnetic-wrap:hover .magnetic-inner {
+      transition: transform 0.1s ease-out;
     }
 
-    .taskbar {
-      position: fixed;
-      bottom: 0;
-      left: 0;
-      width: 100%;
-      height: 28px;
-      background: #c0c0c0;
-      border-top: 1px solid #fff;
-      box-shadow: inset 0 1px #dfdfdf;
-      display: flex;
-      align-items: center;
-      padding: 2px;
-      box-sizing: border-box;
-      z-index: 10000;
-    }
-
-    .start-btn {
-      font-weight: bold;
-      display: flex;
-      align-items: center;
-      gap: 4px;
-      height: 22px;
-    }
-
-    .start-btn.active {
-      border-top: 1px solid #000;
-      border-left: 1px solid #000;
-      border-right: 1px solid #fff;
-      border-bottom: 1px solid #fff;
-      box-shadow: inset 1px 1px #808080, inset -1px -1px #dfdfdf;
-      background: #dfdfdf;
-    }
-
-    .taskbar-clock {
-      margin-left: auto;
-      border-top: 1px solid #808080;
-      border-left: 1px solid #808080;
-      border-right: 1px solid #fff;
-      border-bottom: 1px solid #fff;
-      padding: 2px 8px;
-      font-size: 11px;
-      height: 22px;
-      display: flex;
-      align-items: center;
-    }
-
-    .start-menu {
-      position: absolute;
-      bottom: 28px;
-      left: 0;
-      width: 180px;
-      background: #c0c0c0;
-      border-top: 1px solid #fff;
-      border-left: 1px solid #fff;
-      border-right: 1px solid #000;
-      border-bottom: 1px solid #000;
-      box-shadow: inset 1px 1px #dfdfdf, inset -1px -1px #808080;
-      display: none;
-      z-index: 10001;
-      padding: 2px;
-    }
-
-    .start-menu-sidebar {
-      width: 24px;
-      background: linear-gradient(180deg, #000080, #1084d0);
-      float: left;
-      height: 100%;
-      position: absolute;
-      top: 2px;
-      bottom: 2px;
-      left: 2px;
-      color: white;
-      writing-mode: vertical-rl;
-      transform: rotate(180deg);
-      font-weight: bold;
-      padding-top: 5px;
-      font-size: 12px;
-      letter-spacing: 1px;
-    }
-
-    .start-menu-items {
-      margin-left: 26px;
-      display: flex;
-      flex-direction: column;
-    }
-
-    .start-menu-item {
-      padding: 8px 10px;
-      font-size: 12px;
-      cursor: pointer;
-      display: flex;
-      align-items: center;
-      gap: 8px;
-    }
-
-    .start-menu-item:hover {
-      background: #000080;
-      color: #fff;
-    }
-
-    .start-divider {
-      height: 1px;
-      background: #808080;
-      border-bottom: 1px solid #fff;
-      margin: 4px 2px;
-    }
-
-    .terminal-bg {
-      background-color: #000;
-      color: #0f0;
-      font-family: 'JetBrains Mono', monospace;
-      padding: 10px;
-      height: 200px;
-      overflow-y: auto;
-    }
-
-    .bsod {
-      display: none;
+    nav {
       position: fixed;
       top: 0;
       left: 0;
-      width: 100vw;
-      height: 100vh;
-      background-color: #0000aa;
-      color: #fff;
-      font-family: 'JetBrains Mono', monospace;
-      padding: 50px;
-      z-index: 20000;
-      box-sizing: border-box;
+      right: 0;
+      z-index: 100;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 24px 48px;
+      background: rgba(5, 5, 5, 0.5);
+      backdrop-filter: blur(16px);
+      border-bottom: 1px solid transparent;
+      transition: border-color 0.4s ease, padding 0.4s ease;
     }
 
-    @media (max-width: 767px) {
+    nav.scrolled {
+      border-bottom-color: rgba(255, 255, 255, 0.05);
+      padding: 16px 48px;
+    }
 
-      body,
-      #view-main {
-        height: 100%;
-        height: 100dvh;
+    .nav-logo {
+      color: var(--text);
+      font-weight: 700;
+      font-size: 18px;
+      text-decoration: none;
+      letter-spacing: 0.05em;
+      position: relative;
+    }
+
+    .nav-logo span {
+      color: var(--accent);
+    }
+
+    .nav-links {
+      display: flex;
+      align-items: center;
+      gap: 36px;
+      list-style: none;
+    }
+
+    .nav-links a {
+      color: var(--muted);
+      text-decoration: none;
+      font-size: 15px;
+      letter-spacing: 0.05em;
+      transition: color 0.3s ease;
+      display: block;
+      padding: 10px;
+      margin: -10px;
+    }
+
+    .nav-links a:hover {
+      color: var(--accent);
+    }
+
+    .lang-toggle {
+      background: none;
+      border: 1px solid rgba(255, 255, 255, 0.15);
+      color: var(--muted);
+      font-family: inherit;
+      font-size: 14px;
+      letter-spacing: 0.08em;
+      padding: 5px 12px;
+      border-radius: 4px;
+      cursor: pointer;
+      transition: color 0.3s ease, border-color 0.3s ease, background 0.3s ease;
+      white-space: nowrap;
+    }
+
+    .lang-toggle:hover {
+      color: var(--accent);
+      border-color: rgba(217, 140, 112, 0.4);
+      background: rgba(217, 140, 112, 0.05);
+    }
+
+    section {
+      max-width: 800px;
+      margin: 0 auto;
+      padding: 120px 24px;
+      position: relative;
+    }
+
+    #hero {
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      padding-top: 0;
+      position: relative;
+    }
+
+    .hero-content-wrapper {
+      display: flex;
+      flex-direction: column;
+      align-items: flex-start;
+    }
+
+    .hero-greeting {
+      color: var(--accent);
+      font-size: 16px;
+      letter-spacing: 0.15em;
+      margin-bottom: 20px;
+      display: inline-block;
+    }
+
+    .hero-name {
+      font-size: clamp(2.5rem, 8vw, 4.5rem);
+      font-weight: 800;
+      line-height: 1.1;
+      margin-bottom: 24px;
+      letter-spacing: -0.02em;
+      background: linear-gradient(90deg, #fff 0%, var(--accent) 50%, #fff 100%);
+      background-size: 200% auto;
+      color: transparent;
+      -webkit-background-clip: text;
+      background-clip: text;
+      animation: shine 4s linear infinite, float 6s ease-in-out infinite;
+      display: inline-block;
+      -webkit-text-stroke: 0.5px rgba(255, 255, 255, 0.1);
+    }
+
+    @keyframes shine {
+      to {
+        background-position: 200% center;
+      }
+    }
+
+    @keyframes float {
+      0% {
+        transform: translateY(0px);
       }
 
-      #view-main {
-        overflow-y: auto;
-        overflow-x: hidden;
-        padding-bottom: 30px;
+      50% {
+        transform: translateY(-8px);
       }
 
-      .absolute.top-4.left-4.z-10 {
-        position: relative;
-        top: 0;
-        left: 0;
-        flex-direction: row;
-        flex-wrap: wrap;
-        padding: 10px;
-        justify-content: flex-start;
+      100% {
+        transform: translateY(0px);
+      }
+    }
+
+    .hero-tagline {
+      font-size: clamp(1.2rem, 3vw, 1.4rem);
+      font-weight: normal;
+      color: var(--muted);
+      margin-bottom: 50px;
+      max-width: 540px;
+      line-height: 1.7;
+    }
+
+    .hero-email {
+      display: inline-flex;
+      align-items: center;
+      gap: 12px;
+      color: var(--bg);
+      background: var(--accent);
+      text-decoration: none;
+      font-size: 15px;
+      font-weight: 600;
+      padding: 14px 28px;
+      border-radius: 4px;
+      transition: transform 0.3s ease, box-shadow 0.3s ease;
+      box-shadow: 0 0 20px rgba(217, 140, 112, 0.2);
+      transform: translateZ(0);
+      backface-visibility: hidden;
+    }
+
+    .hero-email:hover {
+      box-shadow: 0 0 30px rgba(217, 140, 112, 0.4);
+    }
+
+    .scroll-indicator {
+      position: absolute;
+      bottom: 40px;
+      left: 50%;
+      transform: translateX(-50%);
+      animation: bounce 2s infinite;
+      opacity: 0.6;
+      transition: opacity 0.3s ease, color 0.3s ease;
+      color: var(--muted);
+    }
+
+    .scroll-indicator:hover {
+      opacity: 1;
+      color: var(--accent);
+    }
+
+    @keyframes bounce {
+      0%, 20%, 50%, 80%, 100% {
+        transform: translateY(0) translateX(-50%);
+      }
+      40% {
+        transform: translateY(-12px) translateX(-50%);
+      }
+      60% {
+        transform: translateY(-6px) translateX(-50%);
+      }
+    }
+
+    .section-label {
+      display: flex;
+      align-items: center;
+      gap: 20px;
+      color: var(--text);
+      font-size: 24px;
+      font-weight: 700;
+      margin-bottom: 60px;
+    }
+
+    .section-label::after {
+      content: '';
+      flex: 1;
+      height: 1px;
+      background: rgba(255, 255, 255, 0.1);
+    }
+
+    .section-label span {
+      color: var(--accent);
+      font-family: inherit;
+      font-size: 18px;
+      margin-right: 10px;
+    }
+
+    .about-text {
+      color: var(--muted);
+      font-size: 17px;
+      line-height: 2;
+      max-width: 650px;
+    }
+
+    .about-text strong {
+      color: var(--accent);
+      font-weight: 700;
+    }
+
+    .projects-grid {
+      display: grid;
+      gap: 20px;
+    }
+
+    .project-card {
+      background: rgba(17, 17, 17, 0.6);
+      border: 1px solid rgba(255, 255, 255, 0.05);
+      backdrop-filter: blur(10px);
+      border-radius: 8px;
+      padding: 32px;
+      text-decoration: none;
+      display: block;
+      transition: border-color 0.4s ease, background 0.4s ease;
+      position: relative;
+    }
+
+    .project-card:hover {
+      border-color: rgba(217, 140, 112, 0.4);
+      background: rgba(17, 17, 17, 0.9);
+    }
+
+    .project-card-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: 16px;
+    }
+
+    .project-name {
+      color: #fff;
+      font-weight: 700;
+      font-size: 20px;
+    }
+
+    .project-arrow {
+      color: var(--muted);
+      font-size: 22px;
+      transition: color 0.3s ease, transform 0.3s ease;
+    }
+
+    .project-card:hover .project-arrow {
+      color: var(--accent);
+      transform: translate(4px, -4px);
+    }
+
+    .project-desc {
+      color: var(--muted);
+      font-size: 16px;
+      line-height: 1.8;
+      margin-bottom: 24px;
+    }
+
+    .project-tags {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px;
+    }
+
+    .tag {
+      font-size: 13px;
+      color: var(--accent);
+      background: rgba(217, 140, 112, 0.05);
+      padding: 4px 12px;
+      border-radius: 4px;
+      border: 1px solid rgba(217, 140, 112, 0.1);
+    }
+
+    .social-list {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+      gap: 16px;
+    }
+
+    .social-item {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 20px 24px;
+      background: rgba(17, 17, 17, 0.6);
+      border: 1px solid rgba(255, 255, 255, 0.05);
+      backdrop-filter: blur(10px);
+      border-radius: 8px;
+      text-decoration: none;
+      color: var(--text);
+      transition: border-color 0.4s ease;
+    }
+
+    .social-item:hover {
+      border-color: rgba(217, 140, 112, 0.4);
+    }
+
+    .social-item-left {
+      display: flex;
+      align-items: center;
+      gap: 16px;
+    }
+
+    .social-icon {
+      width: 44px;
+      height: 44px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      background: rgba(255, 255, 255, 0.03);
+      border-radius: 8px;
+      color: var(--accent);
+      transition: transform 0.3s ease;
+    }
+
+    .social-item:hover .social-icon {
+      transform: scale(1.1);
+    }
+
+    .social-name {
+      font-size: 17px;
+      font-weight: 700;
+      color: #fff;
+    }
+
+    .social-handle {
+      font-size: 14px;
+      color: var(--muted);
+      margin-top: 4px;
+    }
+
+    .social-arrow {
+      color: var(--muted);
+      font-size: 20px;
+      transition: transform 0.3s ease, color 0.3s ease;
+    }
+
+    .social-item:hover .social-arrow {
+      color: var(--accent);
+      transform: translate(4px, -4px);
+    }
+
+    #contact {
+      text-align: center;
+      padding: 160px 24px;
+    }
+
+    .contact-title {
+      font-size: clamp(2rem, 5vw, 3rem);
+      font-weight: 700;
+      color: #fff;
+      margin-bottom: 24px;
+      letter-spacing: -0.02em;
+    }
+
+    .contact-desc {
+      color: var(--muted);
+      font-size: 17px;
+      margin-bottom: 48px;
+      max-width: 450px;
+      margin-left: auto;
+      margin-right: auto;
+      line-height: 1.8;
+    }
+
+    .licenses-list {
+      display: flex;
+      flex-direction: column;
+      gap: 16px;
+    }
+
+    .license-item {
+      background: rgba(17, 17, 17, 0.4);
+      border: 1px solid rgba(255, 255, 255, 0.03);
+      padding: 20px;
+      border-radius: 8px;
+    }
+
+    .license-name {
+      font-size: 16px;
+      font-weight: 700;
+      color: #fff;
+      margin-bottom: 4px;
+    }
+
+    .license-text {
+      font-size: 14px;
+      color: var(--muted);
+    }
+
+    footer {
+      text-align: center;
+      padding: 40px 24px;
+      color: var(--muted);
+      font-size: 14px;
+      border-top: 1px solid rgba(255, 255, 255, 0.05);
+      background: #000;
+    }
+
+    .fade-in {
+      opacity: 0;
+      transform: translateY(30px);
+      transition: opacity 0.8s cubic-bezier(0.25, 1, 0.5, 1), transform 0.8s cubic-bezier(0.25, 1, 0.5, 1);
+    }
+
+    .fade-in.visible {
+      opacity: 1;
+      transform: none;
+    }
+
+    @media (max-width: 768px) {
+      nav {
+        padding: 16px 24px;
       }
 
-      .desktop-icon {
-        width: 72px;
-        margin-bottom: 10px;
+      nav.scrolled {
+        padding: 16px 24px;
       }
 
-      .win-window {
-        position: relative !important;
-        top: 0 !important;
-        left: 0 !important;
-        width: calc(100% - 20px) !important;
-        margin: 10px;
-        box-sizing: border-box;
+      .nav-links {
+        display: none;
       }
 
-      .bsod {
-        padding: 20px;
-        font-size: 12px;
+      section {
+        padding: 80px 24px;
       }
     }
   </style>
@@ -423,406 +547,500 @@
 
 <body>
 
-  <div id="view-boot">
-    <div>Welcome to Louie's homepage...</div>
-    <br>
-    <div id="term-1" class="hidden">C:\> LOC: MELBOURNE_VIC_AU</div>
-    <div id="term-2" class="hidden">C:\> TIME: <span id="boot-time"></span></div>
-    <div id="term-root" class="hidden">C:\> Login as root</div>
-    <div id="term-3" class="hidden">Authorizing... Approved.</div>
-    <div id="term-4" class="hidden">Authorization approved. Loading Louie's 95...</div>
-    <div id="term-cursor" class="dos-cursor mt-2"></div>
+  <div id="canvas-container">
+    <canvas id="fluid-canvas"></canvas>
   </div>
 
-  <div id="view-main">
-    <div class="absolute top-4 left-4 z-10 flex flex-col">
-      <div class="desktop-icon" onclick="handleIconClick(this, 'win-profile')">
-        <img src="lib/po.webp" alt="Profile">
-        <span>Person INFO.exe</span>
+  <nav id="navbar">
+    <div class="magnetic-wrap">
+      <a href="#hero" class="nav-logo magnetic-inner">louie<span>.</span></a>
+    </div>
+    <ul class="nav-links">
+      <li class="magnetic-wrap"><a href="#about" class="magnetic-inner" data-i18n="nav-about">About</a></li>
+      <li class="magnetic-wrap"><a href="#projects" class="magnetic-inner" data-i18n="nav-projects">Projects</a></li>
+      <li class="magnetic-wrap"><a href="#social" class="magnetic-inner" data-i18n="nav-social">Social</a></li>
+      <li class="magnetic-wrap"><a href="#links" class="magnetic-inner" data-i18n="nav-links">Links</a></li>
+      <li class="magnetic-wrap"><a href="#system95" class="magnetic-inner" data-i18n="nav-system95">Louie's 95</a></li>
+      <li class="magnetic-wrap"><a href="#licenses" class="magnetic-inner" data-i18n="nav-licenses">Licenses</a></li>
+      <li>
+        <button class="lang-toggle" id="lang-toggle" onclick="toggleLang()">EN</button>
+      </li>
+    </ul>
+  </nav>
+
+  <section id="hero">
+    <div class="fade-in">
+      <div class="magnetic-wrap" style="display: block;">
+        <div class="magnetic-inner hero-content-wrapper" style="width: 100%;">
+          <p class="hero-greeting" data-i18n="hero-greeting"><span>01.</span> hello, world</p>
+          <h1 class="hero-name">Hi, I'm Louie.</h1>
+          <p class="hero-tagline" data-i18n="hero-tagline">游走在0与1的边界</p>
+        </div>
       </div>
-      <div class="desktop-icon" onclick="handleIconClick(this, 'win-social')">
-        <div class="icon-ph">SOC</div>
-        <span data-i18n="icon_social">Social media.exe</span>
-      </div>
-      <div class="desktop-icon" onclick="handleIconClick(this, 'win-project')">
-        <div class="icon-ph">PRJ</div>
-        <span data-i18n="icon_project">My project.exe</span>
-      </div>
-      <div class="desktop-icon" onclick="handleIconClick(this, 'win-friends')">
-        <div class="icon-ph" style="color:#008000;">LNK</div>
-        <span data-i18n="icon_friends">友情链接.exe</span>
-      </div>
-      <div class="desktop-icon" onclick="handleIconClick(this, 'win-settings')">
-        <div class="icon-ph" style="color:#000;">CFG</div>
-        <span>Control Panel</span>
-      </div>
-      <div class="desktop-icon" onclick="handleIconClick(this, 'win-terminal')">
-        <div class="icon-ph" style="background:#000; color:#0f0;">CMD</div>
-        <span>Terminal.exe</span>
-      </div>
-      <div class="desktop-icon" onclick="triggerBSOD()">
-        <div class="icon-ph" style="background:#0000aa; color:#fff;">SYS</div>
-        <span>Don't_Click.exe</span>
+      <div class="mt-4">
+        <a href="mailto:louieluyaotang@gmail.com" class="hero-email">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"></path>
+            <polyline points="22,6 12,13 2,6"></polyline>
+          </svg>
+          <span data-i18n="hero-email-btn">Email</span>
+        </a>
       </div>
     </div>
+    <div class="scroll-indicator fade-in">
+      <a href="#about" aria-label="Scroll down">
+        <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <line x1="12" y1="5" x2="12" y2="19"></line>
+          <polyline points="19 12 12 19 5 12"></polyline>
+        </svg>
+      </a>
+    </div>
+  </section>
 
-    <div id="win-profile" class="win-window" style="top: 30px; left: 100px;">
-      <div class="win-titlebar" onmousedown="startDrag(event, 'win-profile')">
-        <span><img src="lib/po.webp" class="inline w-3 h-3 mr-1" alt="icon">Person INFO.exe</span>
-        <button class="win-btn-close" onclick="closeWindow('win-profile')">X</button>
-      </div>
-      <div class="win-content" onmousedown="bringToFront('win-profile')">
-        <div class="flex gap-4">
-          <div class="win-inset w-24 h-24 flex-shrink-0 bg-[#008080] p-1">
-            <img src="lib/po.webp" alt="Avatar" class="w-full h-full object-cover" style="image-rendering: pixelated;">
+  <section id="about">
+    <div class="section-label"><span>02.</span> <span data-i18n="section-about">About</span></div>
+    <p class="about-text fade-in" data-i18n-html="about-text">
+      生于江城武汉，现旅居南半球的墨尔本。游走在0与1的边界<br><br>
+    </p>
+  </section>
+
+  <section id="projects">
+    <div class="section-label"><span>03.</span> <span data-i18n="section-projects">Projects</span></div>
+    <div class="projects-grid">
+      <div class="magnetic-wrap" style="display: block;">
+        <a href="https://jetlag.louie1.com" target="_blank" class="project-card magnetic-inner fade-in" style="width: 100%;">
+          <div class="project-card-header">
+            <span class="project-name">Jetlag Commander</span>
+            <span class="project-arrow">↗</span>
           </div>
-          <div class="text-sm space-y-1">
-            <div><strong>ID:</strong> Louie</div>
-            <div><strong>YOB:</strong> 2006</div>
-            <div><strong data-i18n="l_trait">TRAIT:</strong> <span data-i18n="v_trait">游戏，摆弄电子产品</span></div>
-            <div><strong>LOC:</strong> Melbourne, VIC, AU</div>
-            <div><strong data-i18n="l_edu">EDU:</strong> <span data-i18n="v_edu">墨尔本大学 (Unimelb)</span></div>
-            <div><strong data-i18n="l_major">MAJOR:</strong> <span data-i18n="v_major">计算机科学 (Class of 2025)</span>
+          <p class="project-desc" data-i18n="project-jetlag-desc">科学时差调节系统</p>
+          <div class="project-tags">
+            <span class="tag">Web</span>
+            <span class="tag">App</span>
+          </div>
+        </a>
+      </div>
+
+      <div class="magnetic-wrap" style="display: block;">
+        <a href="https://github.com/Cohenjikan/sync-station" target="_blank" class="project-card magnetic-inner fade-in" style="width: 100%;">
+          <div class="project-card-header">
+            <span class="project-name">Sync Station</span>
+            <span class="project-arrow">↗</span>
+          </div>
+          <p class="project-desc" data-i18n="project-sync-desc">私有跨设备同步工具，支持文本与文件的实时共享，基于 WebSocket 实现即时更新，提供双视图布局与 PIN 锁保护。</p>
+          <div class="project-tags">
+            <span class="tag">JavaScript</span>
+            <span class="tag">WebSocket</span>
+            <span class="tag">HTML</span>
+          </div>
+        </a>
+      </div>
+
+      <div class="magnetic-wrap" style="display: block;">
+        <a href="https://github.com/TH-Chen-CN/PrimerScore" target="_blank" class="project-card magnetic-inner fade-in" style="width: 100%;">
+          <div class="project-card-header">
+            <span class="project-name">PrimerScore Web</span>
+            <span class="project-arrow">↗</span>
+          </div>
+          <p class="project-desc" data-i18n="project-primer-desc">PCR 引物设计工具的网页化实现，支持 BLAST 校验与表达感知评分，提升了生信工具的交互体验与可访问性。</p>
+          <div class="project-tags">
+            <span class="tag">Python</span>
+            <span class="tag">Bioinformatics</span>
+            <span class="tag">BLAST</span>
+            <span class="tag">Web</span>
+          </div>
+        </a>
+      </div>
+    </div>
+  </section>
+
+  <section id="social">
+    <div class="section-label"><span>04.</span> <span data-i18n="section-social">Social</span></div>
+    <div class="social-list">
+      
+      <div class="magnetic-wrap">
+        <a href="https://github.com/mrtangluyao/" target="_blank" class="social-item magnetic-inner fade-in" style="width: 100%;">
+          <div class="social-item-left">
+            <div class="social-icon">
+              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <path d="M9 19c-5 1.5-5-2.5-7-3m14 6v-3.87a3.37 3.37 0 0 0-.94-2.61c3.14-.35 6.44-1.54 6.44-7A5.44 5.44 0 0 0 20 4.77 5.07 5.07 0 0 0 19.91 1S18.73.65 16 2.48a13.38 13.38 0 0 0-7 0C6.27.65 5.09 1 5.09 1A5.07 5.07 0 0 0 5 4.77a5.44 5.44 0 0 0-1.5 3.78c0 5.42 3.3 6.61 6.44 7A3.37 3.37 0 0 0 9 18.13V22"></path>
+              </svg>
+            </div>
+            <div>
+              <div class="social-name">GitHub</div>
+              <div class="social-handle">@mrtangluyao</div>
             </div>
           </div>
-        </div>
-        <div class="mt-4 win-inset bg-white">
-          <div class="font-bold border-b border-[#c0c0c0] mb-2 pb-1" data-i18n="t_about">ABOUT_ME</div>
-          <p class="leading-relaxed text-xs" data-i18n="v_about">
-            生于江城武汉，现旅居南半球的墨尔本。游走在0与1的边界，探寻计算机科学的微观宇宙。指尖正尝试用C语言雕刻底层逻辑的轮廓，目光长久停留在科技变迁的潮汐中。</p>
-        </div>
+          <span class="social-arrow">↗</span>
+        </a>
       </div>
-    </div>
 
-    <div id="win-social" class="win-window" style="top: 400px; left: 100px;">
-      <div class="win-titlebar" onmousedown="startDrag(event, 'win-social')">
-        <span data-i18n="icon_social">Social media.exe</span>
-        <button class="win-btn-close" onclick="closeWindow('win-social')">X</button>
-      </div>
-      <div class="win-content space-y-4" onmousedown="bringToFront('win-social')">
-        <div class="win-inset">
-          <div class="font-bold text-[#000080] mb-1">Personal Profiles</div>
-          <div class="text-xs mb-2" data-i18n="p_2_desc">社交媒体与代码库</div>
-          <div class="flex flex-wrap gap-2">
-            <a href="https://github.com/mrtangluyao/" target="_blank" class="win-button">GitHub</a>
-            <a href="https://www.linkedin.com/in/luyao-tang-b8b6353b5" target="_blank" class="win-button">LinkedIn</a>
-            <a href="https://space.bilibili.com/501015028" target="_blank" class="win-button"
-              data-i18n="p_bili">哔哩哔哩</a>
-            <a href="https://xhslink.com/m/7yaJ9ssWxsW" target="_blank" class="win-button" data-i18n="p_rednote">小红书</a>
+      <div class="magnetic-wrap">
+        <a href="https://www.linkedin.com/in/luyao-tang-b8b6353b5" target="_blank" class="social-item magnetic-inner fade-in" style="width: 100%;">
+          <div class="social-item-left">
+            <div class="social-icon">
+              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <path d="M16 8a6 6 0 0 1 6 6v7h-4v-7a2 2 0 0 0-2-2 2 2 0 0 0-2 2v7h-4v-7a6 6 0 0 1 6-6z"></path><rect x="2" y="9" width="4" height="12"></rect><circle cx="4" cy="4" r="2"></circle>
+              </svg>
+            </div>
+            <div>
+              <div class="social-name">LinkedIn</div>
+              <div class="social-handle">Luyao Tang</div>
+            </div>
           </div>
-        </div>
+          <span class="social-arrow">↗</span>
+        </a>
       </div>
-    </div>
 
-    <div id="win-project" class="win-window" style="top: 30px; left: 540px;">
-      <div class="win-titlebar" onmousedown="startDrag(event, 'win-project')">
-        <span data-i18n="icon_project">My project.exe</span>
-        <button class="win-btn-close" onclick="closeWindow('win-project')">X</button>
-      </div>
-      <div class="win-content space-y-4" onmousedown="bringToFront('win-project')">
-        <div class="win-inset">
-          <div class="font-bold text-[#000080] mb-1">Jetlag_Commander</div>
-          <div class="text-xs mb-2" data-i18n="p_1_desc">科学时差调节系统 / 跨国生物钟覆写协议</div>
-          <a href="https://jetlag.louie1.com" target="_blank" class="win-button">Visit!</a>
-          <a href="https://github.com/mrtangluyao/Jetlag_Commander" target="_blank" class="win-button">GitHub Repo</a>
-        </div>
-        <div class="win-inset">
-          <div class="font-bold text-[#000080] mb-1">Sync Station</div>
-          <div class="text-xs mb-2" data-i18n="p_sync_desc">私有跨设备同步工具，支持文本与文件的实时共享，基于 WebSocket 实现即时更新，提供双视图布局与 PIN 锁保护。
+      <div class="magnetic-wrap">
+        <a href="https://space.bilibili.com/501015028" target="_blank" class="social-item magnetic-inner fade-in" style="width: 100%;">
+          <div class="social-item-left">
+            <div class="social-icon">
+              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <rect x="2" y="7" width="20" height="15" rx="2" ry="2"></rect><polyline points="17 2 12 7 7 2"></polyline>
+              </svg>
+            </div>
+            <div>
+              <div class="social-name">Bilibili</div>
+              <div class="social-handle">@古怪的路易</div>
+            </div>
           </div>
-          <a href="https://github.com/Cohenjikan/sync-station" target="_blank" class="win-button">GitHub Repo</a>
-        </div>
+          <span class="social-arrow">↗</span>
+        </a>
+      </div>
+      
+      <div class="magnetic-wrap">
+        <a href="https://xhslink.com/m/7yaJ9ssWxsW" target="_blank" class="social-item magnetic-inner fade-in" style="width: 100%;">
+          <div class="social-item-left">
+            <div class="social-icon">
+              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"></path><path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"></path>
+              </svg>
+            </div>
+            <div>
+              <div class="social-name">小红书</div>
+              <div class="social-handle">@古怪的路易</div>
+            </div>
+          </div>
+          <span class="social-arrow">↗</span>
+        </a>
+      </div>
+
+    </div>
+  </section>
+
+  <section id="links">
+    <div class="section-label"><span>05.</span> <span data-i18n="section-links">Friend Links</span></div>
+    <div class="social-list">
+      
+      <div class="magnetic-wrap">
+        <a href="https://blog.louie1.com" target="_blank" class="social-item magnetic-inner fade-in" style="width: 100%;">
+          <div class="social-item-left">
+            <div class="social-icon">
+              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"></path>
+                <path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"></path>
+              </svg>
+            </div>
+            <div>
+              <div class="social-name" data-i18n="links-blog-name">古怪的路易博客</div>
+              <div class="social-handle">blog.louie1.com</div>
+            </div>
+          </div>
+          <span class="social-arrow">↗</span>
+        </a>
+      </div>
+
+      <div class="magnetic-wrap">
+        <a href="https://cohenjikan.com" target="_blank" class="social-item magnetic-inner fade-in" style="width: 100%;">
+          <div class="social-item-left">
+            <div class="social-icon">
+              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"></path>
+                <path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"></path>
+              </svg>
+            </div>
+            <div>
+              <div class="social-name" data-i18n="links-cohen-name">Cohenjikan 的主页</div>
+              <div class="social-handle">cohenjikan.com</div>
+            </div>
+          </div>
+          <span class="social-arrow">↗</span>
+        </a>
+      </div>
+
+    </div>
+  </section>
+
+  <section id="system95">
+    <div class="section-label"><span>06.</span> <span data-i18n="section-system95">Louie's 95</span></div>
+    <div class="projects-grid">
+      <div class="magnetic-wrap" style="display: block;">
+        <a href="https://louie1.com/95.html" target="_blank" class="project-card magnetic-inner fade-in" style="width: 100%;">
+          <div class="project-card-header">
+            <span class="project-name flex items-center gap-3">
+              <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <polyline points="4 17 10 11 4 5"></polyline>
+                <line x1="12" y1="19" x2="20" y2="19"></line>
+              </svg>
+              <span data-i18n="system95-title">进入 Louie's 95</span>
+            </span>
+            <span class="project-arrow">↗</span>
+          </div>
+          <p class="project-desc" data-i18n="system95-desc">What is that?</p>
+        </a>
       </div>
     </div>
+  </section>
 
-    <div id="win-friends" class="win-window" style="top: 380px; left: 540px;">
-      <div class="win-titlebar" onmousedown="startDrag(event, 'win-friends')">
-        <span data-i18n="icon_friends">友情链接.exe</span>
-        <button class="win-btn-close" onclick="closeWindow('win-friends')">X</button>
+  <section id="licenses">
+    <div class="section-label"><span>07.</span> <span data-i18n="section-licenses">OPEN SOURCE LICENSES</span></div>
+    <div class="licenses-list fade-in">
+      <div class="license-item">
+        <div class="license-name">Tailwind CSS</div>
+        <div class="license-text">MIT License | Copyright (c) Tailwind Labs, Inc.</div>
       </div>
-      <div class="win-content space-y-4" onmousedown="bringToFront('win-friends')">
-        <div class="win-inset">
-          <div class="font-bold text-[#000080] mb-1" data-i18n="title_blog">古怪的路易博客</div>
-          <div class="text-xs mb-2" data-i18n="p_blog_desc">记录技术、生活与杂谈的个人自留地。</div>
-          <a href="https://blog.louie1.com" target="_blank" class="win-button">Visit!</a>
-        </div>
-        <div class="win-inset">
-          <div class="font-bold text-[#000080] mb-1">Cohenjikan 的主页</div>
-          <div class="text-xs mb-2">View Cohen's Homepage</div>
-          <a href="https://cohenjikan.com" target="_blank" class="win-button">Visit!</a>
-        </div>
+      <div class="license-item">
+        <div class="license-name">Luxon.js</div>
+        <div class="license-text">MIT License | Copyright (c) 2017 Isaac Cambron</div>
+      </div>
+      <div class="license-item">
+        <div class="license-name">JetBrains Mono</div>
+        <div class="license-text">SIL Open Font License 1.1 | Copyright (c) 2020 JetBrains s.r.o.</div>
+      </div>
+      <div class="license-item">
+        <div class="license-name">HarmonyOS Sans</div>
+        <div class="license-text">Copyright (c) Huawei Device Co., Ltd.</div>
       </div>
     </div>
+  </section>
 
-    <div id="win-settings" class="win-window" style="top: 130px; left: 910px;">
-      <div class="win-titlebar" onmousedown="startDrag(event, 'win-settings')">
-        <span>Control Panel</span>
-        <button class="win-btn-close" onclick="closeWindow('win-settings')">X</button>
-      </div>
-      <div class="win-content flex flex-col gap-2 text-center" onmousedown="bringToFront('win-settings')">
-        <button id="langBtn" onclick="toggleLanguage()" class="win-button w-full">EN / 中</button>
-        <div class="win-inset text-xs text-left mt-2">
-          <strong>System Status:</strong><br>
-          Memory: 64MB RAM OK<br>
-          <hr class="my-1 border-[#808080]">
-          <strong>Licenses:</strong><br>
-          Tailwind CSS (MIT)<br>
-          Luxon.js (MIT)<br>
-          JetBrains Mono (OFL)
-        </div>
-      </div>
-    </div>
+  <section id="contact">
+    <h2 class="contact-title fade-in">What's Next?</h2>
+    <p class="contact-desc fade-in" data-i18n="contact-desc">我的收件箱始终敞开。无论是有项目合作、技术交流，还是简单地打个招呼，我都会尽量回复。</p>
+  </section>
 
-    <div id="win-terminal" class="win-window" style="top: 100px; left: 300px;">
-      <div class="win-titlebar" onmousedown="startDrag(event, 'win-terminal')">
-        <span>Terminal.exe - SYSTEM OVERRIDE</span>
-        <button class="win-btn-close" onclick="closeWindow('win-terminal')">X</button>
-      </div>
-      <div class="win-content p-0" onmousedown="bringToFront('win-terminal')">
-        <div class="terminal-bg win-inset" id="terminal-output">
-          <span class="dos-cursor"></span>
-        </div>
-      </div>
-    </div>
+  <footer>
+    <span id="footer-year"></span> Louie &mdash; <span data-i18n="footer-built">本地 ♥ 构建</span>
+  </footer>
 
-  </div>
-
-  <div id="start-menu" class="start-menu">
-    <div class="start-menu-sidebar">Louie's 95</div>
-    <div class="start-menu-items">
-      <div class="start-menu-item" onclick="openWindow('win-profile'); toggleStartMenu()">
-        <span class="font-bold">P</span>erson INFO
-      </div>
-      <div class="start-menu-item" onclick="openWindow('win-social'); toggleStartMenu()">
-        <span class="font-bold">S</span>ocial media
-      </div>
-      <div class="start-menu-item" onclick="openWindow('win-project'); toggleStartMenu()">
-        <span class="font-bold">M</span>y project
-      </div>
-      <div class="start-menu-item" onclick="openWindow('win-friends'); toggleStartMenu()">
-        <span class="font-bold">F</span>riends
-      </div>
-      <div class="start-menu-item" onclick="openWindow('win-settings'); toggleStartMenu()">
-        <span class="font-bold">C</span>ontrol Panel
-      </div>
-      <div class="start-divider"></div>
-      <div class="start-menu-item" onclick="openWindow('win-terminal'); toggleStartMenu()">
-        <span class="font-bold">T</span>erminal
-      </div>
-      <div class="start-menu-item" onclick="location.reload()">
-        <span class="font-bold">R</span>eboot System
-      </div>
-    </div>
-  </div>
-
-  <div id="taskbar" class="taskbar hidden">
-    <button id="btn-start" class="win-button start-btn" style="margin-top:0;" onclick="toggleStartMenu()">
-      <span class="text-[#000080] font-black text-lg leading-none" style="margin-right:2px;">L</span> Start
-    </button>
-    <div class="win-inset taskbar-clock" style="margin-top:0; background:#c0c0c0;">
-      <span id="win-time">00:00 AM</span>
-    </div>
-  </div>
-
-  <div id="bsod" class="bsod">
-    <p>A fatal exception 0E has occurred at 0028:C0011E36 in VXD VMM(01) + 00010E36.</p>
-    <p>The current application will be terminated.</p>
-    <p>* Press any key to terminate the current application.</p>
-    <p>* Press CTRL+ALT+DEL again to restart your computer. You will lose any unsaved information in all applications.
-    </p>
-    <br>
-    <p>System override triggered by Don't_Click.exe.</p>
-    <p>Press anywhere to bypass.</p>
-  </div>
-
+  <script src="lib/luxon.min.js"></script>
   <script>
-    const DateTime = luxon.DateTime;
-    let currentLang = 'zh';
-    let zIndexCounter = 100;
-    let isDragging = false, dragTarget = null, offsetX = 0, offsetY = 0, terminalRan = false;
-
     const translations = {
       zh: {
-        l_trait: "爱好:", v_trait: "游戏，摆弄电子产品",
-        l_edu: "教育:", v_edu: "墨尔本大学",
-        l_major: "专业:", v_major: "计算机科学",
-        t_about: "ABOUT_ME",
-        v_about: "生于江城武汉，现旅居南半球的墨尔本。游走在0与1的边界，探寻计算机科学的微观宇宙。指尖正尝试用C语言雕刻底层逻辑的轮廓，目光长久停留在科技变迁的潮汐中。",
-        p_1_desc: "科学时差调节系统",
-        p_2_desc: "社交媒体与代码库",
-        p_bili: "哔哩哔哩",
-        p_rednote: "小红书",
-        icon_project: "My project.exe",
-        icon_social: "Social media.exe",
-        icon_friends: "友情链接.exe",
-        title_blog: "古怪的路易博客",
-        p_blog_desc: "记录技术、生活与杂谈的个人自留地。",
-        p_sync_desc: "私有跨设备同步工具，支持文本与文件的实时共享，基于 WebSocket 实现即时更新，提供双视图布局与 PIN 锁保护。"
+        'nav-about': 'About',
+        'nav-projects': 'Projects',
+        'nav-social': 'Social',
+        'nav-links': 'Links',
+        'nav-system95': 'Louie\'s 95',
+        'nav-licenses': 'Licenses',
+        'nav-contact': 'Contact',
+        'hero-greeting': '<span>01.</span> hello, world',
+        'hero-tagline': '游走在0与1的边界',
+        'hero-email-btn': 'Email',
+        'section-about': 'About',
+        'section-projects': 'Projects',
+        'section-social': 'Social',
+        'section-links': 'Friend Links',
+        'section-system95': 'Louie\'s 95',
+        'section-licenses': 'OPEN SOURCE LICENSES',
+        'about-text': '生于江城武汉，现旅居南半球的墨尔本。游走在0与1的边界<br><br>',
+        'project-jetlag-desc': '科学时差调节系统',
+        'project-sync-desc': '私有跨设备同步工具，支持文本与文件的实时共享，基于 WebSocket 实现即时更新，提供双视图布局与 PIN 锁保护。',
+        'project-primer-desc': 'PCR 引物设计工具的网页化实现，支持 BLAST 校验与表达感知评分，提升了生信工具的交互体验与可访问性。',
+        'links-blog-name': '古怪的路易博客',
+        'links-cohen-name': 'Cohenjikan 的主页',
+        'system95-title': '进入 Louie\'s 95',
+        'system95-desc': 'What is that?',
+        'contact-desc': '我的收件箱始终敞开。无论是有项目合作、技术交流，还是简单地打个招呼，我都会尽量回复。',
+        'footer-built': '本地 ♥ 构建',
       },
       en: {
-        l_trait: "CLASS:", v_trait: "Gaming, Electronics Enthusiast",
-        l_edu: "AFFIL:", v_edu: "University of Melbourne",
-        l_major: "MAJOR:", v_major: "Computer Science",
-        t_about: "ABOUT_ME",
-        v_about: "Born in Wuhan, currently residing in Melbourne. Navigating the boundary between 0 and 1, exploring the microcosm of computer science. Carving the outlines of low-level logic with C, while keeping a long-term gaze on the tides of technological evolution.",
-        p_1_desc: "Circadian Rhythm Override Protocol / Scientific Jetlag Adjustment",
-        p_2_desc: "Social Media & Repositories",
-        p_bili: "Bilibili",
-        p_rednote: "Rednote",
-        icon_project: "My project.exe",
-        icon_social: "Social media.exe",
-        icon_friends: "Friend Links.exe",
-        title_blog: "Strange Louie's blog",
-        p_blog_desc: "A personal space for technology, life, and thoughts.",
-        p_sync_desc: "Private cross-device synchronization tool. Real-time text/file sharing via WebSocket. Features dual-view layout and PIN lock."
+        'nav-about': 'About',
+        'nav-projects': 'Projects',
+        'nav-social': 'Social',
+        'nav-links': 'Links',
+        'nav-system95': 'Louie\'s 95',
+        'nav-licenses': 'Licenses',
+        'nav-contact': 'Contact',
+        'hero-greeting': '<span>01.</span> hello, world',
+        'hero-tagline': 'Navigating the boundary between 0 and 1, exploring the microcosm of computer science.',
+        'hero-email-btn': 'Email',
+        'section-about': 'About',
+        'section-projects': 'Projects',
+        'section-social': 'Social',
+        'section-links': 'Friend Links',
+        'section-system95': 'Louie\'s 95',
+        'section-licenses': 'OPEN SOURCE LICENSES',
+        'about-text': 'Born in Wuhan, currently residing in Melbourne. Navigating the boundary between 0 and 1, exploring the microcosm of computer science.<br><br>',
+        'project-jetlag-desc': 'Circadian Rhythm Override Protocol / Scientific Jetlag Adjustment.',
+        'project-sync-desc': 'Private cross-device synchronization tool. Real-time text/file sharing via WebSocket. Features dual-view layout and PIN lock.',
+        'project-primer-desc': 'A web-based implementation of a PCR primer design tool with BLAST validation and expression-aware scoring.',
+        'links-blog-name': "Strange Louie's blog",
+        'links-cohen-name': "Cohen's Homepage",
+        'system95-title': 'Enter Louie\'s 95',
+        'system95-desc': 'What is that?',
+        'contact-desc': "My inbox is always open. Whether it's a collaboration proposal, a tech chat, or just a hello — I'll do my best to reply.",
+        'footer-built': 'Built with ♥ locally',
       }
     };
 
-    function toggleLanguage() {
-      currentLang = currentLang === 'zh' ? 'en' : 'zh';
-      applyLanguage();
-    }
+    let currentLang = 'zh';
 
-    function applyLanguage() {
-      const t = translations[currentLang];
+    function applyLang(lang) {
+      const t = translations[lang];
       document.querySelectorAll('[data-i18n]').forEach(el => {
         const key = el.getAttribute('data-i18n');
-        if (t[key]) el.innerHTML = t[key];
+        if (t[key] !== undefined) {
+          el.innerHTML = t[key];
+        }
       });
-      document.getElementById('langBtn').innerText = currentLang === 'zh' ? 'EN / 中' : '中 / EN';
+      document.querySelectorAll('[data-i18n-html]').forEach(el => {
+        const key = el.getAttribute('data-i18n-html');
+        if (t[key] !== undefined) {
+          el.innerHTML = t[key];
+        }
+      });
+      document.getElementById('lang-toggle').textContent = lang === 'zh' ? 'EN' : '中';
+      document.documentElement.lang = lang === 'zh' ? 'zh-CN' : 'en';
     }
 
-    function updateClock() {
-      document.getElementById('win-time').innerText = DateTime.now().setZone('Australia/Melbourne').toFormat('hh:mm a');
+    function toggleLang() {
+      currentLang = currentLang === 'zh' ? 'en' : 'zh';
+      applyLang(currentLang);
     }
 
-    function toggleStartMenu() {
-      const menu = document.getElementById('start-menu');
-      const btn = document.getElementById('btn-start');
-      const isHidden = menu.style.display === 'none' || menu.style.display === '';
-      menu.style.display = isHidden ? 'block' : 'none';
-      btn.classList.toggle('active', isHidden);
-      if (isHidden) bringToFront('start-menu');
-    }
+    document.getElementById('footer-year').textContent = '© ' + luxon.DateTime.now().year;
 
-    function handleIconClick(element, winId) {
-      element.classList.add('clicked-effect');
-      setTimeout(() => {
-        element.classList.remove('clicked-effect');
-        openWindow(winId);
-      }, 300);
-    }
-
-    function openWindow(id) {
-      const win = document.getElementById(id);
-      if (!win) return;
-      win.style.display = 'block';
-      bringToFront(id);
-      if (window.innerWidth < 768) win.scrollIntoView({ behavior: 'smooth', block: 'start' });
-      if (id === 'win-terminal' && !terminalRan) {
-        runTerminalScript();
-        terminalRan = true;
-      }
-    }
-
-    function closeWindow(id) { document.getElementById(id).style.display = 'none'; }
-
-    function bringToFront(id) {
-      const targetWin = document.getElementById(id);
-      if (!targetWin) return;
-      targetWin.style.zIndex = ++zIndexCounter;
-      document.querySelectorAll('.win-titlebar').forEach(tb => tb.classList.add('inactive'));
-      const tb = targetWin.querySelector('.win-titlebar');
-      if (tb) tb.classList.remove('inactive');
-    }
-
-    function startDrag(e, id) {
-      if (window.innerWidth < 768 || e.target.tagName.toLowerCase() === 'button') return;
-      isDragging = true;
-      dragTarget = document.getElementById(id);
-      bringToFront(id);
-      const rect = dragTarget.getBoundingClientRect();
-      const clientX = e.type.includes('mouse') ? e.clientX : e.touches[0].clientX;
-      const clientY = e.type.includes('mouse') ? e.clientY : e.touches[0].clientY;
-      offsetX = clientX - rect.left;
-      offsetY = clientY - rect.top;
-      e.preventDefault();
-    }
-
-    function doDrag(e) {
-      if (!isDragging || !dragTarget || window.innerWidth < 768) return;
-      const clientX = e.type.includes('mouse') ? e.clientX : e.touches[0].clientX;
-      const clientY = e.type.includes('mouse') ? e.clientY : e.touches[0].clientY;
-      dragTarget.style.left = (clientX - offsetX) + 'px';
-      dragTarget.style.top = (clientY - offsetY) + 'px';
-    }
-
-    function stopDrag() { isDragging = false; dragTarget = null; }
-
-    document.addEventListener('mousemove', doDrag);
-    document.addEventListener('mouseup', stopDrag);
-    document.addEventListener('touchmove', doDrag, { passive: false });
-    document.addEventListener('touchend', stopDrag);
-
-    document.addEventListener('click', e => {
-      const menu = document.getElementById('start-menu');
-      const btn = document.getElementById('btn-start');
-      if (menu.style.display === 'block' && !menu.contains(e.target) && !btn.contains(e.target)) {
-        menu.style.display = 'none';
-        btn.classList.remove('active');
-      }
+    window.addEventListener('scroll', () => {
+      document.getElementById('navbar').classList.toggle('scrolled', window.scrollY > 50);
     });
 
-    function triggerBSOD() { document.getElementById('bsod').style.display = 'block'; }
-    document.getElementById('bsod').addEventListener('click', function () { this.style.display = 'none'; });
+    const observer = new IntersectionObserver((entries) => {
+      entries.forEach(entry => {
+        if (entry.isIntersecting) {
+          entry.target.classList.add('visible');
+        }
+      });
+    }, { threshold: 0.1 });
 
-    function runTerminalScript() {
-      const term = document.getElementById('terminal-output');
-      const lines = [
-        "Connecting to local host...", "Verifying system integrity...", "Accessing local node.",
-        "System initialization sequence triggered.", "WARNING: Unauthorized inspection of source code detected.",
-        "> System Message: Who is there?", "> Logging incident...", "Connection closed. Terminal terminated."
-      ];
-      term.innerHTML = '';
-      let lineIdx = 0;
-      function typeLine() {
-        if (lineIdx >= lines.length) return term.innerHTML += '<span class="dos-cursor"></span>';
-        const lineText = lines[lineIdx], p = document.createElement('div');
-        term.appendChild(p);
-        let charIdx = 0;
-        const typeChar = setInterval(() => {
-          p.textContent += lineText[charIdx++];
-          term.scrollTop = term.scrollHeight;
-          if (charIdx >= lineText.length) {
-            clearInterval(typeChar);
-            lineIdx++;
-            setTimeout(typeLine, 500);
-          }
-        }, 30);
+    document.querySelectorAll('.fade-in').forEach(el => observer.observe(el));
+
+    const magneticElements = document.querySelectorAll('.magnetic-wrap');
+    magneticElements.forEach((el) => {
+      const inner = el.querySelector('.magnetic-inner');
+      el.addEventListener('mousemove', (e) => {
+        const rect = el.getBoundingClientRect();
+        const centerX = rect.left + rect.width / 2;
+        const centerY = rect.top + rect.height / 2;
+        const distX = e.clientX - centerX;
+        const distY = e.clientY - centerY;
+        const magneticStrength = 0.3;
+        inner.style.transform = `translate(${distX * magneticStrength}px, ${distY * magneticStrength}px)`;
+      });
+      el.addEventListener('mouseleave', () => {
+        inner.style.transform = 'translate(0px, 0px)';
+      });
+    });
+
+    const canvas = document.getElementById('fluid-canvas');
+    const ctx = canvas.getContext('2d');
+    let width, height;
+
+    let particles = [];
+    let mouse = { x: -1000, y: -1000 };
+
+    function resize() {
+      width = canvas.width = window.innerWidth;
+      height = canvas.height = window.innerHeight;
+      initParticles();
+    }
+    window.addEventListener('resize', resize);
+
+    window.addEventListener('mousemove', (e) => {
+      mouse.x = e.clientX;
+      mouse.y = e.clientY;
+    });
+
+    window.addEventListener('mouseleave', () => {
+      mouse.x = -1000;
+      mouse.y = -1000;
+    });
+
+    function initParticles() {
+      particles = [];
+      const numParticles = Math.floor((width * height) / 10000);
+      for (let i = 0; i < numParticles; i++) {
+        particles.push({
+          baseX: Math.random() * width,
+          baseY: Math.random() * height,
+          x: Math.random() * width,
+          y: Math.random() * height,
+          vx: (Math.random() - 0.5) * 0.3,
+          vy: (Math.random() - 0.5) * 0.3,
+          size: Math.random() * 1.5 + 0.5
+        });
       }
-      typeLine();
     }
 
-    function runBootSequence() {
-      const els = ['term-1', 'term-2', 'term-root', 'term-3', 'term-4'].map(id => document.getElementById(id));
-      document.getElementById('boot-time').innerText = DateTime.now().setZone('Australia/Melbourne').toFormat('yyyy-MM-dd HH:mm:ss') + ' AEDT';
+    function animate() {
+      ctx.clearRect(0, 0, width, height);
+      ctx.fillStyle = 'rgba(217, 140, 112, 0.5)';
+      ctx.strokeStyle = 'rgba(217, 140, 112, 0.15)';
+      ctx.lineWidth = 1;
 
-      els.forEach((el, i) => setTimeout(() => el.classList.remove('hidden'), 250 * (i + 1)));
+      for (let i = 0; i < particles.length; i++) {
+        let p = particles[i];
 
-      setTimeout(() => {
-        document.getElementById('view-boot').style.display = 'none';
-        document.getElementById('view-main').style.display = 'block';
-        document.getElementById('taskbar').classList.remove('hidden');
-        setInterval(updateClock, 1000);
-        updateClock();
-        ['win-profile', 'win-social', 'win-project', 'win-friends', 'win-settings'].forEach(openWindow);
-      }, 1500);
+        p.baseX += p.vx;
+        p.baseY += p.vy;
+
+        if (p.baseX < 0 || p.baseX > width) p.vx *= -1;
+        if (p.baseY < 0 || p.baseY > height) p.vy *= -1;
+
+        let targetX = p.baseX;
+        let targetY = p.baseY;
+
+        let dx = mouse.x - p.baseX;
+        let dy = mouse.y - p.baseY;
+        let dist = Math.sqrt(dx * dx + dy * dy);
+        let maxDist = 300;
+
+        if (dist < maxDist) {
+          let force = (maxDist - dist) / maxDist;
+          targetX += dx * force * 0.6;
+          targetY += dy * force * 0.6;
+        }
+
+        p.x += (targetX - p.x) * 0.1;
+        p.y += (targetY - p.y) * 0.1;
+
+        ctx.beginPath();
+        ctx.arc(p.x, p.y, p.size, 0, Math.PI * 2);
+        ctx.fill();
+      }
+
+      for (let i = 0; i < particles.length; i++) {
+        for (let j = i + 1; j < particles.length; j++) {
+          let p1 = particles[i];
+          let p2 = particles[j];
+          let dx = p1.x - p2.x;
+          let dy = p1.y - p2.y;
+          let dist = Math.sqrt(dx * dx + dy * dy);
+
+          if (dist < 100) {
+            ctx.beginPath();
+            ctx.moveTo(p1.x, p1.y);
+            ctx.lineTo(p2.x, p2.y);
+            ctx.stroke();
+          }
+        }
+      }
+      requestAnimationFrame(animate);
     }
 
-    currentLang = (navigator.language || navigator.userLanguage).toLowerCase().startsWith('zh') ? 'zh' : 'en';
-    applyLanguage();
-    runBootSequence();
+    resize();
+    animate();
   </script>
 </body>
-
 </html>
