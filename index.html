@@ -29,6 +29,7 @@
     html {
       scroll-behavior: smooth;
       background-color: var(--bg);
+      overscroll-behavior: none;
     }
 
     body {
@@ -41,6 +42,13 @@
       -moz-osx-font-smoothing: grayscale;
       text-rendering: optimizeLegibility;
       overflow-x: hidden;
+      overscroll-behavior: none;
+      -webkit-user-select: none;
+      user-select: none;
+    }
+
+    img, a {
+      -webkit-user-drag: none;
     }
 
     ::-webkit-scrollbar {
@@ -572,7 +580,7 @@
     <div class="fade-in">
       <div class="magnetic-wrap" style="display: block;">
         <div class="magnetic-inner hero-content-wrapper" style="width: 100%;">
-          <p class="hero-greeting" data-i18n="hero-greeting"><span>01.</span> hello, world</p>
+          <p class="hero-greeting" data-i18n="hero-greeting">hello, world</p>
           <h1 class="hero-name">Hi, I'm Louie.</h1>
           <p class="hero-tagline" data-i18n="hero-tagline">游走在0与1的边界</p>
         </div>
@@ -598,14 +606,14 @@
   </section>
 
   <section id="about">
-    <div class="section-label"><span>02.</span> <span data-i18n="section-about">About</span></div>
+    <div class="section-label"><span>01.</span> <span data-i18n="section-about">About</span></div>
     <p class="about-text fade-in" data-i18n-html="about-text">
       生于江城武汉，现旅居南半球的墨尔本。游走在0与1的边界<br><br>
     </p>
   </section>
 
   <section id="projects">
-    <div class="section-label"><span>03.</span> <span data-i18n="section-projects">Projects</span></div>
+    <div class="section-label"><span>02.</span> <span data-i18n="section-projects">Projects</span></div>
     <div class="projects-grid">
       <div class="magnetic-wrap" style="display: block;">
         <a href="https://jetlag.louie1.com" target="_blank" class="project-card magnetic-inner fade-in" style="width: 100%;">
@@ -655,7 +663,7 @@
   </section>
 
   <section id="social">
-    <div class="section-label"><span>04.</span> <span data-i18n="section-social">Social</span></div>
+    <div class="section-label"><span>03.</span> <span data-i18n="section-social">Social</span></div>
     <div class="social-list">
       
       <div class="magnetic-wrap">
@@ -730,7 +738,7 @@
   </section>
 
   <section id="links">
-    <div class="section-label"><span>05.</span> <span data-i18n="section-links">Friend Links</span></div>
+    <div class="section-label"><span>04.</span> <span data-i18n="section-links">Friend Links</span></div>
     <div class="social-list">
       
       <div class="magnetic-wrap">
@@ -773,7 +781,7 @@
   </section>
 
   <section id="system95">
-    <div class="section-label"><span>06.</span> <span data-i18n="section-system95">Louie's 95</span></div>
+    <div class="section-label"><span>05.</span> <span data-i18n="section-system95">Louie's 95</span></div>
     <div class="projects-grid">
       <div class="magnetic-wrap" style="display: block;">
         <a href="https://louie1.com/95.html" target="_blank" class="project-card magnetic-inner fade-in" style="width: 100%;">
@@ -794,7 +802,7 @@
   </section>
 
   <section id="licenses">
-    <div class="section-label"><span>07.</span> <span data-i18n="section-licenses">OPEN SOURCE LICENSES</span></div>
+    <div class="section-label"><span>06.</span> <span data-i18n="section-licenses">OPEN SOURCE LICENSES</span></div>
     <div class="licenses-list fade-in">
       <div class="license-item">
         <div class="license-name">Tailwind CSS</div>
@@ -835,7 +843,7 @@
         'nav-system95': 'Louie\'s 95',
         'nav-licenses': 'Licenses',
         'nav-contact': 'Contact',
-        'hero-greeting': '<span>01.</span> hello, world',
+        'hero-greeting': 'hello, world',
         'hero-tagline': '游走在0与1的边界',
         'hero-email-btn': 'Email',
         'section-about': 'About',
@@ -863,7 +871,7 @@
         'nav-system95': 'Louie\'s 95',
         'nav-licenses': 'Licenses',
         'nav-contact': 'Contact',
-        'hero-greeting': '<span>01.</span> hello, world',
+        'hero-greeting': 'hello, world',
         'hero-tagline': 'Navigating the boundary between 0 and 1, exploring the microcosm of computer science.',
         'hero-email-btn': 'Email',
         'section-about': 'About',
@@ -933,8 +941,11 @@
     document.querySelectorAll('.fade-in').forEach(el => observer.observe(el));
 
     let isMobile = window.innerWidth <= 768 || window.matchMedia("(any-pointer: coarse)").matches;
+    let lastWidth = window.innerWidth;
+
     window.addEventListener('resize', () => {
       isMobile = window.innerWidth <= 768 || window.matchMedia("(any-pointer: coarse)").matches;
+      resize();
     });
 
     const magneticElements = document.querySelectorAll('.magnetic-wrap');
@@ -966,9 +977,11 @@
     function resize() {
       width = canvas.width = window.innerWidth;
       height = canvas.height = window.innerHeight;
-      initParticles();
+      if (Math.abs(lastWidth - width) > 50 || particles.length === 0) {
+        initParticles();
+        lastWidth = width;
+      }
     }
-    window.addEventListener('resize', resize);
 
     window.addEventListener('mousemove', (e) => {
       if (isMobile) return;
