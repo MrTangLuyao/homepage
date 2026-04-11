@@ -534,7 +534,7 @@
         padding: 16px 24px;
       }
 
-      .nav-links {
+      .nav-links li:not(:last-child) {
         display: none;
       }
 
@@ -885,7 +885,7 @@
       }
     };
 
-    let currentLang = 'zh';
+    let currentLang = 'en';
 
     function applyLang(lang) {
       const t = translations[lang];
@@ -910,6 +910,12 @@
       applyLang(currentLang);
     }
 
+    const userBrowserLang = navigator.language.toLowerCase();
+    if (userBrowserLang === 'zh-cn' || userBrowserLang === 'zh') {
+      currentLang = 'zh';
+    }
+    applyLang(currentLang);
+
     document.getElementById('footer-year').textContent = '© ' + luxon.DateTime.now().year;
 
     window.addEventListener('scroll', () => {
@@ -926,10 +932,16 @@
 
     document.querySelectorAll('.fade-in').forEach(el => observer.observe(el));
 
+    let isMobile = window.innerWidth <= 768 || window.matchMedia("(any-pointer: coarse)").matches;
+    window.addEventListener('resize', () => {
+      isMobile = window.innerWidth <= 768 || window.matchMedia("(any-pointer: coarse)").matches;
+    });
+
     const magneticElements = document.querySelectorAll('.magnetic-wrap');
     magneticElements.forEach((el) => {
       const inner = el.querySelector('.magnetic-inner');
       el.addEventListener('mousemove', (e) => {
+        if (isMobile) return;
         const rect = el.getBoundingClientRect();
         const centerX = rect.left + rect.width / 2;
         const centerY = rect.top + rect.height / 2;
@@ -939,6 +951,7 @@
         inner.style.transform = `translate(${distX * magneticStrength}px, ${distY * magneticStrength}px)`;
       });
       el.addEventListener('mouseleave', () => {
+        if (isMobile) return;
         inner.style.transform = 'translate(0px, 0px)';
       });
     });
@@ -958,6 +971,7 @@
     window.addEventListener('resize', resize);
 
     window.addEventListener('mousemove', (e) => {
+      if (isMobile) return;
       mouse.x = e.clientX;
       mouse.y = e.clientY;
     });
@@ -1006,7 +1020,7 @@
         let dist = Math.sqrt(dx * dx + dy * dy);
         let maxDist = 300;
 
-        if (dist < maxDist) {
+        if (dist < maxDist && !isMobile) {
           let force = (maxDist - dist) / maxDist;
           targetX += dx * force * 0.6;
           targetY += dy * force * 0.6;
