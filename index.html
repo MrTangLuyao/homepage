@@ -741,6 +741,14 @@
       will-change: left, top;
     }
 
+    /* ─── GRID DOTS CANVAS ─── */
+    #grid-dots {
+      position: fixed;
+      inset: 0;
+      pointer-events: none;
+      z-index: 0;
+    }
+
     /* ─── RESPONSIVE ─── */
     @media (max-width: 768px) {
       nav { padding: 16px 24px; }
@@ -758,6 +766,7 @@
   <div id="grain"></div>
   <div id="scanline"></div>
   <div id="cursor-glow"></div>
+  <canvas id="grid-dots"></canvas>
 
   <nav id="navbar">
     <div class="magnetic-wrap">
@@ -1147,6 +1156,48 @@
     });
 
     if (isMobile) cursorGlow.style.display = 'none';
+
+    /* ─── Grid dots ─── */
+    (function () {
+      const canvas = document.getElementById('grid-dots');
+      if (!canvas) return;
+      const ctx = canvas.getContext('2d');
+      const GRID = 60;
+      const REACH = 140;
+
+      function resize() {
+        canvas.width  = window.innerWidth;
+        canvas.height = window.innerHeight;
+      }
+      resize();
+      window.addEventListener('resize', resize);
+
+      function draw() {
+        ctx.clearRect(0, 0, canvas.width, canvas.height);
+        if (isMobile || cx < -500) { requestAnimationFrame(draw); return; }
+
+        const c0 = Math.floor((cx - REACH) / GRID);
+        const c1 = Math.ceil ((cx + REACH) / GRID);
+        const r0 = Math.floor((cy - REACH) / GRID);
+        const r1 = Math.ceil ((cy + REACH) / GRID);
+
+        for (let i = c0; i <= c1; i++) {
+          for (let j = r0; j <= r1; j++) {
+            const x = i * GRID, y = j * GRID;
+            const dist = Math.hypot(cx - x, cy - y);
+            if (dist >= REACH) continue;
+            const t = 1 - dist / REACH;
+            const alpha = t * t * 0.55;
+            ctx.beginPath();
+            ctx.arc(x, y, 1.5, 0, Math.PI * 2);
+            ctx.fillStyle = `rgba(217,140,112,${alpha.toFixed(3)})`;
+            ctx.fill();
+          }
+        }
+        requestAnimationFrame(draw);
+      }
+      draw();
+    })();
 
     /* ─── Typewriter Hero ─── */
     (function () {
