@@ -3,8 +3,8 @@
 
 <head>
   <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <meta name="description" content="Navigating the boundary between 0 and 1">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+  <meta name="description" content="Louie — Developer, Creator, CS Student">
   <title>Louie — Portfolio</title>
   <link rel="stylesheet" href="lib/fonts.css">
   <script src="lib/tailwindcss.js"></script>
@@ -300,11 +300,17 @@
       opacity: 0.6;
     }
 
+    .hero-name-wrap {
+      min-height: calc(clamp(2.8rem, 8vw, 5rem) * 1.05 * 2);
+      margin-bottom: 40px;
+      display: flex;
+      align-items: flex-start;
+    }
+
     .hero-name {
       font-size: clamp(2.8rem, 8vw, 5rem);
       font-weight: 800;
       line-height: 1.05;
-      margin-bottom: 28px;
       letter-spacing: -0.03em;
       background: linear-gradient(135deg, #fff 0%, var(--accent) 45%, #c4a882 75%, #fff 100%);
       background-size: 300% auto;
@@ -324,13 +330,22 @@
       50%       { transform: translateY(-10px); }
     }
 
-    .hero-tagline {
-      font-size: clamp(1.05rem, 2.5vw, 1.25rem);
-      font-weight: normal;
-      color: var(--muted);
-      margin-bottom: 52px;
-      max-width: 520px;
-      line-height: 1.8;
+    .hero-cursor {
+      display: inline-block;
+      color: var(--accent);
+      font-weight: 300;
+      margin-left: 2px;
+      animation: cursorBlink 0.75s step-end infinite;
+      opacity: 1;
+    }
+
+    @keyframes cursorBlink {
+      0%, 100% { opacity: 1; }
+      50%       { opacity: 0; }
+    }
+
+    .hero-dynamic-text {
+      color: var(--accent);
     }
 
     .hero-email {
@@ -356,10 +371,34 @@
       transform: translateY(-2px);
     }
 
+    .hero-blog-btn {
+      display: inline-flex;
+      align-items: center;
+      gap: 10px;
+      color: var(--text);
+      border: 1px solid rgba(255, 255, 255, 0.12);
+      background: rgba(255, 255, 255, 0.05);
+      text-decoration: none;
+      font-size: 14px;
+      font-weight: 700;
+      letter-spacing: 0.05em;
+      padding: 14px 30px;
+      border-radius: 3px;
+      transition: color 0.3s ease, border-color 0.3s ease, background 0.3s ease, box-shadow 0.3s ease, transform 0.2s ease;
+    }
+
+    .hero-blog-btn:hover {
+      color: var(--accent);
+      border-color: rgba(217, 140, 112, 0.45);
+      background: rgba(217, 140, 112, 0.08);
+      box-shadow: 0 4px 20px rgba(217, 140, 112, 0.12);
+      transform: translateY(-2px);
+    }
+
     /* Scroll indicator */
     .scroll-indicator {
       position: absolute;
-      bottom: 40px;
+      bottom: calc(72px + env(safe-area-inset-bottom, 0px));
       left: 50%;
       transform: translateX(-50%);
       opacity: 0.4;
@@ -742,17 +781,26 @@
       <div class="magnetic-wrap" style="display: block;">
         <div class="magnetic-inner hero-content-wrapper" style="width: 100%;">
           <p class="hero-greeting" data-i18n="hero-greeting">hello, world</p>
-          <h1 class="hero-name">Hi, I'm Louie.</h1>
-          <p class="hero-tagline" data-i18n="hero-tagline">Navigating the boundary between 0 and 1</p>
+          <div class="hero-name-wrap">
+            <h1 class="hero-name" id="hero-title"><span id="hero-title-inner"></span><span class="hero-cursor">|</span></h1>
+          </div>
         </div>
       </div>
-      <div class="mt-4">
+      <div class="mt-4" style="display:flex;gap:14px;flex-wrap:wrap;align-items:center;">
         <a href="mailto:louieluyaotang@gmail.com" class="hero-email">
           <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
             <path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"></path>
             <polyline points="22,6 12,13 2,6"></polyline>
           </svg>
-          <span data-i18n="hero-email-btn">Email</span>
+          <span data-i18n="hero-email-btn">Email Me</span>
+        </a>
+        <a href="https://blog.louie1.com" target="_blank" class="hero-blog-btn">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"></path>
+            <polyline points="15 3 21 3 21 9"></polyline>
+            <line x1="10" y1="14" x2="21" y2="3"></line>
+          </svg>
+          <span>View my Blog</span>
         </a>
       </div>
     </div>
@@ -769,7 +817,7 @@
   <section id="about">
     <div class="section-label"><span>01.</span> <span data-i18n="section-about">About</span></div>
     <p class="about-text fade-in" data-i18n-html="about-text">
-      生于江城武汉，现旅居南半球的墨尔本。Navigating the boundary between 0 and 1<br><br>
+      生于江城武汉，现旅居颠倒世界墨尔本。<br><br>
     </p>
   </section>
 
@@ -1000,10 +1048,10 @@
       zh: {
         'nav-about': 'About','nav-projects': 'Projects','nav-social': 'Social','nav-links': 'Links',
         'nav-system95': "Louie's 95",'nav-licenses': 'Licenses','nav-contact': 'Contact',
-        'hero-greeting': 'hello, world','hero-tagline': 'Navigating the boundary between 0 and 1','hero-email-btn': 'Email',
+        'hero-greeting': 'hello, world','hero-email-btn': 'Email Me',
         'section-about': 'About','section-projects': 'Projects','section-social': 'Social',
         'section-links': 'Friend Links','section-system95': "Louie's 95",'section-licenses': 'OPEN SOURCE LICENSES',
-        'about-text': '生于江城武汉，现旅居南半球的墨尔本。Navigating the boundary between 0 and 1<br><br>',
+        'about-text': '生于江城武汉，现旅居颠倒世界墨尔本。<br><br>',
         'project-jetlag-desc': '科学时差调节系统',
         'project-sync-desc': '私有跨设备同步工具，支持文本与文件的实时共享，基于 WebSocket 实现即时更新，提供双视图布局与 PIN 锁保护。',
         'project-primer-desc': 'PCR 引物设计工具的网页化实现，支持 BLAST 校验与表达感知评分，提升了生信工具的交互体验与可访问性。',
@@ -1016,11 +1064,10 @@
         'nav-about': 'About','nav-projects': 'Projects','nav-social': 'Social','nav-links': 'Links',
         'nav-system95': "Louie's 95",'nav-licenses': 'Licenses','nav-contact': 'Contact',
         'hero-greeting': 'hello, world',
-        'hero-tagline': 'Navigating the boundary between 0 and 1, exploring the microcosm of computer science.',
-        'hero-email-btn': 'Email',
+        'hero-email-btn': 'Email Me',
         'section-about': 'About','section-projects': 'Projects','section-social': 'Social',
         'section-links': 'Friend Links','section-system95': "Louie's 95",'section-licenses': 'OPEN SOURCE LICENSES',
-        'about-text': 'Born in Wuhan, currently residing in Melbourne. Navigating the boundary between 0 and 1, exploring the microcosm of computer science.<br><br>',
+        'about-text': 'Born in Wuhan, currently residing in Melbourne — the Upside Down.<br><br>',
         'project-jetlag-desc': 'Circadian Rhythm Override Protocol / Scientific Jetlag Adjustment.',
         'project-sync-desc': 'Private cross-device synchronization tool. Real-time text/file sharing via WebSocket. Features dual-view layout and PIN lock.',
         'project-primer-desc': 'A web-based implementation of a PCR primer design tool with BLAST validation and expression-aware scoring.',
@@ -1100,6 +1147,80 @@
     });
 
     if (isMobile) cursorGlow.style.display = 'none';
+
+    /* ─── Typewriter Hero ─── */
+    (function () {
+      const SHARED = "Hi, I'm ";
+      const sequences = [
+        { prefix: SHARED,         highlight: "Louie",      suffix: ".", type: 'intro' },
+        { prefix: SHARED + "a ",  highlight: "Developer",  suffix: ".", type: 'intro' },
+        { prefix: SHARED + "a ",  highlight: "Creator",    suffix: ".", type: 'intro' },
+        { prefix: SHARED + "a ",  highlight: "CS Student", suffix: ".", type: 'intro' },
+        { prefix: "", highlight: "Build things that matter.",     suffix: "", type: 'motto' },
+        { prefix: "", highlight: "Curiosity over certainty.",     suffix: "", type: 'motto' },
+        { prefix: "", highlight: "Make it work, make it good.", suffix: "", type: 'motto' },
+        { prefix: "", highlight: "Think deep, build bold.",         suffix: "", type: 'motto' },
+      ];
+
+      const el = document.getElementById('hero-title-inner');
+      if (!el) return;
+
+      let seqIdx = 0, charIdx = 0, isDeleting = false;
+
+      function esc(s) {
+        return s.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
+      }
+
+      function render(seq, n) {
+        const full = seq.prefix + seq.highlight + seq.suffix;
+        const text = full.slice(0, n);
+        if (seq.type === 'motto') {
+          el.innerHTML = `<span class="hero-dynamic-text">${esc(text)}</span>`;
+          return;
+        }
+        if (text.length <= seq.prefix.length) {
+          el.innerHTML = esc(text);
+        } else {
+          const hi = text.slice(seq.prefix.length, seq.prefix.length + seq.highlight.length);
+          const suf = text.slice(seq.prefix.length + seq.highlight.length);
+          el.innerHTML = `${esc(seq.prefix)}<span class="hero-dynamic-text">${esc(hi)}</span>${esc(suf)}`;
+        }
+      }
+
+      function deleteFloor() {
+        const cur  = sequences[seqIdx];
+        const next = sequences[(seqIdx + 1) % sequences.length];
+        return (cur.type === 'intro' && next.type === 'intro') ? SHARED.length : 0;
+      }
+
+      function tick() {
+        const seq = sequences[seqIdx];
+        const fullLen = (seq.prefix + seq.highlight + seq.suffix).length;
+        if (!isDeleting) {
+          charIdx++;
+          render(seq, charIdx);
+          if (charIdx >= fullLen) {
+            setTimeout(() => { isDeleting = true; tick(); }, 1800);
+            return;
+          }
+          setTimeout(tick, 55 + Math.random() * 35);
+        } else {
+          const floor = deleteFloor();
+          charIdx--;
+          render(seq, charIdx);
+          if (charIdx <= floor) {
+            charIdx = floor;
+            isDeleting = false;
+            seqIdx = (seqIdx + 1) % sequences.length;
+            setTimeout(tick, 320);
+            return;
+          }
+          setTimeout(tick, 28 + Math.random() * 18);
+        }
+      }
+
+      setTimeout(tick, 600);
+    })();
 
     /* ─── Magnetic ─── */
     document.querySelectorAll('.magnetic-wrap').forEach((el) => {
