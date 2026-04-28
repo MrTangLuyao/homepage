@@ -607,7 +607,7 @@
     /* ─── CONTACT ─── */
     #contact {
       text-align: center;
-      padding: 160px 24px;
+      padding: 160px 24px 280px;
     }
 
     .contact-title {
@@ -825,6 +825,14 @@
       0%   { color: #ff4444; text-shadow: 0 0 6px #ff4444; }
       45%  { color: #ff4444; text-shadow: 0 0 6px #ff4444; }
       100% { color: #0f0;    text-shadow: none; }
+    }
+
+    /* ─── PARTICLE SECTION ─── */
+    #particle-canvas {
+      display: block;
+      width: 100%;
+      cursor: crosshair;
+      border-radius: 6px;
     }
 
     /* ─── RESPONSIVE ─── */
@@ -1162,13 +1170,14 @@
   <section id="contact">
     <h2 class="contact-title fade-in">What's Next?</h2>
     <p class="contact-desc fade-in" data-i18n="contact-desc">我的收件箱始终敞开。无论是有项目合作、技术交流，还是简单地打个招呼，我都会尽量回复。</p>
+    <canvas id="particle-canvas" class="fade-in" style="margin-top:32px;"></canvas>
   </section>
 
   <div class="relative h-0 -mb-px z-20" style="pointer-events: none;">
     <!-- 吉祥物暂时注释（版权问题处理中，解决后重新启用）
     <img src="lib/pp_clean_p.webp" class="w-28 h-auto absolute bottom-0 left-1/4 -translate-x-1/2 block" alt="">
     -->
-    <div id="win-coming-soon" class="win-window" data-base-transform="translateX(-50%) rotate(-2deg)" style="position: absolute; bottom: 20px; left: 25%; transform: translateX(-50%) rotate(-2deg); pointer-events: all;" onmousedown="elasticStartDrag(event, 'win-coming-soon')">
+    <div id="win-coming-soon" class="win-window" data-base-transform="translateX(-50%) rotate(-2deg)" style="position: absolute; bottom: 20px; left: 38%; transform: translateX(-50%) rotate(-2deg); pointer-events: all;" onmousedown="elasticStartDrag(event, 'win-coming-soon')">
       <div class="win-titlebar">
         <span>Coming Soon.exe</span>
         <button class="win-btn-close" onclick="denyClose('Coming Soon')">X</button>
@@ -1400,6 +1409,180 @@
       });
     });
 
+    /* ─── Particle About ─── */
+    (function () {
+      const canvas = document.getElementById('particle-canvas');
+      if (!canvas) return;
+      const ctx = canvas.getContext('2d');
+
+      const WORDS = ['Developer', 'Creator', 'Builder', 'Curious'];
+      const N = 320;
+      const REPEL_R = 90;
+      const H = 200;
+
+      let W = 0;
+      let particles = [];
+      let mx = -9999, my = -9999;
+      let wordIdx = 0;
+      let allTargets = [];
+      // phases: 0=wait  1=forming  2=holding  3=dissolving
+      let phase = 0, phaseTime = 0;
+      const PHASE_DUR = [400, 2600, 1000, 320];
+
+      function initCanvas() {
+        W = canvas.parentElement.clientWidth || 700;
+        canvas.width = W;
+        canvas.height = H;
+      }
+
+      function initParticles() {
+        particles = Array.from({length: N}, () => ({
+          x: Math.random() * W, y: Math.random() * H,
+          vx: (Math.random() - 0.5) * 0.6,
+          vy: (Math.random() - 0.5) * 0.6,
+          tx: null, ty: null,
+          r: 1.5 + Math.random() * 1.2,
+          baseAlpha: 0.12 + Math.random() * 0.18,
+        }));
+      }
+
+      function getWordTargets(word) {
+        const off = document.createElement('canvas');
+        off.width = W; off.height = H;
+        const oCtx = off.getContext('2d');
+        let fs = Math.min(90, H * 0.72);
+        oCtx.font = `800 ${fs}px "JetBrains Mono", monospace`;
+        while (oCtx.measureText(word).width > W * 0.84 && fs > 22) {
+          fs -= 3;
+          oCtx.font = `800 ${fs}px "JetBrains Mono", monospace`;
+        }
+        oCtx.fillStyle = '#fff';
+        oCtx.textAlign = 'center';
+        oCtx.textBaseline = 'middle';
+        oCtx.fillText(word, W / 2, H / 2);
+        const data = oCtx.getImageData(0, 0, W, H).data;
+        const pts = [];
+        const gap = 5;
+        for (let y = 0; y < H; y += gap)
+          for (let x = 0; x < W; x += gap)
+            if (data[(y * W + x) * 4 + 3] > 80)
+              pts.push({ x: x + (Math.random()-0.5)*2, y: y + (Math.random()-0.5)*2 });
+        for (let i = pts.length - 1; i > 0; i--) {
+          const j = Math.floor(Math.random() * (i + 1));
+          [pts[i], pts[j]] = [pts[j], pts[i]];
+        }
+        return pts;
+      }
+
+      function assignTargets(pts) {
+        particles.forEach((p, i) => {
+          const t = pts[i % pts.length];
+          p.tx = t.x; p.ty = t.y;
+        });
+      }
+
+      function clearTargets() {
+        particles.forEach(p => { p.tx = null; p.ty = null; });
+      }
+
+      function precompute() {
+        allTargets = WORDS.map(w => getWordTargets(w));
+      }
+
+      let last = 0;
+      function tick(t) {
+        requestAnimationFrame(tick);
+        const dt = Math.min(t - last, 50);
+        last = t;
+
+        phaseTime += dt;
+        while (phaseTime >= PHASE_DUR[phase]) {
+          phaseTime -= PHASE_DUR[phase];
+          phase = (phase + 1) % 4;
+          if (phase === 1) assignTargets(allTargets[wordIdx]);
+          if (phase === 3) {
+            clearTargets();
+            particles.forEach(p => {
+              p.vx += (Math.random() - 0.5) * 14;
+              p.vy += (Math.random() - 0.5) * 14;
+            });
+            wordIdx = (wordIdx + 1) % WORDS.length;
+          }
+        }
+
+        ctx.clearRect(0, 0, W, H);
+
+        for (const p of particles) {
+          // Repulsion
+          const dx = p.x - mx, dy = p.y - my;
+          const dist = Math.hypot(dx, dy);
+          if (dist < REPEL_R && dist > 0.1) {
+            const t = 1 - dist / REPEL_R;
+            const push = t * t * 7;
+            p.vx += (dx / dist) * push;
+            p.vy += (dy / dist) * push;
+          }
+
+          if (p.tx !== null) {
+            p.vx += (p.tx - p.x) * 0.055;
+            p.vy += (p.ty - p.y) * 0.055;
+            p.vx *= 0.82; p.vy *= 0.82;
+          } else {
+            if (Math.random() < 0.015) {
+              p.vx += (Math.random() - 0.5) * 0.5;
+              p.vy += (Math.random() - 0.5) * 0.5;
+            }
+            p.vx += (W * 0.5 - p.x) * 0.00006;
+            p.vy += (H * 0.5 - p.y) * 0.00006;
+            p.vx *= 0.99; p.vy *= 0.99;
+          }
+
+          p.x += p.vx; p.y += p.vy;
+          if (p.x < 0)  { p.x = 0;  p.vx =  Math.abs(p.vx) * 0.4; }
+          if (p.x > W)  { p.x = W;  p.vx = -Math.abs(p.vx) * 0.4; }
+          if (p.y < 0)  { p.y = 0;  p.vy =  Math.abs(p.vy) * 0.4; }
+          if (p.y > H)  { p.y = H;  p.vy = -Math.abs(p.vy) * 0.4; }
+
+          const settled = p.tx !== null && Math.hypot(p.x - p.tx, p.y - p.ty) < 5;
+          const alpha = settled ? 0.88 : (p.tx !== null ? 0.42 : p.baseAlpha);
+          ctx.beginPath();
+          ctx.arc(p.x, p.y, p.r, 0, Math.PI * 2);
+          ctx.fillStyle = settled
+            ? `rgba(245,196,160,${alpha})`
+            : `rgba(217,140,112,${alpha})`;
+          ctx.fill();
+        }
+      }
+
+      canvas.addEventListener('mousemove', e => {
+        const r = canvas.getBoundingClientRect();
+        mx = e.clientX - r.left;
+        my = e.clientY - r.top;
+      });
+      canvas.addEventListener('mouseleave', () => { mx = -9999; my = -9999; });
+      canvas.addEventListener('touchmove', e => {
+        e.preventDefault();
+        const r = canvas.getBoundingClientRect();
+        mx = e.touches[0].clientX - r.left;
+        my = e.touches[0].clientY - r.top;
+      }, { passive: false });
+      canvas.addEventListener('touchend', () => { mx = -9999; my = -9999; });
+
+      let resizeTimer;
+      window.addEventListener('resize', () => {
+        clearTimeout(resizeTimer);
+        resizeTimer = setTimeout(() => {
+          initCanvas(); precompute(); initParticles();
+          phase = 0; phaseTime = 0;
+        }, 200);
+      });
+
+      initCanvas();
+      precompute();
+      initParticles();
+      requestAnimationFrame(tick);
+    })();
+
     /* ─── Deny Close ─── */
     function denyClose(name) {
       const terminal = document.getElementById('win-terminal');
@@ -1463,7 +1646,7 @@
       const el = document.getElementById(elasticTarget);
       if (el) {
         const base = el.dataset.baseTransform || '';
-        el.style.transition = 'transform 0.65s cubic-bezier(0.34, 1.56, 0.64, 1)';
+        el.style.transition = 'transform 0.45s cubic-bezier(0.34, 1.56, 0.64, 1)';
         el.style.transform = base;
         el.style.cursor = 'grab';
       }
