@@ -1427,7 +1427,7 @@
       let allTargets = [];
       // phases: 0=wait  1=forming  2=holding  3=dissolving
       let phase = 0, phaseTime = 0;
-      const PHASE_DUR = [400, 2600, 1000, 320];
+      const PHASE_DUR = [600, 2000, 900, 700];
 
       function initCanvas() {
         W = canvas.parentElement.clientWidth || 700;
@@ -1436,14 +1436,17 @@
       }
 
       function initParticles() {
-        particles = Array.from({length: N}, () => ({
-          x: Math.random() * W, y: Math.random() * H,
-          vx: (Math.random() - 0.5) * 0.6,
-          vy: (Math.random() - 0.5) * 0.6,
-          tx: null, ty: null,
-          r: 1.5 + Math.random() * 1.2,
-          baseAlpha: 0.12 + Math.random() * 0.18,
-        }));
+        particles = Array.from({length: N}, () => {
+          const ba = 0.12 + Math.random() * 0.18;
+          return {
+            x: Math.random() * W, y: Math.random() * H,
+            vx: (Math.random() - 0.5) * 0.6,
+            vy: (Math.random() - 0.5) * 0.6,
+            tx: null, ty: null,
+            r: 1.5 + Math.random() * 1.2,
+            baseAlpha: ba, displayAlpha: ba, colorT: 0,
+          };
+        });
       }
 
       function getWordTargets(word) {
@@ -1503,8 +1506,8 @@
           if (phase === 3) {
             clearTargets();
             particles.forEach(p => {
-              p.vx += (Math.random() - 0.5) * 14;
-              p.vy += (Math.random() - 0.5) * 14;
+              p.vx += (Math.random() - 0.5) * 0.8;
+              p.vy += (Math.random() - 0.5) * 0.8;
             });
             wordIdx = (wordIdx + 1) % WORDS.length;
           }
@@ -1524,9 +1527,9 @@
           }
 
           if (p.tx !== null) {
-            p.vx += (p.tx - p.x) * 0.055;
-            p.vy += (p.ty - p.y) * 0.055;
-            p.vx *= 0.82; p.vy *= 0.82;
+            p.vx *= 0.5; p.vy *= 0.5;
+            p.x += (p.tx - p.x) * 0.04;
+            p.y += (p.ty - p.y) * 0.04;
           } else {
             if (Math.random() < 0.015) {
               p.vx += (Math.random() - 0.5) * 0.5;
@@ -1544,12 +1547,16 @@
           if (p.y > H)  { p.y = H;  p.vy = -Math.abs(p.vy) * 0.4; }
 
           const settled = p.tx !== null && Math.hypot(p.x - p.tx, p.y - p.ty) < 5;
-          const alpha = settled ? 0.88 : (p.tx !== null ? 0.42 : p.baseAlpha);
+          const targetAlpha = settled ? 0.88 : (p.tx !== null ? 0.42 : p.baseAlpha);
+          const targetColorT = settled ? 1 : 0;
+          p.displayAlpha += (targetAlpha  - p.displayAlpha) * 0.05;
+          p.colorT       += (targetColorT - p.colorT)       * 0.05;
+          const rr = Math.round(217 + 28 * p.colorT);
+          const gg = Math.round(140 + 56 * p.colorT);
+          const bb = Math.round(112 + 48 * p.colorT);
           ctx.beginPath();
           ctx.arc(p.x, p.y, p.r, 0, Math.PI * 2);
-          ctx.fillStyle = settled
-            ? `rgba(245,196,160,${alpha})`
-            : `rgba(217,140,112,${alpha})`;
+          ctx.fillStyle = `rgba(${rr},${gg},${bb},${p.displayAlpha.toFixed(3)})`;
           ctx.fill();
         }
       }
