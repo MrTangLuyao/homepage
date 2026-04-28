@@ -76,7 +76,7 @@
       background: var(--bg);
     }
 
-    /* Aurora mesh blobs */
+    /* Aurora mesh blobs + hp2.html Orbs */
     #bg-layer::before {
       content: '';
       position: absolute;
@@ -143,7 +143,7 @@
       opacity: 0.4;
     }
 
-    /* ─── NAV ─── */
+    /* hp2.html Nav glass effect */
     .magnetic-wrap {
       display: inline-block;
       position: relative;
@@ -164,21 +164,21 @@
       top: 0;
       left: 0;
       right: 0;
-      z-index: 100;
+      z-index: 9999;
       display: flex;
       align-items: center;
       justify-content: space-between;
       padding: 24px 48px;
-      background: rgba(6, 6, 10, 0.4);
-      backdrop-filter: blur(24px) saturate(1.4);
-      border-bottom: 1px solid transparent;
+      /* hp2.html glass style */
+      background: rgba(29, 29, 31, 0.65);
+      backdrop-filter: blur(24px) saturate(180%);
+      -webkit-backdrop-filter: blur(24px) saturate(180%);
+      border-bottom: 1px solid rgba(255, 255, 255, 0.08);
       transition: border-color 0.4s ease, padding 0.4s ease, background 0.4s ease;
     }
 
     nav.scrolled {
-      border-bottom-color: rgba(217, 140, 112, 0.08);
       padding: 14px 48px;
-      background: rgba(6, 6, 10, 0.7);
     }
 
     .nav-logo {
@@ -262,6 +262,7 @@
       margin: 0 auto;
       padding: 120px 24px;
       position: relative;
+      z-index: 10;
     }
 
     /* ─── HERO ─── */
@@ -307,22 +308,19 @@
       align-items: flex-start;
     }
 
+    /* hp2.html title gradient */
     .hero-name {
       font-size: clamp(2.8rem, 8vw, 5rem);
       font-weight: 800;
       line-height: 1.05;
       letter-spacing: -0.03em;
-      background: linear-gradient(135deg, #fff 0%, var(--accent) 45%, #c4a882 75%, #fff 100%);
+      background: linear-gradient(135deg, #FFFFFF 0%, #F0D4B8 100%);
       background-size: 300% auto;
       color: transparent;
       -webkit-background-clip: text;
       background-clip: text;
-      animation: shine 5s linear infinite, float 7s ease-in-out infinite;
+      animation: float 7s ease-in-out infinite;
       display: inline-block;
-    }
-
-    @keyframes shine {
-      to { background-position: 300% center; }
     }
 
     @keyframes float {
@@ -360,7 +358,7 @@
       font-weight: 700;
       letter-spacing: 0.05em;
       padding: 14px 30px;
-      border-radius: 3px;
+      border-radius: 99px; /* hp2 style pill */
       transition: background-position 0.5s ease, box-shadow 0.4s ease, transform 0.2s ease;
       box-shadow: 0 4px 24px rgba(217, 140, 112, 0.25), 0 0 0 0 rgba(217, 140, 112, 0);
     }
@@ -376,22 +374,22 @@
       align-items: center;
       gap: 10px;
       color: var(--text);
-      border: 1px solid rgba(255, 255, 255, 0.12);
-      background: rgba(255, 255, 255, 0.05);
+      /* hp2 style glass btn */
+      background: rgba(40, 40, 42, 0.5);
+      backdrop-filter: blur(24px) saturate(180%);
+      border: 1px solid rgba(255, 255, 255, 0.1);
       text-decoration: none;
       font-size: 14px;
       font-weight: 700;
       letter-spacing: 0.05em;
       padding: 14px 30px;
-      border-radius: 3px;
-      transition: color 0.3s ease, border-color 0.3s ease, background 0.3s ease, box-shadow 0.3s ease, transform 0.2s ease;
+      border-radius: 99px;
+      transition: background 0.3s ease, border-color 0.3s ease, transform 0.2s ease;
     }
 
     .hero-blog-btn:hover {
-      color: var(--accent);
-      border-color: rgba(217, 140, 112, 0.45);
-      background: rgba(217, 140, 112, 0.08);
-      box-shadow: 0 4px 20px rgba(217, 140, 112, 0.12);
+      background: rgba(60, 60, 62, 0.6);
+      border-color: rgba(255, 255, 255, 0.3);
       transform: translateY(-2px);
     }
 
@@ -462,36 +460,28 @@
       gap: 16px;
     }
 
-    .project-card {
-      background: rgba(14, 14, 20, 0.7);
-      border: 1px solid rgba(255, 255, 255, 0.04);
-      backdrop-filter: blur(16px);
-      border-radius: 6px;
+    /* hp2.html apple-glass integration */
+    .project-card, .social-item {
+      background: rgba(35, 35, 37, 0.4);
+      backdrop-filter: blur(40px) saturate(150%);
+      -webkit-backdrop-filter: blur(40px) saturate(150%);
+      border: 1px solid rgba(255, 255, 255, 0.06);
+      box-shadow: 0 8px 32px rgba(0, 0, 0, 0.25);
+      border-radius: 1rem;
       padding: 32px;
       text-decoration: none;
       display: block;
-      transition: border-color 0.4s ease, background 0.4s ease, box-shadow 0.4s ease, transform 0.3s ease;
+      transition: transform 0.4s cubic-bezier(0.16, 1, 0.3, 1), box-shadow 0.4s cubic-bezier(0.16, 1, 0.3, 1), background 0.4s, border-color 0.4s;
       position: relative;
       overflow: hidden;
     }
 
-    .project-card::before {
-      content: '';
-      position: absolute;
-      inset: 0;
-      background: linear-gradient(135deg, rgba(217, 140, 112, 0.04) 0%, transparent 60%);
-      opacity: 0;
-      transition: opacity 0.4s ease;
+    .project-card:hover, .social-item:hover {
+      transform: translateY(-4px);
+      background: rgba(50, 50, 53, 0.5);
+      border-color: rgba(255, 255, 255, 0.12);
+      box-shadow: 0 16px 48px rgba(0, 0, 0, 0.4);
     }
-
-    .project-card:hover {
-      border-color: rgba(217, 140, 112, 0.3);
-      background: rgba(20, 18, 24, 0.9);
-      box-shadow: 0 8px 40px rgba(217, 140, 112, 0.08), inset 0 0 0 1px rgba(217, 140, 112, 0.06);
-      transform: translateY(-2px);
-    }
-
-    .project-card:hover::before { opacity: 1; }
 
     .project-card-header {
       display: flex;
@@ -559,38 +549,8 @@
       align-items: center;
       justify-content: space-between;
       padding: 20px 24px;
-      background: rgba(14, 14, 20, 0.7);
-      border: 1px solid rgba(255, 255, 255, 0.04);
-      backdrop-filter: blur(16px);
-      border-radius: 6px;
-      text-decoration: none;
       color: var(--text);
-      transition: border-color 0.4s ease, background 0.4s ease, box-shadow 0.4s ease, transform 0.3s ease;
-      position: relative;
-      overflow: hidden;
     }
-
-    .social-item::before {
-      content: '';
-      position: absolute;
-      left: 0;
-      top: 0;
-      bottom: 0;
-      width: 2px;
-      background: var(--accent);
-      transform: scaleY(0);
-      transform-origin: bottom;
-      transition: transform 0.4s cubic-bezier(0.25, 1, 0.5, 1);
-    }
-
-    .social-item:hover {
-      border-color: rgba(217, 140, 112, 0.25);
-      background: rgba(20, 18, 24, 0.9);
-      box-shadow: 0 4px 24px rgba(217, 140, 112, 0.07);
-      transform: translateY(-1px);
-    }
-
-    .social-item:hover::before { transform: scaleY(1); }
 
     .social-item-left {
       display: flex;
@@ -749,6 +709,99 @@
       z-index: 0;
     }
 
+    /* ─── WINDOWS 95 FILLER ELEMENTS ─── */
+    #win-profile {
+      top: 18%;
+      right: 15%;
+    }
+    #win-terminal {
+      top: 75%;
+      left: 12%;
+    }
+    @media (max-aspect-ratio: 4/3) and (min-width: 769px), (max-width: 1200px) and (min-width: 769px) {
+      #win-profile {
+        top: 85%;
+        right: 5%;
+      }
+      #win-terminal {
+        top: 85%;
+        left: 5%;
+      }
+    }
+    .win-window {
+      background: #c0c0c0;
+      border-top: 1px solid #fff;
+      border-left: 1px solid #fff;
+      border-right: 1px solid #000;
+      border-bottom: 1px solid #000;
+      box-shadow: inset 1px 1px #dfdfdf, inset -1px -1px #808080;
+      position: absolute;
+      width: 320px;
+      z-index: 50;
+      font-family: 'Tahoma', system-ui, sans-serif;
+      color: #000;
+      transform-style: preserve-3d;
+      backface-visibility: hidden;
+      outline: 1px solid transparent;
+    }
+    .win-titlebar {
+      background: linear-gradient(90deg, #000080, #1084d0);
+      color: #fff;
+      font-weight: bold;
+      padding: 2px 4px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      font-size: 12px;
+      cursor: move;
+      user-select: none;
+    }
+    .win-btn-close {
+      background: #c0c0c0;
+      border-top: 1px solid #fff;
+      border-left: 1px solid #fff;
+      border-right: 1px solid #000;
+      border-bottom: 1px solid #000;
+      box-shadow: inset 1px 1px #dfdfdf, inset -1px -1px #808080;
+      color: #000;
+      font-weight: bold;
+      width: 16px;
+      height: 14px;
+      line-height: 10px;
+      text-align: center;
+      font-size: 10px;
+      cursor: pointer;
+    }
+    .win-btn-close:active {
+      border-top: 1px solid #000;
+      border-left: 1px solid #000;
+      border-right: 1px solid #fff;
+      border-bottom: 1px solid #fff;
+      box-shadow: inset 1px 1px #808080, inset -1px -1px #dfdfdf;
+      padding-top: 1px;
+      padding-left: 1px;
+    }
+    .win-content {
+      padding: 10px;
+      font-size: 13px;
+      user-select: none;
+      -webkit-user-select: none;
+    }
+    .win-inset {
+      background: #fff;
+      border-top: 1px solid #808080;
+      border-left: 1px solid #808080;
+      border-right: 1px solid #fff;
+      border-bottom: 1px solid #fff;
+      box-shadow: inset 1px 1px #000;
+      padding: 8px;
+    }
+    .dos-cursor::after {
+      content: '_';
+      animation: dos-blink 1s step-end infinite;
+    }
+    @keyframes dos-blink { 0%, 100% { opacity: 1; } 50% { opacity: 0; } }
+
     /* ─── RESPONSIVE ─── */
     @media (max-width: 768px) {
       nav { padding: 16px 24px; }
@@ -756,6 +809,7 @@
       .nav-links li:not(:last-child) { display: none; }
       section { padding: 80px 24px; }
       .licenses-list { grid-template-columns: 1fr; }
+      .win-window { display: none !important; }
     }
   </style>
 </head>
@@ -784,6 +838,31 @@
       </li>
     </ul>
   </nav>
+
+  <!-- WINDOWS 95 FILLER: PROFILE -->
+  <div id="win-profile" class="win-window" style="top: 18%; right: 15%; display: block; transform: rotate(2deg) translateZ(0);" onmousedown="startDrag(event, 'win-profile')">
+    <div class="win-titlebar">
+      <span><img src="lib/po.webp" class="inline w-3 h-3 mr-1" alt="icon" style="image-rendering:pixelated; vertical-align:middle;">Person INFO.exe</span>
+      <button class="win-btn-close" onclick="this.parentElement.parentElement.style.display='none'">X</button>
+    </div>
+    <div class="win-content">
+      <div style="display:flex; gap:16px;">
+        <div class="win-inset" style="width:80px; height:80px; flex-shrink:0; background:#008080; padding:2px;">
+          <img src="lib/po.webp" alt="Avatar" style="width:100%; height:100%; object-fit:cover; image-rendering: pixelated;">
+        </div>
+        <div style="font-size:13px; line-height:1.6;">
+          <div><strong>ID:</strong> Louie</div>
+          <div><strong>LOC:</strong> Melbourne, VIC, AU</div>
+        </div>
+      </div>
+      <div style="margin-top:16px;" class="win-inset bg-white">
+        <div style="font-weight:bold; border-bottom:1px solid #c0c0c0; margin-bottom:8px; padding-bottom:4px;" data-i18n="t_about">ABOUT_ME</div>
+        <p style="line-height:1.6; font-size:12px;" data-i18n="v_about">
+          生于江城武汉，现旅居颠倒世界墨尔本。
+        </p>
+      </div>
+    </div>
+  </div>
 
   <section id="hero">
     <div class="fade-in">
@@ -822,6 +901,24 @@
       </a>
     </div>
   </section>
+
+  <!-- WINDOWS 95 FILLER: TERMINAL -->
+  <div id="win-terminal" class="win-window" style="display: block; transform: rotate(-3deg) translateZ(0);" onmousedown="startDrag(event, 'win-terminal')">
+    <div class="win-titlebar">
+      <span>Terminal.exe - SYSTEM OVERRIDE</span>
+      <button class="win-btn-close" onclick="this.parentElement.parentElement.style.display='none'">X</button>
+    </div>
+    <div class="win-content" style="padding:0;">
+      <div class="win-inset" id="terminal-output" style="background:#000; color:#0f0; font-family:'JetBrains Mono', monospace; padding:10px; height:180px; overflow-y:auto; border-top:1px solid #808080; border-left:1px solid #808080; border-right:1px solid #fff; border-bottom:1px solid #fff;">
+        <div>C:\> LOC: MELBOURNE_VIC_AU</div>
+        <div>C:\> Login as root</div>
+        <div>Authorizing... Approved.</div>
+        <div>Loading Louie's 95 filler modules...</div>
+        <br>
+        <span class="dos-cursor"></span>
+      </div>
+    </div>
+  </div>
 
   <section id="about">
     <div class="section-label"><span>01.</span> <span data-i18n="section-about">About</span></div>
@@ -960,24 +1057,6 @@
     <div class="social-list">
       
       <div class="magnetic-wrap">
-        <a href="https://blog.louie1.com" target="_blank" class="social-item magnetic-inner fade-in" style="width: 100%;">
-          <div class="social-item-left">
-            <div class="social-icon">
-              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                <path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"></path>
-                <path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"></path>
-              </svg>
-            </div>
-            <div>
-              <div class="social-name" data-i18n="links-blog-name">古怪的路易博客</div>
-              <div class="social-handle">blog.louie1.com</div>
-            </div>
-          </div>
-          <span class="social-arrow"><svg width="1em" height="1em" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="7" y1="17" x2="17" y2="7"></line><polyline points="7 7 17 7 17 17"></polyline></svg></span>
-        </a>
-      </div>
-
-      <div class="magnetic-wrap">
         <a href="https://cohenjikan.com" target="_blank" class="social-item magnetic-inner fade-in" style="width: 100%;">
           <div class="social-item-left">
             <div class="social-icon">
@@ -1001,19 +1080,29 @@
   <section id="system95">
     <div class="section-label"><span>05.</span> <span data-i18n="section-system95">Louie's 95</span></div>
     <div class="projects-grid">
-      <div class="magnetic-wrap" style="display: block;">
-        <a href="https://louie1.com/95.html" target="_blank" class="project-card magnetic-inner fade-in" style="width: 100%;">
-          <div class="project-card-header">
-            <span class="project-name flex items-center gap-3">
-              <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                <polyline points="4 17 10 11 4 5"></polyline>
-                <line x1="12" y1="19" x2="20" y2="19"></line>
-              </svg>
-              <span data-i18n="system95-title">进入 Louie's 95</span>
-            </span>
-            <span class="project-arrow"><svg width="1em" height="1em" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="7" y1="17" x2="17" y2="7"></line><polyline points="7 7 17 7 17 17"></polyline></svg></span>
+      <div class="magnetic-wrap" style="display: block; width: 100%;">
+        <a href="https://louie1.com/95.html" target="_blank" class="magnetic-inner fade-in" style="width: 100%; text-decoration: none; display: block; transform: translateZ(0);">
+          <div class="win-window" style="position: relative; width: 100%; display: block; transition: transform 0.2s; cursor: pointer; user-select: none; -webkit-user-select: none;">
+            <div class="win-titlebar">
+              <span style="display:flex; align-items:center; gap:8px;">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                  <polyline points="4 17 10 11 4 5"></polyline>
+                  <line x1="12" y1="19" x2="20" y2="19"></line>
+                </svg>
+                Louie's 95.exe
+              </span>
+              <div class="win-btn-close" style="pointer-events: none;">?</div>
+            </div>
+            <div class="win-content" style="display: flex; align-items: center; justify-content: space-between; padding: 24px 20px;">
+              <div>
+                <div style="font-size: 18px; font-weight: bold; margin-bottom: 8px; color: #000;" data-i18n="system95-title">进入 Louie's 95</div>
+                <div style="font-size: 13px; color: #333;" data-i18n="system95-desc">What is that?</div>
+              </div>
+              <div style="background: #c0c0c0; border-top: 1px solid #fff; border-left: 1px solid #fff; border-right: 1px solid #000; border-bottom: 1px solid #000; box-shadow: inset 1px 1px #dfdfdf, inset -1px -1px #808080; padding: 6px 16px; font-size: 13px; font-weight: bold; cursor: pointer; color: #000;">
+                Run
+              </div>
+            </div>
           </div>
-          <p class="project-desc" data-i18n="system95-desc">What is that?</p>
         </a>
       </div>
     </div>
@@ -1068,6 +1157,8 @@
         'system95-title': "进入 Louie's 95",'system95-desc': 'What is that?',
         'contact-desc': '我的收件箱始终敞开。无论是有项目合作、技术交流，还是简单地打个招呼，我都会尽量回复。',
         'footer-built': 'homepage ♥ 构建',
+        'l_trait': '爱好:', 'v_trait': '游戏，摆弄电子产品', 't_about': 'ABOUT_ME',
+        'v_about': '生于江城武汉，现旅居颠倒世界墨尔本。'
       },
       en: {
         'nav-about': 'About','nav-projects': 'Projects','nav-social': 'Social','nav-links': 'Links',
@@ -1084,6 +1175,8 @@
         'system95-title': "Enter Louie's 95",'system95-desc': 'What is that?',
         'contact-desc': "My inbox is always open. Whether it's a collaboration proposal, a tech chat, or just a hello — I'll do my best to reply.",
         'footer-built': 'homepage ♥ built',
+        'l_trait': 'CLASS:', 'v_trait': 'Gaming, Electronics Enthusiast', 't_about': 'ABOUT_ME',
+        'v_about': 'Born in Wuhan, currently residing in Melbourne — the Upside Down.'
       }
     };
 
@@ -1149,10 +1242,26 @@
     }
     animateGlow();
 
-    /* ─── Mobile detect ─── */
+    /* ─── Mobile & Resize detect ─── */
     let isMobile = window.innerWidth <= 768 || window.matchMedia("(any-pointer: coarse)").matches;
+    let isNarrow = window.innerWidth < 1200 || (window.innerWidth / window.innerHeight) < 1.33;
+    
     window.addEventListener('resize', () => {
+      const currentlyNarrow = window.innerWidth < 1200 || (window.innerWidth / window.innerHeight) < 1.33;
+      if (currentlyNarrow !== isNarrow) {
+        isNarrow = currentlyNarrow;
+        const wp = document.getElementById('win-profile');
+        const wt = document.getElementById('win-terminal');
+        if (wp) { wp.style.left = ''; wp.style.top = ''; wp.style.right = ''; }
+        if (wt) { wt.style.left = ''; wt.style.top = ''; wt.style.right = ''; }
+      }
+
       isMobile = window.innerWidth <= 768 || window.matchMedia("(any-pointer: coarse)").matches;
+      if (isMobile) {
+        cursorGlow.style.display = 'none';
+      } else {
+        cursorGlow.style.display = 'block';
+      }
     });
 
     if (isMobile) cursorGlow.style.display = 'none';
@@ -1289,6 +1398,45 @@
         inner.style.transform = 'translate(0px, 0px)';
       });
     });
+
+    /* ─── Windows Dragging Logic ─── */
+    let zIndexCounter = 100;
+    let isDragging = false, dragTarget = null, offsetX = 0, offsetY = 0;
+
+    function bringToFront(id) {
+      const targetWin = document.getElementById(id);
+      if (!targetWin) return;
+      targetWin.style.zIndex = ++zIndexCounter;
+    }
+
+    function startDrag(e, id) {
+      if (isMobile || e.target.tagName.toLowerCase() === 'button') return;
+      isDragging = true;
+      dragTarget = document.getElementById(id);
+      bringToFront(id);
+      const rect = dragTarget.getBoundingClientRect();
+      const clientX = e.type.includes('mouse') ? e.clientX : e.touches[0].clientX;
+      const clientY = e.type.includes('mouse') ? e.clientY : e.touches[0].clientY;
+      offsetX = clientX - rect.left;
+      offsetY = clientY - rect.top;
+      e.preventDefault();
+    }
+
+    function doDrag(e) {
+      if (!isDragging || !dragTarget || isMobile) return;
+      const clientX = e.type.includes('mouse') ? e.clientX : e.touches[0].clientX;
+      const clientY = e.type.includes('mouse') ? e.clientY : e.touches[0].clientY;
+      dragTarget.style.left = (clientX - offsetX) + 'px';
+      dragTarget.style.top = (clientY - offsetY) + 'px';
+    }
+
+    function stopDrag() { isDragging = false; dragTarget = null; }
+
+    document.addEventListener('mousemove', doDrag);
+    document.addEventListener('mouseup', stopDrag);
+    document.addEventListener('touchmove', doDrag, { passive: false });
+    document.addEventListener('touchend', stopDrag);
+
   </script>
 </body>
 </html>

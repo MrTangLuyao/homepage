@@ -478,18 +478,13 @@
           </div>
           <div class="text-sm space-y-1">
             <div><strong>ID:</strong> Louie</div>
-            <div><strong>YOB:</strong> 2006</div>
-            <div><strong data-i18n="l_trait">TRAIT:</strong> <span data-i18n="v_trait">游戏，摆弄电子产品</span></div>
             <div><strong>LOC:</strong> Melbourne, VIC, AU</div>
-            <div><strong data-i18n="l_edu">EDU:</strong> <span data-i18n="v_edu">墨尔本大学 (Unimelb)</span></div>
-            <div><strong data-i18n="l_major">MAJOR:</strong> <span data-i18n="v_major">计算机科学 (Class of 2025)</span>
-            </div>
           </div>
         </div>
         <div class="mt-4 win-inset bg-white">
           <div class="font-bold border-b border-[#c0c0c0] mb-2 pb-1" data-i18n="t_about">ABOUT_ME</div>
           <p class="leading-relaxed text-xs" data-i18n="v_about">
-            生于江城武汉，现旅居南半球的墨尔本。游走在0与1的边界，探寻计算机科学的微观宇宙。指尖正尝试用C语言雕刻底层逻辑的轮廓，目光长久停留在科技变迁的潮汐中。</p>
+            生于江城武汉，现旅居颠倒世界墨尔本。</p>
         </div>
       </div>
     </div>
@@ -514,23 +509,16 @@
       </div>
     </div>
 
-    <div id="win-project" class="win-window" style="top: 30px; left: 540px;">
-      <div class="win-titlebar" onmousedown="startDrag(event, 'win-project')">
-        <span data-i18n="icon_project">My project.exe</span>
-        <button class="win-btn-close" onclick="closeWindow('win-project')">X</button>
+    <div id="win-homepage" class="win-window" style="top: 30px; left: 540px;">
+      <div class="win-titlebar" onmousedown="startDrag(event, 'win-homepage')">
+        <span data-i18n="icon_homepage">Go_Homepage.exe</span>
+        <button class="win-btn-close" onclick="closeWindow('win-homepage')">X</button>
       </div>
-      <div class="win-content space-y-4" onmousedown="bringToFront('win-project')">
-        <div class="win-inset">
-          <div class="font-bold text-[#000080] mb-1">Jetlag_Commander</div>
-          <div class="text-xs mb-2" data-i18n="p_1_desc">科学时差调节系统 / 跨国生物钟覆写协议</div>
-          <a href="https://jetlag.louie1.com" target="_blank" class="win-button">Visit!</a>
-          <a href="https://github.com/mrtangluyao/Jetlag_Commander" target="_blank" class="win-button">GitHub Repo</a>
-        </div>
-        <div class="win-inset">
-          <div class="font-bold text-[#000080] mb-1">Sync Station</div>
-          <div class="text-xs mb-2" data-i18n="p_sync_desc">私有跨设备同步工具，支持文本与文件的实时共享，基于 WebSocket 实现即时更新，提供双视图布局与 PIN 锁保护。
-          </div>
-          <a href="https://github.com/Cohenjikan/sync-station" target="_blank" class="win-button">GitHub Repo</a>
+      <div class="win-content space-y-4 text-center" onmousedown="bringToFront('win-homepage')">
+        <div class="win-inset py-6">
+          <div class="font-bold text-[#000080] text-base mb-2" data-i18n="home_title">进入 Louie 的主页</div>
+          <div class="text-xs mb-6 text-[#333]" data-i18n="home_desc">点击下方按钮退出系统并回到现代化的主站。</div>
+          <a href="https://louie1.com" target="_self" class="win-button font-bold text-sm px-6 py-2" data-i18n="home_btn">Go to louie1.com</a>
         </div>
       </div>
     </div>
@@ -652,8 +640,11 @@
         p_2_desc: "社交媒体与代码库",
         p_bili: "哔哩哔哩",
         p_rednote: "小红书",
-        icon_project: "My project.exe",
         icon_social: "Social media.exe",
+        icon_homepage: "Go_Homepage.exe",
+        home_title: "进入 Louie 的主页",
+        home_desc: "点击下方按钮退出系统并回到现代化的主站。",
+        home_btn: "前往 louie1.com",
         icon_friends: "友情链接.exe",
         title_blog: "古怪的路易博客",
         p_blog_desc: "记录技术、生活与杂谈的个人自留地。",
@@ -815,7 +806,7 @@
         document.getElementById('taskbar').classList.remove('hidden');
         setInterval(updateClock, 1000);
         updateClock();
-        ['win-profile', 'win-social', 'win-project', 'win-friends', 'win-settings'].forEach(openWindow);
+        ['win-profile', 'win-social', 'win-homepage', 'win-friends', 'win-settings'].forEach(openWindow);
       }, 1500);
     }
 
