@@ -739,6 +739,7 @@
       }
     }
     .win-window {
+      cursor: grab;
       background: #c0c0c0;
       border-top: 1px solid #fff;
       border-left: 1px solid #fff;
@@ -763,9 +764,11 @@
       justify-content: space-between;
       align-items: center;
       font-size: 12px;
-      cursor: move;
+      cursor: grab;
       user-select: none;
     }
+    .win-window button { cursor: default; }
+
     .win-btn-close {
       background: #c0c0c0;
       border-top: 1px solid #fff;
@@ -1435,6 +1438,8 @@
       elasticStartX = pt.clientX;
       elasticStartY = pt.clientY;
       el.style.transition = 'none';
+      el.style.cursor = 'grabbing';
+      document.body.style.cursor = 'grabbing';
       bringToFront(id);
       e.preventDefault();
     }
@@ -1460,7 +1465,9 @@
         const base = el.dataset.baseTransform || '';
         el.style.transition = 'transform 0.65s cubic-bezier(0.34, 1.56, 0.64, 1)';
         el.style.transform = base;
+        el.style.cursor = 'grab';
       }
+      document.body.style.cursor = '';
       elasticTarget = null;
     }
 
