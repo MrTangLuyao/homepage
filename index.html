@@ -305,6 +305,7 @@
       min-height: calc(clamp(2.8rem, 8vw, 5rem) * 1.05 * 2);
       margin-bottom: 40px;
       display: flex;
+      flex-direction: column;
       align-items: flex-start;
     }
 
@@ -319,13 +320,15 @@
       color: transparent;
       -webkit-background-clip: text;
       background-clip: text;
-      animation: float 7s ease-in-out infinite;
-      display: inline-block;
+      display: block;
     }
 
-    @keyframes float {
-      0%, 100% { transform: translateY(0px); }
-      50%       { transform: translateY(-10px); }
+    .hero-roll-line {
+      overflow: hidden;
+    }
+
+    #hero-roll-text {
+      display: inline-block;
     }
 
     .hero-cursor {
@@ -802,6 +805,18 @@
     }
     @keyframes dos-blink { 0%, 100% { opacity: 1; } 50% { opacity: 0; } }
 
+    #terminal-deny-line {
+      color: #0f0;
+    }
+    .deny-flash {
+      animation: denyFlash 0.7s ease forwards;
+    }
+    @keyframes denyFlash {
+      0%   { color: #ff4444; text-shadow: 0 0 6px #ff4444; }
+      45%  { color: #ff4444; text-shadow: 0 0 6px #ff4444; }
+      100% { color: #0f0;    text-shadow: none; }
+    }
+
     /* ─── RESPONSIVE ─── */
     @media (max-width: 768px) {
       nav { padding: 16px 24px; }
@@ -840,10 +855,10 @@
   </nav>
 
   <!-- WINDOWS 95 FILLER: PROFILE -->
-  <div id="win-profile" class="win-window" style="top: 18%; right: 15%; display: block; transform: rotate(2deg) translateZ(0);" onmousedown="startDrag(event, 'win-profile')">
+  <div id="win-profile" class="win-window" data-base-transform="rotate(2deg)" style="top: 18%; right: 15%; display: block; transform: rotate(2deg);" onmousedown="elasticStartDrag(event, 'win-profile')">
     <div class="win-titlebar">
       <span><img src="lib/po.webp" class="inline w-3 h-3 mr-1" alt="icon" style="image-rendering:pixelated; vertical-align:middle;">Person INFO.exe</span>
-      <button class="win-btn-close" onclick="this.parentElement.parentElement.style.display='none'">X</button>
+      <button class="win-btn-close" onclick="denyClose('Person INFO')">X</button>
     </div>
     <div class="win-content">
       <div style="display:flex; gap:16px;">
@@ -858,7 +873,7 @@
       <div style="margin-top:16px;" class="win-inset bg-white">
         <div style="font-weight:bold; border-bottom:1px solid #c0c0c0; margin-bottom:8px; padding-bottom:4px;" data-i18n="t_about">ABOUT_ME</div>
         <p style="line-height:1.6; font-size:12px;" data-i18n="v_about">
-          生于江城武汉，现旅居颠倒世界墨尔本。
+          来自江城武汉，现旅居颠倒世界墨尔本。
         </p>
       </div>
     </div>
@@ -866,11 +881,14 @@
 
   <section id="hero">
     <div class="fade-in">
-      <div class="magnetic-wrap" style="display: block;">
-        <div class="magnetic-inner hero-content-wrapper" style="width: 100%;">
+      <div style="display: block;">
+        <div class="hero-content-wrapper" style="width: 100%;">
           <p class="hero-greeting" data-i18n="hero-greeting">hello, world!</p>
           <div class="hero-name-wrap">
-            <h1 class="hero-name" id="hero-title"><span id="hero-title-inner"></span><span class="hero-cursor">|</span></h1>
+            <div class="hero-name">Hi, I'm</div>
+            <div class="hero-name hero-roll-line">
+              <span id="hero-roll-text" class="hero-dynamic-text">Louie</span>
+            </div>
           </div>
         </div>
       </div>
@@ -903,10 +921,10 @@
   </section>
 
   <!-- WINDOWS 95 FILLER: TERMINAL -->
-  <div id="win-terminal" class="win-window" style="display: block; transform: rotate(-3deg) translateZ(0);" onmousedown="startDrag(event, 'win-terminal')">
+  <div id="win-terminal" class="win-window" data-base-transform="rotate(-3deg)" style="display: block; transform: rotate(-3deg);" onmousedown="elasticStartDrag(event, 'win-terminal')">
     <div class="win-titlebar">
       <span>Terminal.exe - SYSTEM OVERRIDE</span>
-      <button class="win-btn-close" onclick="this.parentElement.parentElement.style.display='none'">X</button>
+      <button class="win-btn-close" onclick="denyClose('Terminal')">X</button>
     </div>
     <div class="win-content" style="padding:0;">
       <div class="win-inset" id="terminal-output" style="background:#000; color:#0f0; font-family:'JetBrains Mono', monospace; padding:10px; height:180px; overflow-y:auto; border-top:1px solid #808080; border-left:1px solid #808080; border-right:1px solid #fff; border-bottom:1px solid #fff;">
@@ -923,7 +941,7 @@
   <section id="about">
     <div class="section-label"><span>01.</span> <span data-i18n="section-about">About</span></div>
     <p class="about-text fade-in" data-i18n-html="about-text">
-      生于江城武汉，现旅居颠倒世界墨尔本。<br><br>
+      来自江城武汉，现旅居颠倒世界墨尔本。<br><br>
     </p>
   </section>
 
@@ -1135,8 +1153,22 @@
     <p class="contact-desc fade-in" data-i18n="contact-desc">我的收件箱始终敞开。无论是有项目合作、技术交流，还是简单地打个招呼，我都会尽量回复。</p>
   </section>
 
-  <div class="relative h-0 -mb-px z-20 pointer-events-none">
+  <div class="relative h-0 -mb-px z-20" style="pointer-events: none;">
+    <!-- 吉祥物暂时注释（版权问题处理中，解决后重新启用）
     <img src="lib/pp_clean_p.webp" class="w-28 h-auto absolute bottom-0 left-1/4 -translate-x-1/2 block" alt="">
+    -->
+    <div id="win-coming-soon" class="win-window" data-base-transform="translateX(-50%) rotate(-2deg)" style="position: absolute; bottom: 20px; left: 25%; transform: translateX(-50%) rotate(-2deg); pointer-events: all;" onmousedown="elasticStartDrag(event, 'win-coming-soon')">
+      <div class="win-titlebar">
+        <span>Coming Soon.exe</span>
+        <button class="win-btn-close" onclick="denyClose('Coming Soon')">X</button>
+      </div>
+      <div class="win-content" style="background: #fdf5d3;">
+        <div class="win-inset" style="background: #fdf5d3; font-size: 13px; line-height: 1.9; color: #333;">
+          <div>更多内容即将到来</div>
+          <div style="color: #888; margin-top: 2px;">Something cool is coming.</div>
+        </div>
+      </div>
+    </div>
   </div>
 
   <footer>
@@ -1153,7 +1185,7 @@
         'hero-greeting': '你好, 陌生人!','hero-email-btn': 'Email Me',
         'section-about': 'About','section-projects': 'Projects','section-social': 'Social',
         'section-links': 'Friend Links','section-system95': "Louie's 95",'section-licenses': 'OPEN SOURCE LICENSES',
-        'about-text': '生于江城武汉，现旅居颠倒世界墨尔本。<br><br>',
+        'about-text': '来自江城武汉，现旅居颠倒世界墨尔本。<br><br>',
         'project-jetlag-desc': '科学时差调节系统',
         'project-sync-desc': '私有跨设备同步工具，支持文本与文件的实时共享，基于 WebSocket 实现即时更新，提供双视图布局与 PIN 锁保护。',
         'project-primer-desc': 'PCR 引物设计工具的网页化实现，支持 BLAST 校验与表达感知评分，提升了生信工具的交互体验与可访问性。',
@@ -1162,7 +1194,7 @@
         'contact-desc': '我的收件箱始终敞开。无论是有项目合作、技术交流，还是简单地打个招呼，我都会尽量回复。',
         'footer-built': 'homepage ♥ 构建',
         'l_trait': '爱好:', 'v_trait': '游戏，摆弄电子产品', 't_about': 'ABOUT_ME',
-        'v_about': '生于江城武汉，现旅居颠倒世界墨尔本。'
+        'v_about': '来自江城武汉，现旅居颠倒世界墨尔本。'
       },
       en: {
         'nav-about': 'About','nav-projects': 'Projects','nav-social': 'Social','nav-links': 'Links',
@@ -1312,78 +1344,32 @@
       draw();
     })();
 
-    /* ─── Typewriter Hero ─── */
+    /* ─── Rolling Hero ─── */
     (function () {
-      const SHARED = "Hi, I'm ";
-      const sequences = [
-        { prefix: SHARED,         highlight: "Louie",      suffix: ".", type: 'intro' },
-        { prefix: SHARED + "a ",  highlight: "Developer",  suffix: ".", type: 'intro' },
-        { prefix: SHARED + "a ",  highlight: "Creator",    suffix: ".", type: 'intro' },
-        { prefix: SHARED + "a ",  highlight: "CS Student", suffix: ".", type: 'intro' },
-        { prefix: "", highlight: "Build things that matter.",     suffix: "", type: 'motto' },
-        { prefix: "", highlight: "Curiosity over certainty.",     suffix: "", type: 'motto' },
-        { prefix: "", highlight: "Make it work, make it good.", suffix: "", type: 'motto' },
-        { prefix: "", highlight: "Think deep, build bold.",         suffix: "", type: 'motto' },
-      ];
-
-      const el = document.getElementById('hero-title-inner');
+      const words = ['Louie', 'Developer', 'Creator', 'CS Student'];
+      const el = document.getElementById('hero-roll-text');
       if (!el) return;
+      let idx = 0;
 
-      let seqIdx = 0, charIdx = 0, isDeleting = false;
-
-      function esc(s) {
-        return s.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
+      function rollNext() {
+        el.style.transition = 'transform 0.35s cubic-bezier(0.4,0,1,1), opacity 0.28s ease';
+        el.style.transform = 'translateY(-115%)';
+        el.style.opacity = '0';
+        setTimeout(() => {
+          idx = (idx + 1) % words.length;
+          el.textContent = words[idx];
+          el.style.transition = 'none';
+          el.style.transform = 'translateY(115%)';
+          el.style.opacity = '0';
+          requestAnimationFrame(() => requestAnimationFrame(() => {
+            el.style.transition = 'transform 0.42s cubic-bezier(0,0,0.2,1), opacity 0.35s ease';
+            el.style.transform = 'translateY(0)';
+            el.style.opacity = '1';
+          }));
+        }, 370);
       }
 
-      function render(seq, n) {
-        const full = seq.prefix + seq.highlight + seq.suffix;
-        const text = full.slice(0, n);
-        if (seq.type === 'motto') {
-          el.innerHTML = `<span class="hero-dynamic-text">${esc(text)}</span>`;
-          return;
-        }
-        if (text.length <= seq.prefix.length) {
-          el.innerHTML = esc(text);
-        } else {
-          const hi = text.slice(seq.prefix.length, seq.prefix.length + seq.highlight.length);
-          const suf = text.slice(seq.prefix.length + seq.highlight.length);
-          el.innerHTML = `${esc(seq.prefix)}<span class="hero-dynamic-text">${esc(hi)}</span>${esc(suf)}`;
-        }
-      }
-
-      function deleteFloor() {
-        const cur  = sequences[seqIdx];
-        const next = sequences[(seqIdx + 1) % sequences.length];
-        return (cur.type === 'intro' && next.type === 'intro') ? SHARED.length : 0;
-      }
-
-      function tick() {
-        const seq = sequences[seqIdx];
-        const fullLen = (seq.prefix + seq.highlight + seq.suffix).length;
-        if (!isDeleting) {
-          charIdx++;
-          render(seq, charIdx);
-          if (charIdx >= fullLen) {
-            setTimeout(() => { isDeleting = true; tick(); }, 1800);
-            return;
-          }
-          setTimeout(tick, 55 + Math.random() * 35);
-        } else {
-          const floor = deleteFloor();
-          charIdx--;
-          render(seq, charIdx);
-          if (charIdx <= floor) {
-            charIdx = floor;
-            isDeleting = false;
-            seqIdx = (seqIdx + 1) % sequences.length;
-            setTimeout(tick, 320);
-            return;
-          }
-          setTimeout(tick, 28 + Math.random() * 18);
-        }
-      }
-
-      setTimeout(tick, 600);
+      setInterval(rollNext, 2800);
     })();
 
     /* ─── Magnetic ─── */
@@ -1403,43 +1389,77 @@
       });
     });
 
-    /* ─── Windows Dragging Logic ─── */
-    let zIndexCounter = 100;
-    let isDragging = false, dragTarget = null, offsetX = 0, offsetY = 0;
-
-    function bringToFront(id) {
-      const targetWin = document.getElementById(id);
-      if (!targetWin) return;
-      targetWin.style.zIndex = ++zIndexCounter;
+    /* ─── Deny Close ─── */
+    function denyClose(name) {
+      const terminal = document.getElementById('win-terminal');
+      if (terminal) terminal.style.display = 'block';
+      const output = document.getElementById('terminal-output');
+      if (!output) return;
+      let line = document.getElementById('terminal-deny-line');
+      if (!line) {
+        line = document.createElement('div');
+        line.id = 'terminal-deny-line';
+        const cursor = output.querySelector('.dos-cursor');
+        cursor ? output.insertBefore(line, cursor) : output.appendChild(line);
+      }
+      line.textContent = 'C:\\> ' + name + '.exe Failed to close. Access Denied.';
+      line.classList.remove('deny-flash');
+      void line.offsetWidth;
+      line.classList.add('deny-flash');
+      output.scrollTop = output.scrollHeight;
     }
 
-    function startDrag(e, id) {
+    /* ─── Elastic Drag System ─── */
+    let zIndexCounter = 100;
+    let elasticTarget = null, elasticStartX = 0, elasticStartY = 0;
+
+    function bringToFront(id) {
+      const el = document.getElementById(id);
+      if (el) el.style.zIndex = ++zIndexCounter;
+    }
+
+    function elasticStartDrag(e, id) {
       if (isMobile || e.target.tagName.toLowerCase() === 'button') return;
-      isDragging = true;
-      dragTarget = document.getElementById(id);
+      const el = document.getElementById(id);
+      if (!el) return;
+      elasticTarget = id;
+      const pt = e.type.includes('mouse') ? e : e.touches[0];
+      elasticStartX = pt.clientX;
+      elasticStartY = pt.clientY;
+      el.style.transition = 'none';
       bringToFront(id);
-      const rect = dragTarget.getBoundingClientRect();
-      const clientX = e.type.includes('mouse') ? e.clientX : e.touches[0].clientX;
-      const clientY = e.type.includes('mouse') ? e.clientY : e.touches[0].clientY;
-      offsetX = clientX - rect.left;
-      offsetY = clientY - rect.top;
       e.preventDefault();
     }
 
-    function doDrag(e) {
-      if (!isDragging || !dragTarget || isMobile) return;
-      const clientX = e.type.includes('mouse') ? e.clientX : e.touches[0].clientX;
-      const clientY = e.type.includes('mouse') ? e.clientY : e.touches[0].clientY;
-      dragTarget.style.left = (clientX - offsetX) + 'px';
-      dragTarget.style.top = (clientY - offsetY) + 'px';
+    function elasticDoDrag(e) {
+      if (!elasticTarget) return;
+      const el = document.getElementById(elasticTarget);
+      if (!el) return;
+      const pt = e.type.includes('mouse') ? e : e.touches[0];
+      const dx = pt.clientX - elasticStartX;
+      const dy = pt.clientY - elasticStartY;
+      const S = 160;
+      const ex = dx / (1 + Math.abs(dx) / S);
+      const ey = dy / (1 + Math.abs(dy) / S);
+      const base = el.dataset.baseTransform || '';
+      el.style.transform = `${base} translate(${ex}px, ${ey}px)`;
     }
 
-    function stopDrag() { isDragging = false; dragTarget = null; }
+    function elasticStopDrag() {
+      if (!elasticTarget) return;
+      const el = document.getElementById(elasticTarget);
+      if (el) {
+        const base = el.dataset.baseTransform || '';
+        el.style.transition = 'transform 0.65s cubic-bezier(0.34, 1.56, 0.64, 1)';
+        el.style.transform = base;
+      }
+      elasticTarget = null;
+    }
 
-    document.addEventListener('mousemove', doDrag);
-    document.addEventListener('mouseup', stopDrag);
-    document.addEventListener('touchmove', doDrag, { passive: false });
-    document.addEventListener('touchend', stopDrag);
+    document.addEventListener('mousemove', elasticDoDrag);
+    document.addEventListener('mouseup', elasticStopDrag);
+    document.addEventListener('touchmove', elasticDoDrag, { passive: false });
+    document.addEventListener('touchend', elasticStopDrag);
 
   </script>
 </body>
