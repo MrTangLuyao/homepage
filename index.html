@@ -712,14 +712,21 @@
       z-index: 0;
     }
 
+    @keyframes winAppear {
+      from { opacity: 0; scale: 0.92; filter: blur(3px); }
+      to   { opacity: 1; scale: 1;    filter: blur(0px); }
+    }
+
     /* ─── WINDOWS 95 FILLER ELEMENTS ─── */
     #win-profile {
       top: 18%;
       right: 15%;
+      animation: winAppear 0.45s cubic-bezier(0.16, 1, 0.3, 1) 0.25s both;
     }
     #win-terminal {
       top: 75%;
       left: 12%;
+      animation: winAppear 0.45s cubic-bezier(0.16, 1, 0.3, 1) 0.45s both;
     }
     @media (max-aspect-ratio: 4/3) and (min-width: 769px), (max-width: 1200px) and (min-width: 769px) {
       #win-profile {
