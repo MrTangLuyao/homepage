@@ -1,7 +1,15 @@
 {
   "permissions": {
     "allow": [
-      "Bash(python *)"
+      "Bash(python *)",
+      "Bash(brew install *)",
+      "Bash(pdftotext *)",
+      "Read(//usr/local/bin/**)",
+      "Read(//opt/homebrew/bin/**)",
+      "Bash(python3 *)",
+      "Bash(ffmpeg -i blog_data/sql-syntax-guide-1/cover.png -quality 90 blog_data/sql-syntax-guide-1/cover.webp -y)",
+      "Bash(sips -s format webp /Users/louietang/Documents/GitHub/homepage/blog_data/sql-syntax-guide-1/cover.png --out /Users/louietang/Documents/GitHub/homepage/blog_data/sql-syntax-guide-1/cover.webp)",
+      "Bash(cwebp -q 90 /Users/louietang/Documents/GitHub/homepage/blog_data/sql-syntax-guide-1/cover.png -o /Users/louietang/Documents/GitHub/homepage/blog_data/sql-syntax-guide-1/cover.webp)"
     ]
   }
 }

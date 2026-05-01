@@ -6,7 +6,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
   <meta name="description" content="Louie's Blog — dev logs, notes, and small experiments">
   <title>Louie — Blog</title>
-  <link rel="icon" href="lib/pp_icon.ico">
+  <link rel="icon" href="lib/po.webp">
   <link rel="stylesheet" href="lib/fonts.css">
   <script src="lib/tailwindcss.js"></script>
   <style>
@@ -517,6 +517,26 @@
       background: linear-gradient(90deg, transparent, rgba(217, 140, 112, 0.3), transparent);
       margin: 48px 0;
     }
+    .reader-body table {
+      width: 100%; border-collapse: collapse;
+      font-size: 14px; margin: 20px 0;
+      border: 1px solid rgba(255,255,255,0.06);
+      border-radius: 8px; overflow: hidden;
+    }
+    .reader-body th {
+      background: rgba(217,140,112,0.10);
+      color: var(--accent); font-weight: 700;
+      padding: 10px 14px; text-align: left;
+      border-bottom: 1px solid rgba(217,140,112,0.20);
+      font-size: 13px; letter-spacing: 0.02em;
+    }
+    .reader-body td {
+      padding: 8px 14px; color: var(--text);
+      border-bottom: 1px solid rgba(255,255,255,0.04);
+      vertical-align: top;
+    }
+    .reader-body tr:last-child td { border-bottom: none; }
+    .reader-body tbody tr:hover { background: rgba(217,140,112,0.04); }
 
     .reader-footer {
       margin-top: 80px; padding-top: 32px;
@@ -531,6 +551,60 @@
       transition: transform 0.25s ease;
     }
     .reader-footer-link:hover { transform: translateX(3px); }
+
+    /* ─── TOC sidebar ─── */
+    #toc-sidebar {
+      position: fixed;
+      top: 180px;
+      left: max(16px, calc((100vw - 880px) / 2 - 248px));
+      width: 220px;
+      max-height: calc(100vh - 220px);
+      overflow-y: auto;
+      scrollbar-width: none;
+      display: none;
+      flex-direction: column;
+      z-index: 50;
+      background: rgba(28, 28, 30, 0.72);
+      backdrop-filter: blur(24px) saturate(150%);
+      -webkit-backdrop-filter: blur(24px) saturate(150%);
+      border: 1px solid rgba(255, 255, 255, 0.07);
+      border-radius: 14px;
+      padding: 14px 0 10px;
+    }
+    #toc-sidebar::-webkit-scrollbar { display: none; }
+    #toc-sidebar.toc-active { display: flex; }
+    .toc-label {
+      font-size: 10px; letter-spacing: 0.13em; text-transform: uppercase;
+      color: var(--muted); opacity: 0.4; font-weight: 700;
+      padding: 0 16px 10px;
+      border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+      margin-bottom: 6px;
+    }
+    .toc-link {
+      font-size: 12.5px; color: var(--muted); text-decoration: none;
+      padding: 5px 16px 5px 14px;
+      border-left: 2px solid transparent;
+      transition: color 0.18s, border-color 0.18s, background 0.18s;
+      line-height: 1.5; display: block; width: 100%; box-sizing: border-box;
+      word-break: break-word;
+    }
+    .toc-link:hover {
+      color: var(--text);
+      border-left-color: rgba(255, 255, 255, 0.18);
+      background: rgba(255, 255, 255, 0.04);
+    }
+    .toc-link.toc-current {
+      color: var(--accent);
+      border-left-color: var(--accent);
+      background: rgba(217, 140, 112, 0.07);
+    }
+    .toc-link.toc-h3 {
+      padding-left: 26px;
+      font-size: 11.5px;
+      opacity: 0.75;
+    }
+    .toc-link.toc-h3.toc-current { opacity: 1; }
+    @media (max-width: 1359px) { #toc-sidebar { display: none !important; } }
 
     .post-not-found {
       text-align: center; padding: 80px 24px;
@@ -686,6 +760,7 @@
 
     <!-- READER VIEW -->
     <article id="view-reader" style="display:none;">
+      <nav id="toc-sidebar" aria-label="Table of contents"></nav>
       <a href="#" class="reader-back" id="reader-back">
         <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><line x1="19" y1="12" x2="5" y2="12"></line><polyline points="12 19 5 12 12 5"></polyline></svg>
         <span data-i18n="reader-back">All posts</span>
@@ -830,6 +905,72 @@
         });
       }, { threshold: 0.05 });
       document.querySelectorAll('.fade-in:not(.visible)').forEach(el => fadeObserver.observe(el));
+    }
+
+    /* ─── TOC sidebar ─── */
+    let _tocObserver = null;
+
+    function buildToc() {
+      const sidebar = document.getElementById('toc-sidebar');
+      const body    = document.getElementById('reader-body');
+      if (!sidebar || !body) return;
+
+      if (_tocObserver) { _tocObserver.disconnect(); _tocObserver = null; }
+
+      const headings = Array.from(body.querySelectorAll('h2, h3'));
+      if (headings.length < 2) {
+        sidebar.innerHTML = '';
+        sidebar.classList.remove('toc-active');
+        return;
+      }
+
+      // Assign stable IDs to headings
+      const used = {};
+      headings.forEach(h => {
+        let base = h.textContent.trim()
+          .replace(/[^\w一-鿿\s]/g, '').trim().replace(/\s+/g, '-')
+          .toLowerCase() || h.tagName.toLowerCase();
+        let id = base;
+        if (used[id] !== undefined) { used[id]++; id = `${base}-${used[id]}`; }
+        else used[id] = 0;
+        h.id = id;
+      });
+
+      const label = currentLang === 'zh' ? '目录' : 'Contents';
+      sidebar.innerHTML =
+        `<div class="toc-label">${label}</div>` +
+        headings.map(h =>
+          `<a class="toc-link toc-${h.tagName.toLowerCase()}" href="#${h.id}">${h.textContent.trim()}</a>`
+        ).join('');
+      sidebar.classList.add('toc-active');
+
+      // Click: scroll without changing hash (changing hash triggers route())
+      sidebar.querySelectorAll('.toc-link').forEach(a => {
+        a.addEventListener('click', e => {
+          e.preventDefault();
+          const target = document.getElementById(a.getAttribute('href').slice(1));
+          if (target) target.scrollIntoView({ behavior: 'smooth', block: 'start' });
+        });
+      });
+
+      // Scroll spy
+      const links = sidebar.querySelectorAll('.toc-link');
+      _tocObserver = new IntersectionObserver(entries => {
+        entries.forEach(entry => {
+          if (entry.isIntersecting) {
+            links.forEach(a => a.classList.remove('toc-current'));
+            const cur = sidebar.querySelector(`.toc-link[href="#${entry.target.id}"]`);
+            if (cur) cur.classList.add('toc-current');
+          }
+        });
+      }, { rootMargin: '-10% 0px -80% 0px' });
+      headings.forEach(h => _tocObserver.observe(h));
+    }
+
+    function clearToc() {
+      const sidebar = document.getElementById('toc-sidebar');
+      if (sidebar) { sidebar.innerHTML = ''; sidebar.classList.remove('toc-active'); }
+      if (_tocObserver) { _tocObserver.disconnect(); _tocObserver = null; }
     }
 
     /* ─── Manifest loading ─── */
@@ -995,7 +1136,10 @@
             <a class="reader-footer-link" href="#" style="margin-top: 24px; display: inline-flex;">${t['not-found-back']} →</a>
           </div>
         `;
-        bindFadeIn();
+        requestAnimationFrame(() => {
+          const wrapper = reader.querySelector('.fade-in');
+          if (wrapper) wrapper.classList.add('visible');
+        });
         return;
       }
 
@@ -1028,29 +1172,61 @@
           </div>
         </div>
       `;
-      bindFadeIn();
+      // Use requestAnimationFrame instead of IntersectionObserver for the reader
+      // skeleton: rAF fires after layout is computed, so the transition plays
+      // correctly without the display:none→block timing race that IO has.
+      requestAnimationFrame(() => {
+        const wrapper = reader.querySelector('.fade-in');
+        if (wrapper) wrapper.classList.add('visible');
+      });
 
       // load body on demand
       const lang = post.lang || 'both';
       const wantedLang = (lang === 'both') ? currentLang : lang;
+
+      // Helper: write html into #reader-body only if the element still belongs to
+      // this render pass (identified by the slug stamped on it). If the user
+      // navigated away while the fetch was in flight, the element is either gone
+      // or belongs to a different post — skip silently.
+      function writeBody(html) {
+        const el = document.getElementById('reader-body');
+        if (!el || el.dataset.slug !== slug) return false;
+        el.innerHTML = html;
+        return true;
+      }
+
+      // Stamp the slug on the element so writeBody can validate it later.
       const bodyEl = document.getElementById('reader-body');
+      if (bodyEl) bodyEl.dataset.slug = slug;
+
       try {
-        const html = await loadPostBody(slug, wantedLang);
-        bodyEl.innerHTML = html;
+        let html = await loadPostBody(slug, wantedLang);
+        // If the resolved value is empty (rare race: cache returned '' or script
+        // registered too late), clear the stale cache entry and retry once.
+        if (!html) {
+          if (window.__BLOG_POSTS) delete window.__BLOG_POSTS[`${slug}:${wantedLang}`];
+          html = await loadPostBody(slug, wantedLang);
+        }
+        writeBody(html);
+        buildToc();
       } catch (e) {
         // fall back to the other language if this is a bilingual post
         if (lang === 'both') {
           const altLang = wantedLang === 'zh' ? 'en' : 'zh';
           try {
             const html = await loadPostBody(slug, altLang);
-            bodyEl.innerHTML = html;
+            writeBody(html);
+            buildToc();
             return;
           } catch (_) {}
         }
-        bodyEl.innerHTML = `
-          <p style="color: #d96e6e;">Failed to load post body.</p>
-          <pre><code>${String(e).replace(/[<>&]/g, c => ({'<':'&lt;','>':'&gt;','&':'&amp;'})[c])}</code></pre>
-        `;
+        const el = document.getElementById('reader-body');
+        if (el && el.dataset.slug === slug) {
+          el.innerHTML = `
+            <p style="color: #d96e6e;">Failed to load post body.</p>
+            <pre><code>${String(e).replace(/[<>&]/g, c => ({'<':'&lt;','>':'&gt;','&':'&amp;'})[c])}</code></pre>
+          `;
+        }
       }
     }
 
@@ -1067,6 +1243,7 @@
       } else {
         reader.style.display = 'none';
         list.style.display = 'block';
+        clearToc();
         renderTagBar();
         renderList();
       }

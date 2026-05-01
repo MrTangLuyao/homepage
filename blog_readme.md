@@ -153,6 +153,28 @@ Need a new prose element? Add it both to the post body AND to `.reader-body …`
 
 ---
 
+## TOC sidebar (table of contents)
+
+On wide viewports (≥ 1300 px), the reader automatically builds a sticky left sidebar with all `<h2>` and `<h3>` headings from the post body. Clicking a heading scrolls smoothly to it; the current section is highlighted as the user scrolls.
+
+**How it works:**
+- `buildToc()` is called in `renderReader` right after `writeBody(html)` succeeds.
+- It queries `#reader-body` for `h2, h3` elements, assigns stable `id` attributes (slugified from text), and renders `<a class="toc-link">` elements into `<nav id="toc-sidebar">`.
+- An `IntersectionObserver` with `rootMargin: '-10% 0px -80% 0px'` tracks which heading is in the upper portion of the viewport and adds `.toc-current` to the matching link.
+- Clicks use `scrollIntoView({ behavior: 'smooth' })` with `e.preventDefault()` — **do not let these links change `location.hash`**, because any hash change triggers `route()` which would navigate away from the post.
+- `clearToc()` is called in `route()` when switching back to the list view; it disconnects the observer and empties the sidebar.
+- Language toggle rebuilds the TOC automatically because `applyLang → route → renderReader → writeBody → buildToc`.
+
+**CSS positioning:**
+```css
+left: max(20px, calc(50vw - 450px - 210px));
+```
+This keeps the TOC left of the 880 px content column regardless of viewport width. Hidden via `display: none !important` below 1300 px.
+
+**Post authoring note:** The TOC is driven entirely by `<h2>` and `<h3>` in the post body — no extra markup needed. Posts with fewer than 2 headings get no sidebar.
+
+---
+
 ## ⚠️ Template-literal escaping
 
 `post.<lang>.js` body strings are JS backtick-delimited template literals. Two characters need escaping:
@@ -246,6 +268,7 @@ Language preference persists via `localStorage['louie-lang']` and is shared with
 7. **No code highlighting** is bundled. If a post needs syntax highlighting, ship a small highlighter (Prism, Shiki) or stick with plain `<pre><code>`.
 8. **Date format**: ISO 8601 only (`YYYY-MM-DD`). Anything else makes Luxon return "Invalid DateTime".
 9. **Tag filter doesn't reset on language switch** — by design (`activeTag` is module-scoped). If you change tags between languages, just click "All".
+10. **Reader skeleton uses `requestAnimationFrame` to reveal itself, not `IntersectionObserver`.** When `route()` flips `view-reader` from `display:none` to `display:block` and then immediately calls `renderReader`, the IO fires before layout is recomputed and reports `isIntersecting: false` — so the `.visible` class never gets added and the entire reader stays at `opacity: 0` (blank screen). The fix: after `reader.innerHTML = skeleton`, call `requestAnimationFrame(() => wrapper.classList.add('visible'))`. rAF fires after layout is stable, so the CSS transition plays correctly. The list-view cards still use IO because they scroll into view from a stable layout — no issue there. **Do not switch the reader back to IO.**
 
 ---
 
@@ -257,12 +280,16 @@ Language preference persists via `localStorage['louie-lang']` and is shared with
 - [ ] Body HTML uses only the elements listed in "Post body conventions"
 - [ ] Asset paths in body use `blog_data/<slug>/...` (resolved against `blog.html`)
 - [ ] No unescaped `` ` `` or `${` inside body strings
+- [ ] **Headings are well-structured for the TOC** — use `<h2>` for top-level sections and `<h3>` for sub-sections. The sidebar appears automatically when there are ≥ 2 headings. Avoid skipping levels (e.g. `<h2>` → `<h4>`) since only h2/h3 are picked up.
+- [ ] **Heading text is concise** — TOC links are 220 px wide; very long headings wrap to two lines. Aim for headings under ~30 characters where possible.
 - [ ] Manifest entry appended in `manifest.js` (matching `slug`, `date`, `title`, `excerpt`, `lang`, etc.)
+- [ ] Cover image: place `cover.webp` in `blog_data/<slug>/` and add `cover: 'cover.webp'` to the manifest entry. Convert PNG → WebP with `cwebp -q 90 cover.png -o cover.webp`.
 - [ ] `pinned` / `draft` set deliberately (or omitted)
 - [ ] If editing an existing post, `updated` bumped (or deliberately not)
 - [ ] Top-level `manifest.updated` bumped
 - [ ] Verified locally by opening `blog.html` directly in the browser — list view AND clicking through to the reader should both work
 - [ ] If `lang: 'both'`, verified in **both** languages via the language toggle
+- [ ] On a wide screen (≥ 1360 px), verify the TOC sidebar appears and scroll-spy highlights correctly
 
 ---
 

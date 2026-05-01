@@ -11,8 +11,59 @@
 
 window.__BLOG_MANIFEST = {
   version: 3,
-  updated: '2026-05-01',
+  updated: '2026-05-02',
   posts: [
+
+    {
+      slug: 'sql-syntax-guide-1',
+      date: '2026-05-02',
+      title: {
+        zh: 'SQL 基础语法 1',
+        en: 'SQL Basic Syntax 1'
+      },
+      excerpt: {
+        zh: 'SELECT · FROM · WHERE · 比较运算符 · AND/OR/NOT · IN · BETWEEN · LIKE · IS NULL · ORDER BY',
+        en: 'SELECT · FROM · WHERE · Operators · AND/OR/NOT · IN · BETWEEN · LIKE · IS NULL · ORDER BY'
+      },
+      cover: 'cover.webp',
+      tags: ['sql', 'guide'],
+      readingTime: 20,
+      lang: 'both'
+    },
+
+    {
+      slug: 'sql-syntax-guide-2',
+      date: '2026-05-02',
+      title: {
+        zh: 'SQL 基础语法 2',
+        en: 'SQL Basic Syntax 2'
+      },
+      excerpt: {
+        zh: 'LIMIT · DISTINCT · AS · JOIN · COUNT · GROUP BY · HAVING',
+        en: 'LIMIT · DISTINCT · AS · JOIN · COUNT · GROUP BY · HAVING'
+      },
+      cover: 'cover.webp',
+      tags: ['sql', 'guide'],
+      readingTime: 22,
+      lang: 'both'
+    },
+
+    {
+      slug: 'sql-syntax-guide-3',
+      date: '2026-05-02',
+      title: {
+        zh: 'SQL 基础语法 3',
+        en: 'SQL Basic Syntax 3'
+      },
+      excerpt: {
+        zh: '子查询 · EXISTS · COALESCE · CASE WHEN · 执行顺序 · 实用技巧',
+        en: 'Subqueries · EXISTS · COALESCE · CASE WHEN · Execution Order · Practical Tips'
+      },
+      cover: 'cover.webp',
+      tags: ['sql', 'guide'],
+      readingTime: 18,
+      lang: 'both'
+    },
 
     {
       slug: 'welcome',
