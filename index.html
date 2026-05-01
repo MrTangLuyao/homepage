@@ -423,7 +423,7 @@
     }
 
     .hero-name-wrap {
-      min-height: calc(clamp(2.8rem, 8vw, 5rem) * 1.05 * 2);
+      min-height: calc(clamp(2.8rem, 8vw, 5rem) * 1.2 * 2);
       margin-bottom: 40px;
       display: flex;
       flex-direction: column;
@@ -434,7 +434,7 @@
     .hero-name {
       font-size: clamp(2.8rem, 8vw, 5rem);
       font-weight: 800;
-      line-height: 1.05;
+      line-height: 1.2;
       letter-spacing: -0.03em;
       background: linear-gradient(135deg, #FFFFFF 0%, #F0D4B8 100%);
       background-size: 300% auto;
@@ -982,6 +982,40 @@
       border-radius: 6px;
     }
 
+    /* ─── NAV HINT ─── */
+    #nav-hint {
+      position: fixed;
+      top: 102px;
+      left: 110px;
+      z-index: 9998;
+      pointer-events: none;
+      color: var(--accent);
+      display: flex;
+      flex-direction: column;
+      align-items: flex-start;
+      gap: 12px;
+      opacity: 0;
+      transition: opacity 1s ease;
+    }
+    #nav-hint.show { opacity: 0.8; }
+    .hint-arrow {
+      width: 44px;
+      height: 44px;
+      margin-left: 2px;
+    }
+    .hint-text {
+      font-size: 13px;
+      font-weight: 600;
+      line-height: 1.4;
+      background: rgba(217, 140, 112, 0.05);
+      padding: 10px 14px;
+      border-radius: 12px;
+      border: 1px solid rgba(217, 140, 112, 0.15);
+      backdrop-filter: blur(10px);
+      -webkit-backdrop-filter: blur(10px);
+      box-shadow: 0 4px 20px rgba(0, 0, 0, 0.2);
+    }
+
     /* ─── RESPONSIVE ─── */
     @media (max-width: 768px) {
       nav { padding: 16px 24px; }
@@ -991,6 +1025,9 @@
       .licenses-list { grid-template-columns: 1fr; }
       #win-profile, #win-terminal { display: none !important; }
       #cat-mascot { width: 8rem !important; left: 50% !important; }
+      #nav-hint { left: 36px; top: 82px; gap: 8px; }
+      .hint-arrow { width: 34px; height: 34px; }
+      .hint-text { font-size: 12px; padding: 8px 12px; }
     }
   </style>
 </head>
@@ -1002,6 +1039,16 @@
   <div id="scanline"></div>
   <div id="cursor-glow"></div>
   <canvas id="grid-dots"></canvas>
+
+  <div id="nav-hint">
+    <svg class="hint-arrow" viewBox="0 0 100 100" fill="none" stroke="currentColor" stroke-width="6" stroke-linecap="round" stroke-linejoin="round">
+      <path d="M85 85 C 30 85, 20 60, 20 15" />
+      <path d="M5 35 L 20 15 L 35 35" />
+    </svg>
+    <div class="hint-text" data-i18n="nav-hint">
+      点击这里能切换我的不同网页
+    </div>
+  </div>
 
   <nav id="navbar">
     <div class="page-switcher" id="page-switcher">
@@ -1076,20 +1123,20 @@
         </div>
       </div>
       <div class="mt-4" style="display:flex;gap:14px;flex-wrap:wrap;align-items:center;">
-        <a href="mailto:louieluyaotang@gmail.com" class="hero-email">
-          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
-            <path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"></path>
-            <polyline points="22,6 12,13 2,6"></polyline>
-          </svg>
-          <span data-i18n="hero-email-btn">Email Me</span>
-        </a>
-        <a href="blog.html" class="hero-blog-btn">
+        <a href="blog.html" class="hero-email">
           <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
             <path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"></path>
             <polyline points="15 3 21 3 21 9"></polyline>
             <line x1="10" y1="14" x2="21" y2="3"></line>
           </svg>
-          <span>View my Blog</span>
+          <span data-i18n="hero-blog-btn">View my Blog</span>
+        </a>
+        <a href="mailto:louieluyaotang@gmail.com" class="hero-blog-btn">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"></path>
+            <polyline points="22,6 12,13 2,6"></polyline>
+          </svg>
+          <span data-i18n="hero-email-btn">Email Me</span>
         </a>
       </div>
     </div>
@@ -1355,7 +1402,7 @@
       zh: {
         'nav-about': 'About','nav-projects': 'Projects','nav-social': 'Social','nav-links': 'Links',
         'nav-system95': "Louie's 95",'nav-licenses': 'Licenses','nav-contact': 'Contact',
-        'hero-greeting': '你好, 陌生人!','hero-email-btn': 'Email Me',
+        'hero-greeting': '你好, 陌生人!','hero-email-btn': 'Email Me', 'hero-blog-btn': 'View my Blog',
         'section-about': 'About','section-projects': 'Projects','section-social': 'Social',
         'section-links': 'Friend Links','section-system95': "Louie's 95",'section-licenses': 'OPEN SOURCE LICENSES',
         'about-text': '来自江城武汉，现旅居颠倒世界墨尔本。<br><br>',
@@ -1367,13 +1414,14 @@
         'contact-desc': '我的收件箱始终敞开。无论是有项目合作、技术交流，还是简单地打个招呼，我都会尽量回复。',
         'footer-built': 'homepage ♥ 构建',
         'l_trait': '爱好:', 'v_trait': '游戏，摆弄电子产品', 't_about': 'ABOUT_ME',
-        'v_about': '来自江城武汉，现旅居颠倒世界墨尔本。'
+        'v_about': '来自江城武汉，现旅居颠倒世界墨尔本。',
+        'nav-hint': '点击这里能切换我的不同网页'
       },
       en: {
         'nav-about': 'About','nav-projects': 'Projects','nav-social': 'Social','nav-links': 'Links',
         'nav-system95': "Louie's 95",'nav-licenses': 'Licenses','nav-contact': 'Contact',
         'hero-greeting': 'hello, world!',
-        'hero-email-btn': 'Email Me',
+        'hero-email-btn': 'Email Me', 'hero-blog-btn': 'View my Blog',
         'section-about': 'About','section-projects': 'Projects','section-social': 'Social',
         'section-links': 'Friend Links','section-system95': "Louie's 95",'section-licenses': 'OPEN SOURCE LICENSES',
         'about-text': 'Born in Wuhan, currently residing in Melbourne — the Upside Down.<br><br>',
@@ -1385,7 +1433,8 @@
         'contact-desc': "My inbox is always open. Whether it's a collaboration proposal, a tech chat, or just a hello — I'll do my best to reply.",
         'footer-built': 'homepage ♥ built',
         'l_trait': 'CLASS:', 'v_trait': 'Gaming, Electronics Enthusiast', 't_about': 'ABOUT_ME',
-        'v_about': 'Born in Wuhan, currently residing in Melbourne — the Upside Down.'
+        'v_about': 'Born in Wuhan, currently residing in Melbourne — the Upside Down.',
+        'nav-hint': 'Click here to switch between my different pages'
       }
     };
 
@@ -1409,6 +1458,19 @@
       currentLang = currentLang === 'zh' ? 'en' : 'zh';
       applyLang(currentLang);
     }
+
+    /* ─── Nav Hint ─── */
+    (function() {
+      const hint = document.getElementById('nav-hint');
+      if (!hint) return;
+      // Show after a short delay
+      setTimeout(() => hint.classList.add('show'), 500);
+      // Hide after 10 seconds
+      setTimeout(() => {
+        hint.classList.remove('show');
+        setTimeout(() => hint.remove(), 1000); // remove from DOM after fade
+      }, 10000);
+    })();
 
     const userBrowserLang = navigator.language.toLowerCase();
     if (userBrowserLang === 'zh-cn' || userBrowserLang === 'zh') currentLang = 'zh';

@@ -570,6 +570,40 @@
       position: relative; z-index: 10;
     }
 
+    /* ─── NAV HINT ─── */
+    #nav-hint {
+      position: fixed;
+      top: 102px;
+      left: 110px;
+      z-index: 9998;
+      pointer-events: none;
+      color: var(--accent);
+      display: flex;
+      flex-direction: column;
+      align-items: flex-start;
+      gap: 12px;
+      opacity: 0;
+      transition: opacity 1s ease;
+    }
+    #nav-hint.show { opacity: 0.8; }
+    .hint-arrow {
+      width: 44px;
+      height: 44px;
+      margin-left: 2px;
+    }
+    .hint-text {
+      font-size: 13px;
+      font-weight: 600;
+      line-height: 1.4;
+      background: rgba(217, 140, 112, 0.05);
+      padding: 10px 14px;
+      border-radius: 12px;
+      border: 1px solid rgba(217, 140, 112, 0.15);
+      backdrop-filter: blur(10px);
+      -webkit-backdrop-filter: blur(10px);
+      box-shadow: 0 4px 20px rgba(0, 0, 0, 0.2);
+    }
+
     /* ─── RESPONSIVE ─── */
     @media (max-width: 768px) {
       nav { padding: 16px 24px; }
@@ -580,6 +614,9 @@
       .post-cover { aspect-ratio: 16 / 9; }
       .post-card-arrow { top: 22px; right: 22px; }
       .reader-body h2 { margin-top: 40px; }
+      #nav-hint { left: 36px; top: 82px; gap: 8px; }
+      .hint-arrow { width: 34px; height: 34px; }
+      .hint-text { font-size: 12px; padding: 8px 12px; }
     }
   </style>
 </head>
@@ -590,6 +627,16 @@
   <div id="grain"></div>
   <div id="scanline"></div>
   <div id="cursor-glow"></div>
+
+  <div id="nav-hint">
+    <svg class="hint-arrow" viewBox="0 0 100 100" fill="none" stroke="currentColor" stroke-width="6" stroke-linecap="round" stroke-linejoin="round">
+      <path d="M85 85 C 30 85, 20 60, 20 15" />
+      <path d="M5 35 L 20 15 L 35 35" />
+    </svg>
+    <div class="hint-text" data-i18n="nav-hint">
+      点击这里能切换我的不同网页
+    </div>
+  </div>
 
   <nav id="navbar">
     <div class="page-switcher" id="page-switcher">
@@ -670,7 +717,8 @@
         'footer-copy': 'Copyright © 2026 路易的博客',
         'not-found-title': '没找到这篇文章',
         'not-found-desc': '可能链接已失效，回到列表试试看。',
-        'not-found-back': '回到博客列表'
+        'not-found-back': '回到博客列表',
+        'nav-hint': '点击这里能切换我的不同网页'
       },
       en: {
         'blog-greeting': 'notes',
@@ -685,7 +733,8 @@
         'footer-copy': 'Copyright © 2026 Louie’s Blog',
         'not-found-title': 'Post not found',
         'not-found-desc': 'The link may have changed. Go back to the list and try again.',
-        'not-found-back': 'Back to blog'
+        'not-found-back': 'Back to blog',
+        'nav-hint': 'Click here to switch between my different pages'
       }
     };
 
@@ -713,6 +762,19 @@
       currentLang = currentLang === 'zh' ? 'en' : 'zh';
       applyLang(currentLang);
     }
+
+    /* ─── Nav Hint ─── */
+    (function() {
+      const hint = document.getElementById('nav-hint');
+      if (!hint) return;
+      // Show after a short delay
+      setTimeout(() => hint.classList.add('show'), 500);
+      // Hide after 10 seconds
+      setTimeout(() => {
+        hint.classList.remove('show');
+        setTimeout(() => hint.remove(), 1000); // remove from DOM after fade
+      }, 10000);
+    })();
 
     /* ─── Nav scroll ─── */
     window.addEventListener('scroll', () => {
