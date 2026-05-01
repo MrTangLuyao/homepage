@@ -1,0 +1,1021 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+  <meta name="description" content="Louie's Blog — dev logs, notes, and small experiments">
+  <title>Louie — Blog</title>
+  <link rel="icon" href="lib/pp_icon.ico">
+  <link rel="stylesheet" href="lib/fonts.css">
+  <script src="lib/tailwindcss.js"></script>
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    :root {
+      --bg: #06060a;
+      --surface: #0e0e14;
+      --border: #1c1c28;
+      --text: #e8e8e8;
+      --muted: #7a7a8c;
+      --accent: #d98c70;
+      --accent-dim: rgba(217, 140, 112, 0.08);
+      --accent2: #8b70d9;
+      --accent2-dim: rgba(139, 112, 217, 0.06);
+      --glow: rgba(217, 140, 112, 0.12);
+    }
+
+    html { scroll-behavior: smooth; background-color: var(--bg); overscroll-behavior: none; }
+
+    body {
+      background-color: transparent;
+      color: var(--text);
+      font-family: 'JetBrains Mono', 'HarmonyOS Sans', 'PingFang SC', 'Microsoft YaHei', sans-serif;
+      font-size: 16px;
+      line-height: 1.8;
+      -webkit-font-smoothing: antialiased;
+      -moz-osx-font-smoothing: grayscale;
+      text-rendering: optimizeLegibility;
+      overflow-x: hidden;
+      overscroll-behavior: none;
+      -webkit-user-select: text;
+      user-select: text;
+    }
+
+    img, a { -webkit-user-drag: none; }
+
+    ::-webkit-scrollbar { width: 3px; }
+    ::-webkit-scrollbar-track { background: var(--bg); }
+    ::-webkit-scrollbar-thumb { background: rgba(217, 140, 112, 0.3); border-radius: 2px; }
+
+    /* ─── BACKGROUND (mirrors index.html) ─── */
+    #bg-layer { position: fixed; inset: 0; z-index: -2; background: var(--bg); }
+    #bg-layer::before {
+      content: ''; position: absolute; inset: 0;
+      background:
+        radial-gradient(ellipse 70% 55% at 20% 20%, rgba(217, 140, 112, 0.07) 0%, transparent 60%),
+        radial-gradient(ellipse 60% 50% at 80% 75%, rgba(139, 112, 217, 0.06) 0%, transparent 60%),
+        radial-gradient(ellipse 50% 40% at 60% 10%, rgba(112, 170, 217, 0.04) 0%, transparent 55%),
+        radial-gradient(ellipse 80% 60% at 10% 85%, rgba(217, 140, 112, 0.04) 0%, transparent 60%);
+      animation: auroraShift 18s ease-in-out infinite alternate;
+    }
+    #bg-layer::after {
+      content: ''; position: absolute; inset: 0;
+      background-image:
+        linear-gradient(rgba(255,255,255,0.018) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(255,255,255,0.018) 1px, transparent 1px);
+      background-size: 60px 60px;
+      mask-image: radial-gradient(ellipse 90% 80% at 50% 50%, black 30%, transparent 100%);
+    }
+    @keyframes auroraShift {
+      0%   { opacity: 1; transform: scale(1) rotate(0deg); }
+      50%  { opacity: 0.7; transform: scale(1.06) rotate(1deg); }
+      100% { opacity: 1; transform: scale(1.02) rotate(-0.5deg); }
+    }
+
+    #grain {
+      position: fixed; inset: -50%; width: 200%; height: 200%;
+      z-index: -1; opacity: 0.028; pointer-events: none;
+      background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 512 512' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.75' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)'/%3E%3C/svg%3E");
+      animation: grainMove 0.4s steps(1) infinite;
+    }
+    @keyframes grainMove {
+      0%   { transform: translate(0, 0); }
+      25%  { transform: translate(-3%, -5%); }
+      50%  { transform: translate(5%, 2%); }
+      75%  { transform: translate(-2%, 6%); }
+      100% { transform: translate(4%, -3%); }
+    }
+
+    #scanline {
+      position: fixed; inset: 0; z-index: -1; pointer-events: none;
+      background: repeating-linear-gradient(0deg, transparent, transparent 3px, rgba(0,0,0,0.06) 3px, rgba(0,0,0,0.06) 4px);
+      opacity: 0.4;
+    }
+
+    /* ─── NAV (mirrors index.html) ─── */
+    nav {
+      position: fixed; top: 0; left: 0; right: 0; z-index: 9999;
+      display: flex; align-items: center; justify-content: space-between;
+      padding: 24px 48px;
+      background: rgba(29, 29, 31, 0.65);
+      backdrop-filter: blur(24px) saturate(180%);
+      -webkit-backdrop-filter: blur(24px) saturate(180%);
+      border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+      transition: border-color 0.4s ease, padding 0.4s ease, background 0.4s ease;
+    }
+    nav.scrolled { padding: 14px 48px; }
+
+    .nav-logo {
+      color: var(--text); font-weight: 700; font-size: 18px;
+      text-decoration: none; letter-spacing: 0.05em;
+    }
+    .nav-logo span { color: var(--accent); }
+
+    .nav-links {
+      display: flex; align-items: center; gap: 36px; list-style: none;
+    }
+    .nav-links a {
+      color: var(--muted); text-decoration: none; font-size: 13px;
+      letter-spacing: 0.08em; text-transform: uppercase;
+      transition: color 0.3s ease; display: block; padding: 10px; margin: -10px;
+      position: relative;
+    }
+    .nav-links a::after {
+      content: ''; position: absolute; bottom: 4px; left: 10px; right: 10px;
+      height: 1px; background: var(--accent);
+      transform: scaleX(0); transform-origin: left;
+      transition: transform 0.3s cubic-bezier(0.25, 1, 0.5, 1);
+    }
+    .nav-links a:hover { color: var(--accent); }
+    .nav-links a:hover::after { transform: scaleX(1); }
+
+    .lang-toggle {
+      background: none; border: 1px solid rgba(217, 140, 112, 0.2);
+      color: var(--muted); font-family: inherit; font-size: 13px;
+      letter-spacing: 0.1em; padding: 5px 12px; border-radius: 3px;
+      cursor: pointer; white-space: nowrap;
+      transition: color 0.3s ease, border-color 0.3s ease, background 0.3s ease, box-shadow 0.3s ease;
+    }
+    .lang-toggle:hover {
+      color: var(--accent); border-color: rgba(217, 140, 112, 0.5);
+      background: rgba(217, 140, 112, 0.06);
+      box-shadow: 0 0 12px rgba(217, 140, 112, 0.1);
+    }
+
+    /* ─── BRAND SWITCHER (logo + dropdown as one unit) ─── */
+    .page-switcher { position: relative; font-family: inherit; }
+
+    .brand-switcher {
+      display: inline-flex;
+      align-items: baseline;
+      gap: 4px;
+      padding: 6px 10px 6px 8px;
+      margin-left: -8px;
+      background: transparent;
+      border: 1px solid transparent;
+      border-radius: 8px;
+      color: var(--text);
+      font-family: inherit;
+      font-size: 18px;
+      font-weight: 700;
+      letter-spacing: 0.05em;
+      cursor: pointer;
+      text-decoration: none;
+      transition: background 0.25s ease, border-color 0.25s ease;
+    }
+    .brand-switcher:hover,
+    .page-switcher.open .brand-switcher {
+      background: rgba(255, 255, 255, 0.03);
+      border-color: rgba(255, 255, 255, 0.06);
+    }
+
+    .brand-switcher-static { color: var(--text); }
+    .brand-switcher-static .accent { color: var(--accent); }
+
+    .brand-switcher-current {
+      color: var(--muted);
+      font-weight: 500;
+      transition: color 0.25s ease;
+    }
+    .brand-switcher:hover .brand-switcher-current,
+    .page-switcher.open .brand-switcher-current {
+      color: var(--accent);
+    }
+
+    .brand-switcher-chevron {
+      width: 10px; height: 10px;
+      align-self: center;
+      margin-left: 2px;
+      opacity: 0.35;
+      color: var(--muted);
+      transition: opacity 0.2s ease, transform 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
+    }
+    .brand-switcher:hover .brand-switcher-chevron { opacity: 0.7; }
+    .page-switcher.open .brand-switcher-chevron {
+      opacity: 0.85;
+      transform: rotate(180deg);
+      color: var(--accent);
+    }
+
+    .page-switcher-menu {
+      position: absolute; top: calc(100% + 8px); left: 0;
+      min-width: 170px;
+      background: rgba(20, 20, 26, 0.92);
+      backdrop-filter: blur(28px) saturate(180%);
+      -webkit-backdrop-filter: blur(28px) saturate(180%);
+      border: 1px solid rgba(255, 255, 255, 0.08);
+      border-radius: 10px;
+      padding: 5px;
+      display: flex; flex-direction: column; gap: 2px;
+      box-shadow: 0 16px 48px rgba(0, 0, 0, 0.45), 0 0 0 1px rgba(217, 140, 112, 0.04);
+      opacity: 0; pointer-events: none;
+      transform: translateY(-6px) scale(0.97);
+      transform-origin: top left;
+      transition: opacity 0.22s ease, transform 0.22s cubic-bezier(0.34, 1.56, 0.64, 1);
+      z-index: 10001;
+    }
+    .page-switcher.open .page-switcher-menu {
+      opacity: 1; pointer-events: auto;
+      transform: translateY(0) scale(1);
+    }
+
+    .page-switcher-item {
+      display: flex; align-items: center; justify-content: space-between;
+      gap: 16px; padding: 8px 12px; border-radius: 6px;
+      color: var(--muted); text-decoration: none;
+      font-size: 14px; font-weight: 600; letter-spacing: 0.02em;
+      transition: color 0.2s ease, background 0.2s ease;
+    }
+    .page-switcher-item:hover { color: var(--text); background: rgba(255, 255, 255, 0.04); }
+    .page-switcher-item.active {
+      color: var(--text);
+      background: rgba(217, 140, 112, 0.08);
+    }
+    .page-switcher-item .accent { color: var(--accent); }
+
+    .page-switcher-item-dot {
+      width: 5px; height: 5px; border-radius: 50%;
+      background: var(--accent);
+      box-shadow: 0 0 8px rgba(217, 140, 112, 0.6);
+      opacity: 0; transform: scale(0.6);
+      transition: opacity 0.2s ease, transform 0.2s ease;
+    }
+    .page-switcher-item.active .page-switcher-item-dot { opacity: 1; transform: scale(1); }
+
+    /* ─── LAYOUT ─── */
+    main { padding: 140px 24px 80px; max-width: 880px; margin: 0 auto; position: relative; z-index: 10; }
+
+    /* ─── HERO ─── */
+    .blog-hero { margin-bottom: 64px; }
+    .blog-hero-greeting {
+      color: var(--accent); font-size: 13px; letter-spacing: 0.25em;
+      text-transform: uppercase; margin-bottom: 20px;
+      display: inline-flex; align-items: center; gap: 12px;
+    }
+    .blog-hero-greeting::before {
+      content: ''; display: inline-block; width: 32px; height: 1px;
+      background: var(--accent); opacity: 0.6;
+    }
+    .blog-hero-title {
+      display: block;
+      font-size: clamp(2.4rem, 6vw, 4rem);
+      font-weight: 800; line-height: 1.2; letter-spacing: -0.03em;
+      background: linear-gradient(135deg, #FFFFFF 0%, #F0D4B8 100%);
+      color: transparent; -webkit-background-clip: text; background-clip: text;
+      margin-bottom: 18px;
+      padding-bottom: 0.12em;
+    }
+    .blog-hero-sub {
+      color: var(--muted); font-size: 17px; line-height: 1.9; max-width: 600px;
+    }
+
+    /* ─── TAG FILTERS ─── */
+    .blog-tagbar {
+      display: flex; flex-wrap: wrap; gap: 8px;
+      padding: 18px 0; margin-bottom: 28px;
+      border-top: 1px solid rgba(255, 255, 255, 0.04);
+      border-bottom: 1px solid rgba(255, 255, 255, 0.04);
+    }
+    .blog-tag-btn {
+      font-family: inherit; cursor: pointer;
+      font-size: 12px; color: var(--muted);
+      background: rgba(255, 255, 255, 0.02);
+      padding: 5px 12px; border-radius: 99px;
+      border: 1px solid rgba(255, 255, 255, 0.06);
+      letter-spacing: 0.05em;
+      transition: all 0.25s ease;
+    }
+    .blog-tag-btn:hover {
+      color: var(--accent); border-color: rgba(217, 140, 112, 0.3);
+    }
+    .blog-tag-btn.active {
+      color: var(--accent); background: rgba(217, 140, 112, 0.1);
+      border-color: rgba(217, 140, 112, 0.4);
+    }
+
+    /* ─── POST LIST ─── */
+    .blog-list { display: grid; gap: 16px; }
+
+    .post-card {
+      background: rgba(35, 35, 37, 0.4);
+      backdrop-filter: blur(40px) saturate(150%);
+      -webkit-backdrop-filter: blur(40px) saturate(150%);
+      border: 1px solid rgba(255, 255, 255, 0.06);
+      box-shadow: 0 8px 32px rgba(0, 0, 0, 0.25);
+      border-radius: 14px;
+      padding: 28px;
+      text-decoration: none; color: inherit;
+      display: grid;
+      grid-template-columns: 140px 1fr;
+      gap: 24px; align-items: stretch;
+      transition: transform 0.4s cubic-bezier(0.16, 1, 0.3, 1), border-color 0.4s, background 0.4s, box-shadow 0.4s;
+      position: relative; overflow: hidden;
+    }
+    .post-card.no-cover { grid-template-columns: 1fr; }
+    .post-card:hover {
+      transform: translateY(-3px);
+      background: rgba(50, 50, 53, 0.5);
+      border-color: rgba(217, 140, 112, 0.18);
+      box-shadow: 0 16px 48px rgba(0, 0, 0, 0.4);
+    }
+
+    .post-cover {
+      width: 100%; aspect-ratio: 1 / 1;
+      border-radius: 10px; overflow: hidden;
+      background: rgba(217, 140, 112, 0.06);
+      display: flex; align-items: center; justify-content: center;
+    }
+    .post-cover img {
+      width: 100%; height: 100%; object-fit: cover;
+      transition: transform 0.6s cubic-bezier(0.16, 1, 0.3, 1);
+    }
+    .post-card:hover .post-cover img { transform: scale(1.04); }
+    .post-cover-fallback {
+      color: var(--accent); opacity: 0.5; font-size: 32px;
+      font-weight: 800; letter-spacing: -0.04em;
+    }
+
+    .post-card-body { display: flex; flex-direction: column; gap: 10px; min-width: 0; }
+
+    .post-card-meta {
+      display: flex; align-items: center; gap: 12px;
+      font-size: 12px; color: var(--muted);
+      letter-spacing: 0.04em;
+    }
+    .post-card-date {
+      font-variant-numeric: tabular-nums;
+      color: var(--accent); font-weight: 700;
+    }
+    .post-card-dot { width: 3px; height: 3px; border-radius: 50%; background: var(--muted); opacity: 0.5; }
+
+    .post-card-update {
+      color: var(--muted);
+      font-style: italic;
+      letter-spacing: 0.02em;
+    }
+
+    .post-pin {
+      display: inline-flex;
+      align-items: center;
+      gap: 5px;
+      font-size: 10px;
+      font-weight: 700;
+      color: var(--accent);
+      letter-spacing: 0.14em;
+      text-transform: uppercase;
+      background: rgba(217, 140, 112, 0.1);
+      border: 1px solid rgba(217, 140, 112, 0.25);
+      padding: 2px 8px 2px 7px;
+      border-radius: 99px;
+    }
+    .post-pin svg { transform: rotate(20deg); }
+
+    .post-card.is-pinned {
+      border-color: rgba(217, 140, 112, 0.18);
+      background: rgba(45, 38, 36, 0.45);
+    }
+    .post-card.is-pinned:hover {
+      border-color: rgba(217, 140, 112, 0.32);
+    }
+
+    .post-card-title {
+      color: #fff; font-size: 20px; font-weight: 700;
+      letter-spacing: -0.01em; line-height: 1.35;
+    }
+    .post-card-excerpt {
+      color: var(--muted); font-size: 14px; line-height: 1.8;
+      display: -webkit-box; -webkit-box-orient: vertical;
+      -webkit-line-clamp: 2; overflow: hidden;
+    }
+    .post-card-tags { display: flex; flex-wrap: wrap; gap: 6px; margin-top: 4px; }
+    .post-card-tag {
+      font-size: 11px; color: var(--accent);
+      background: rgba(217, 140, 112, 0.06);
+      padding: 2px 9px; border-radius: 3px;
+      border: 1px solid rgba(217, 140, 112, 0.12);
+      letter-spacing: 0.05em;
+    }
+
+    .post-card-arrow {
+      position: absolute; top: 28px; right: 28px;
+      color: var(--muted); font-size: 18px;
+      transition: color 0.3s ease, transform 0.3s ease;
+    }
+    .post-card:hover .post-card-arrow {
+      color: var(--accent); transform: translate(4px, -4px);
+    }
+
+    .blog-empty {
+      text-align: center; padding: 80px 24px;
+      color: var(--muted); font-size: 14px;
+    }
+
+    /* ─── READER VIEW ─── */
+    .reader-back {
+      display: inline-flex; align-items: center; gap: 8px;
+      color: var(--muted); text-decoration: none;
+      font-size: 13px; letter-spacing: 0.06em;
+      padding: 8px 14px 8px 10px; border-radius: 99px;
+      border: 1px solid rgba(255, 255, 255, 0.06);
+      background: rgba(255, 255, 255, 0.02);
+      transition: all 0.25s ease;
+      margin-bottom: 40px;
+    }
+    .reader-back:hover {
+      color: var(--accent); border-color: rgba(217, 140, 112, 0.3);
+      background: rgba(217, 140, 112, 0.06);
+      transform: translateX(-2px);
+    }
+
+    .reader-meta {
+      display: flex; flex-wrap: wrap; align-items: center; gap: 12px;
+      color: var(--muted); font-size: 12px;
+      letter-spacing: 0.06em; margin-bottom: 18px;
+    }
+    .reader-meta .post-card-date { font-size: 12px; }
+
+    .reader-title {
+      font-size: clamp(2rem, 4.6vw, 3.2rem);
+      font-weight: 800; line-height: 1.15; letter-spacing: -0.025em;
+      color: #fff; margin-bottom: 24px;
+    }
+
+    .reader-tags { display: flex; flex-wrap: wrap; gap: 6px; margin-bottom: 36px; }
+
+    .reader-cover {
+      margin: 0 0 48px;
+      border-radius: 14px; overflow: hidden;
+      border: 1px solid rgba(255, 255, 255, 0.06);
+      box-shadow: 0 16px 48px rgba(0, 0, 0, 0.35);
+    }
+    .reader-cover img { width: 100%; height: auto; display: block; }
+
+    /* prose */
+    .reader-body {
+      color: var(--text);
+      font-size: 16px; line-height: 1.95;
+      letter-spacing: 0.005em;
+    }
+    .reader-body > * + * { margin-top: 1.1em; }
+    .reader-body .lead {
+      font-size: 18px; color: #f0d4b8;
+      border-left: 2px solid var(--accent); padding-left: 18px;
+      margin-bottom: 32px; font-style: italic;
+    }
+    .reader-body h2 {
+      font-size: 22px; font-weight: 700; color: #fff;
+      letter-spacing: -0.01em; margin-top: 56px; margin-bottom: 16px;
+      padding-top: 16px; border-top: 1px solid rgba(255, 255, 255, 0.05);
+    }
+    .reader-body h2:first-child { margin-top: 0; padding-top: 0; border-top: none; }
+    .reader-body h3 { font-size: 18px; font-weight: 700; color: #fff; margin-top: 36px; }
+    .reader-body p { color: var(--text); }
+    .reader-body strong { color: var(--accent); font-weight: 700; }
+    .reader-body em { color: #f0d4b8; }
+    .reader-body a {
+      color: var(--accent); text-decoration: none;
+      border-bottom: 1px solid rgba(217, 140, 112, 0.3);
+      transition: border-color 0.25s ease;
+    }
+    .reader-body a:hover { border-bottom-color: var(--accent); }
+    .reader-body ul, .reader-body ol { padding-left: 28px; }
+    .reader-body li + li { margin-top: 6px; }
+    .reader-body code {
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 0.92em; color: var(--accent);
+      background: rgba(217, 140, 112, 0.07);
+      padding: 2px 8px; border-radius: 4px;
+      border: 1px solid rgba(217, 140, 112, 0.12);
+    }
+    .reader-body pre {
+      background: rgba(14, 14, 20, 0.7);
+      border: 1px solid rgba(255, 255, 255, 0.05);
+      border-radius: 8px;
+      padding: 18px 22px;
+      overflow-x: auto;
+      font-size: 13px; line-height: 1.7;
+    }
+    .reader-body pre code {
+      color: var(--text); background: none;
+      padding: 0; border: none; font-size: 13px;
+    }
+    .reader-body img {
+      max-width: 100%; height: auto; border-radius: 10px;
+      margin: 24px auto; display: block;
+      border: 1px solid rgba(255, 255, 255, 0.05);
+    }
+    .reader-body blockquote {
+      border-left: 3px solid var(--accent);
+      padding: 4px 20px; margin-left: 0;
+      color: var(--muted); font-style: italic;
+      background: rgba(217, 140, 112, 0.04);
+      border-radius: 0 6px 6px 0;
+    }
+    .reader-body hr {
+      border: none; height: 1px;
+      background: linear-gradient(90deg, transparent, rgba(217, 140, 112, 0.3), transparent);
+      margin: 48px 0;
+    }
+
+    .reader-footer {
+      margin-top: 80px; padding-top: 32px;
+      border-top: 1px solid rgba(255, 255, 255, 0.05);
+      display: flex; justify-content: space-between; align-items: center;
+      flex-wrap: wrap; gap: 16px;
+    }
+    .reader-footer-note { color: var(--muted); font-size: 13px; }
+    .reader-footer-link {
+      color: var(--accent); text-decoration: none; font-size: 13px;
+      letter-spacing: 0.06em; display: inline-flex; align-items: center; gap: 6px;
+      transition: transform 0.25s ease;
+    }
+    .reader-footer-link:hover { transform: translateX(3px); }
+
+    .post-not-found {
+      text-align: center; padding: 80px 24px;
+      color: var(--muted);
+    }
+    .post-not-found h2 {
+      color: #fff; font-size: 24px; margin-bottom: 12px;
+    }
+
+    /* ─── FADE IN ─── */
+    .fade-in {
+      opacity: 0; transform: translateY(20px);
+      transition: opacity 0.7s cubic-bezier(0.25, 1, 0.5, 1), transform 0.7s cubic-bezier(0.25, 1, 0.5, 1);
+    }
+    .fade-in.visible { opacity: 1; transform: none; }
+    .blog-list .fade-in:nth-child(2) { transition-delay: 0.06s; }
+    .blog-list .fade-in:nth-child(3) { transition-delay: 0.12s; }
+    .blog-list .fade-in:nth-child(4) { transition-delay: 0.18s; }
+    .blog-list .fade-in:nth-child(5) { transition-delay: 0.24s; }
+
+    /* ─── CURSOR GLOW ─── */
+    #cursor-glow {
+      position: fixed; width: 400px; height: 400px;
+      border-radius: 50%; pointer-events: none; z-index: 0;
+      background: radial-gradient(circle, rgba(217, 140, 112, 0.055) 0%, transparent 65%);
+      transform: translate(-50%, -50%);
+      transition: opacity 0.4s ease;
+      will-change: left, top;
+    }
+
+    /* ─── FOOTER ─── */
+    footer {
+      text-align: center; padding: 36px 24px;
+      color: var(--muted); font-size: 13px;
+      border-top: 1px solid rgba(255, 255, 255, 0.04);
+      background: rgba(0, 0, 0, 0.5); letter-spacing: 0.05em;
+      position: relative; z-index: 10;
+    }
+
+    /* ─── RESPONSIVE ─── */
+    @media (max-width: 768px) {
+      nav { padding: 16px 24px; }
+      nav.scrolled { padding: 14px 24px; }
+      .nav-links li:not(:last-child) { display: none; }
+      main { padding: 110px 20px 60px; }
+      .post-card { grid-template-columns: 1fr; padding: 22px; gap: 16px; }
+      .post-cover { aspect-ratio: 16 / 9; }
+      .post-card-arrow { top: 22px; right: 22px; }
+      .reader-body h2 { margin-top: 40px; }
+    }
+  </style>
+</head>
+
+<body>
+
+  <div id="bg-layer"></div>
+  <div id="grain"></div>
+  <div id="scanline"></div>
+  <div id="cursor-glow"></div>
+
+  <nav id="navbar">
+    <div class="page-switcher" id="page-switcher">
+      <button class="brand-switcher" type="button" aria-haspopup="listbox" aria-expanded="false" onclick="togglePageSwitcher(event)">
+        <span class="brand-switcher-static">louie<span class="accent">.</span></span><span class="brand-switcher-current">blog</span>
+        <svg class="brand-switcher-chevron" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"></polyline></svg>
+      </button>
+      <div class="page-switcher-menu" role="listbox">
+        <a href="index.html" class="page-switcher-item" role="option">
+          <span>louie<span class="accent">.</span>home</span>
+          <span class="page-switcher-item-dot"></span>
+        </a>
+        <a href="blog.html" class="page-switcher-item active" role="option" aria-current="page">
+          <span>louie<span class="accent">.</span>blog</span>
+          <span class="page-switcher-item-dot"></span>
+        </a>
+        <a href="95.html" class="page-switcher-item" role="option">
+          <span>louie<span class="accent">.</span>95</span>
+          <span class="page-switcher-item-dot"></span>
+        </a>
+      </div>
+    </div>
+    <ul class="nav-links">
+      <li>
+        <button class="lang-toggle" id="lang-toggle" onclick="toggleLang()">EN</button>
+      </li>
+    </ul>
+  </nav>
+
+  <main>
+    <!-- LIST VIEW -->
+    <div id="view-list">
+      <div class="blog-hero fade-in">
+        <p class="blog-hero-greeting" data-i18n="blog-greeting">notes</p>
+        <h1 class="blog-hero-title" data-i18n="blog-title">Blog</h1>
+        <p class="blog-hero-sub" data-i18n="blog-sub">Louie 的博客及文章</p>
+      </div>
+
+      <div class="blog-tagbar fade-in" id="tag-bar">
+        <button class="blog-tag-btn active" data-tag="__all" data-i18n="blog-tag-all">All</button>
+      </div>
+
+      <div class="blog-list" id="blog-list"></div>
+
+      <div class="blog-empty" id="blog-empty" style="display:none;" data-i18n="blog-empty">No posts yet — come back soon.</div>
+    </div>
+
+    <!-- READER VIEW -->
+    <article id="view-reader" style="display:none;">
+      <a href="#" class="reader-back" id="reader-back">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><line x1="19" y1="12" x2="5" y2="12"></line><polyline points="12 19 5 12 12 5"></polyline></svg>
+        <span data-i18n="reader-back">All posts</span>
+      </a>
+
+      <div id="reader-content"></div>
+    </article>
+  </main>
+
+  <footer>
+    <span data-i18n="footer-copy">Copyright © 2026 路易的博客</span>
+  </footer>
+
+  <script src="lib/luxon.min.js"></script>
+  <script src="blog_data/manifest.js"></script>
+  <script>
+    /* ─── i18n ─── */
+    const translations = {
+      zh: {
+        'blog-greeting': '笔记',
+        'blog-title': '博客',
+        'blog-sub': 'Louie 的博客及文章',
+        'blog-tag-all': '全部',
+        'blog-empty': '还没有文章——稍后回来看看吧。',
+        'reader-back': '所有文章',
+        'reader-min': '分钟',
+        'reader-updated': '更新于',
+        'reader-pinned': '置顶',
+        'footer-copy': 'Copyright © 2026 路易的博客',
+        'not-found-title': '没找到这篇文章',
+        'not-found-desc': '可能链接已失效，回到列表试试看。',
+        'not-found-back': '回到博客列表'
+      },
+      en: {
+        'blog-greeting': 'notes',
+        'blog-title': 'Blog',
+        'blog-sub': "Louie's blog & articles",
+        'blog-tag-all': 'All',
+        'blog-empty': 'No posts yet — come back soon.',
+        'reader-back': 'All posts',
+        'reader-min': 'min',
+        'reader-updated': 'Updated',
+        'reader-pinned': 'Pinned',
+        'footer-copy': 'Copyright © 2026 Louie’s Blog',
+        'not-found-title': 'Post not found',
+        'not-found-desc': 'The link may have changed. Go back to the list and try again.',
+        'not-found-back': 'Back to blog'
+      }
+    };
+
+    let currentLang = 'en';
+    const userBrowserLang = navigator.language.toLowerCase();
+    if (userBrowserLang === 'zh-cn' || userBrowserLang === 'zh') currentLang = 'zh';
+    try {
+      const saved = localStorage.getItem('louie-lang');
+      if (saved === 'zh' || saved === 'en') currentLang = saved;
+    } catch(e) {}
+
+    function applyLang(lang) {
+      const t = translations[lang];
+      document.querySelectorAll('[data-i18n]').forEach(el => {
+        const key = el.getAttribute('data-i18n');
+        if (t[key] !== undefined) el.innerHTML = t[key];
+      });
+      document.getElementById('lang-toggle').textContent = lang === 'zh' ? 'EN' : '中';
+      document.documentElement.lang = lang === 'zh' ? 'zh-CN' : 'en';
+      try { localStorage.setItem('louie-lang', lang); } catch(e) {}
+      route(); // re-render content for the new language
+    }
+
+    function toggleLang() {
+      currentLang = currentLang === 'zh' ? 'en' : 'zh';
+      applyLang(currentLang);
+    }
+
+    /* ─── Nav scroll ─── */
+    window.addEventListener('scroll', () => {
+      document.getElementById('navbar').classList.toggle('scrolled', window.scrollY > 50);
+    });
+
+    /* ─── Page switcher dropdown ─── */
+    function togglePageSwitcher(e) {
+      if (e) e.stopPropagation();
+      const sw = document.getElementById('page-switcher');
+      if (!sw) return;
+      const opening = !sw.classList.contains('open');
+      sw.classList.toggle('open');
+      const trigger = sw.querySelector('.page-switcher-trigger');
+      if (trigger) trigger.setAttribute('aria-expanded', opening ? 'true' : 'false');
+    }
+    document.addEventListener('click', (e) => {
+      const sw = document.getElementById('page-switcher');
+      if (!sw) return;
+      if (!sw.contains(e.target)) {
+        sw.classList.remove('open');
+        const trigger = sw.querySelector('.page-switcher-trigger');
+        if (trigger) trigger.setAttribute('aria-expanded', 'false');
+      }
+    });
+    document.addEventListener('keydown', (e) => {
+      if (e.key === 'Escape') {
+        const sw = document.getElementById('page-switcher');
+        if (sw) sw.classList.remove('open');
+      }
+    });
+
+    /* ─── Cursor glow ─── */
+    const cursorGlow = document.getElementById('cursor-glow');
+    let cx = -1000, cy = -1000, gcx = -1000, gcy = -1000;
+    window.addEventListener('mousemove', (e) => { cx = e.clientX; cy = e.clientY; });
+    function animateGlow() {
+      gcx += (cx - gcx) * 0.07;
+      gcy += (cy - gcy) * 0.07;
+      cursorGlow.style.left = gcx + 'px';
+      cursorGlow.style.top  = gcy + 'px';
+      requestAnimationFrame(animateGlow);
+    }
+    animateGlow();
+
+    /* ─── Fade-in observer (re-bound on each render) ─── */
+    let fadeObserver = null;
+    function bindFadeIn() {
+      if (fadeObserver) fadeObserver.disconnect();
+      fadeObserver = new IntersectionObserver((entries) => {
+        entries.forEach(entry => {
+          if (entry.isIntersecting) entry.target.classList.add('visible');
+        });
+      }, { threshold: 0.05 });
+      document.querySelectorAll('.fade-in:not(.visible)').forEach(el => fadeObserver.observe(el));
+    }
+
+    /* ─── Manifest loading ─── */
+    let manifest = { posts: [] };
+    let activeTag = '__all';
+
+    function loadManifest() {
+      // Loaded synchronously via <script src="blog_data/manifest.js"> — no fetch.
+      // This works on both file:// and http(s):// without any server.
+      const m = window.__BLOG_MANIFEST;
+      if (!m) {
+        console.error('blog_data/manifest.js did not register window.__BLOG_MANIFEST');
+        manifest = { posts: [] };
+        return;
+      }
+      manifest = {
+        ...m,
+        posts: (m.posts || [])
+          .filter(p => !p.draft)
+          .sort((a, b) => {
+            // pinned posts always above non-pinned
+            const pa = a.pinned ? 1 : 0;
+            const pb = b.pinned ? 1 : 0;
+            if (pa !== pb) return pb - pa;
+            // then by publish date descending
+            return (b.date || '').localeCompare(a.date || '');
+          })
+      };
+    }
+
+    function pickLang(field, fallback = '') {
+      if (field == null) return fallback;
+      if (typeof field === 'string') return field;
+      return field[currentLang] || field.en || field.zh || fallback;
+    }
+
+    function formatDate(iso) {
+      if (!iso) return '';
+      try {
+        const d = luxon.DateTime.fromISO(iso).setLocale(currentLang === 'zh' ? 'zh-CN' : 'en');
+        return d.toFormat(currentLang === 'zh' ? 'yyyy.MM.dd' : 'LLL d, yyyy');
+      } catch (e) {
+        return iso;
+      }
+    }
+
+    function postCoverUrl(post) {
+      if (!post.cover) return null;
+      return `blog_data/${post.slug}/${post.cover}`;
+    }
+
+    /* ─── Tag bar ─── */
+    function renderTagBar() {
+      const bar = document.getElementById('tag-bar');
+      const tags = new Set();
+      manifest.posts.forEach(p => (p.tags || []).forEach(t => tags.add(t)));
+      const allLabel = translations[currentLang]['blog-tag-all'] || 'All';
+      bar.innerHTML = `<button class="blog-tag-btn ${activeTag === '__all' ? 'active' : ''}" data-tag="__all">${allLabel}</button>` +
+        [...tags].sort().map(t =>
+          `<button class="blog-tag-btn ${activeTag === t ? 'active' : ''}" data-tag="${t}">${t}</button>`
+        ).join('');
+      bar.querySelectorAll('.blog-tag-btn').forEach(btn => {
+        btn.addEventListener('click', () => {
+          activeTag = btn.dataset.tag;
+          renderTagBar();
+          renderList();
+        });
+      });
+    }
+
+    /* ─── List view ─── */
+    function renderList() {
+      const list = document.getElementById('blog-list');
+      const empty = document.getElementById('blog-empty');
+      const filtered = activeTag === '__all'
+        ? manifest.posts
+        : manifest.posts.filter(p => (p.tags || []).includes(activeTag));
+
+      if (filtered.length === 0) {
+        list.innerHTML = '';
+        empty.style.display = 'block';
+        return;
+      }
+      empty.style.display = 'none';
+
+      const tt = translations[currentLang];
+      list.innerHTML = filtered.map(post => {
+        const cover = postCoverUrl(post);
+        const initial = (pickLang(post.title) || post.slug).trim().charAt(0).toUpperCase();
+        const coverHtml = cover
+          ? `<div class="post-cover"><img src="${cover}" alt="" loading="lazy" onerror="this.parentElement.innerHTML='<span class=\\'post-cover-fallback\\'>${initial}</span>'"></div>`
+          : `<div class="post-cover"><span class="post-cover-fallback">${initial}</span></div>`;
+        const tagsHtml = (post.tags || []).map(t => `<span class="post-card-tag">${t}</span>`).join('');
+        const minLabel = tt['reader-min'] || 'min';
+        const updatedHtml = (post.updated && post.updated !== post.date)
+          ? `<span class="post-card-dot"></span><span class="post-card-update">${tt['reader-updated']} ${formatDate(post.updated)}</span>`
+          : '';
+        const pinHtml = post.pinned
+          ? `<span class="post-pin" title="${tt['reader-pinned']}"><svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="17" x2="12" y2="22"></line><path d="M5 17h14v-1.76a2 2 0 0 0-1.11-1.79l-1.78-.9A2 2 0 0 1 15 10.76V6h1a2 2 0 0 0 0-4H8a2 2 0 0 0 0 4h1v4.76a2 2 0 0 1-1.11 1.79l-1.78.9A2 2 0 0 0 5 15.24Z"></path></svg><span>${tt['reader-pinned']}</span></span>`
+          : '';
+        return `
+          <a class="post-card fade-in${post.pinned ? ' is-pinned' : ''}" href="#${post.slug}">
+            ${coverHtml}
+            <div class="post-card-body">
+              <div class="post-card-meta">
+                ${pinHtml}
+                <span class="post-card-date">${formatDate(post.date)}</span>
+                ${updatedHtml}
+                ${post.readingTime ? `<span class="post-card-dot"></span><span>${post.readingTime} ${minLabel}</span>` : ''}
+              </div>
+              <div class="post-card-title">${pickLang(post.title)}</div>
+              <div class="post-card-excerpt">${pickLang(post.excerpt)}</div>
+              ${tagsHtml ? `<div class="post-card-tags">${tagsHtml}</div>` : ''}
+            </div>
+            <span class="post-card-arrow"><svg width="1em" height="1em" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="7" y1="17" x2="17" y2="7"></line><polyline points="7 7 17 7 17 17"></polyline></svg></span>
+          </a>
+        `;
+      }).join('');
+      bindFadeIn();
+    }
+
+    /* ─── Post body loader ─── */
+    /* Each post folder has post.<lang>.js that registers
+       window.__BLOG_POSTS['<slug>:<lang>'] = '<html>'.
+       We inject a <script> tag on demand. Works on file:// AND HTTP. */
+    const _bodyLoading = {};
+    function loadPostBody(slug, lang) {
+      const key = `${slug}:${lang}`;
+      const cached = (window.__BLOG_POSTS || {})[key];
+      if (cached != null) return Promise.resolve(cached);
+      if (_bodyLoading[key]) return _bodyLoading[key];
+
+      _bodyLoading[key] = new Promise((resolve, reject) => {
+        const script = document.createElement('script');
+        script.src = `blog_data/${slug}/post.${lang}.js`;
+        script.async = false;
+        script.onload = () => {
+          delete _bodyLoading[key];
+          const body = (window.__BLOG_POSTS || {})[key];
+          if (body != null) resolve(body);
+          else reject(new Error(`${script.src} did not register window.__BLOG_POSTS['${key}']`));
+        };
+        script.onerror = () => {
+          delete _bodyLoading[key];
+          reject(new Error(`Failed to load ${script.src}`));
+        };
+        document.head.appendChild(script);
+      });
+      return _bodyLoading[key];
+    }
+
+    /* ─── Reader view ─── */
+    async function renderReader(slug) {
+      const post = manifest.posts.find(p => p.slug === slug);
+      const reader = document.getElementById('reader-content');
+      const t = translations[currentLang];
+
+      if (!post) {
+        reader.innerHTML = `
+          <div class="post-not-found fade-in">
+            <h2>${t['not-found-title']}</h2>
+            <p>${t['not-found-desc']}</p>
+            <a class="reader-footer-link" href="#" style="margin-top: 24px; display: inline-flex;">${t['not-found-back']} →</a>
+          </div>
+        `;
+        bindFadeIn();
+        return;
+      }
+
+      const tagsHtml = (post.tags || []).map(t => `<span class="post-card-tag">${t}</span>`).join('');
+      const minLabel = t['reader-min'];
+      const cover = postCoverUrl(post);
+      const updatedHtml = (post.updated && post.updated !== post.date)
+        ? `<span class="post-card-dot"></span><span class="post-card-update">${t['reader-updated']} ${formatDate(post.updated)}</span>`
+        : '';
+      const pinHtml = post.pinned
+        ? `<span class="post-pin" title="${t['reader-pinned']}"><svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="17" x2="12" y2="22"></line><path d="M5 17h14v-1.76a2 2 0 0 0-1.11-1.79l-1.78-.9A2 2 0 0 1 15 10.76V6h1a2 2 0 0 0 0-4H8a2 2 0 0 0 0 4h1v4.76a2 2 0 0 1-1.11 1.79l-1.78.9A2 2 0 0 0 5 15.24Z"></path></svg><span>${t['reader-pinned']}</span></span>`
+        : '';
+
+      // render skeleton with loading state for the body
+      reader.innerHTML = `
+        <div class="fade-in">
+          <div class="reader-meta">
+            ${pinHtml}
+            <span class="post-card-date">${formatDate(post.date)}</span>
+            ${updatedHtml}
+            ${post.readingTime ? `<span class="post-card-dot"></span><span>${post.readingTime} ${minLabel}</span>` : ''}
+          </div>
+          <h1 class="reader-title">${pickLang(post.title)}</h1>
+          ${tagsHtml ? `<div class="reader-tags">${tagsHtml}</div>` : ''}
+          ${cover ? `<div class="reader-cover"><img src="${cover}" alt=""></div>` : ''}
+          <div class="reader-body" id="reader-body"><p style="color: var(--muted); font-style: italic;">…</p></div>
+          <div class="reader-footer">
+            <span class="reader-footer-note">— ${formatDate(post.date)}${(post.updated && post.updated !== post.date) ? ` · ${t['reader-updated']} ${formatDate(post.updated)}` : ''}</span>
+            <a class="reader-footer-link" href="#">${t['reader-back']} →</a>
+          </div>
+        </div>
+      `;
+      bindFadeIn();
+
+      // load body on demand
+      const lang = post.lang || 'both';
+      const wantedLang = (lang === 'both') ? currentLang : lang;
+      const bodyEl = document.getElementById('reader-body');
+      try {
+        const html = await loadPostBody(slug, wantedLang);
+        bodyEl.innerHTML = html;
+      } catch (e) {
+        // fall back to the other language if this is a bilingual post
+        if (lang === 'both') {
+          const altLang = wantedLang === 'zh' ? 'en' : 'zh';
+          try {
+            const html = await loadPostBody(slug, altLang);
+            bodyEl.innerHTML = html;
+            return;
+          } catch (_) {}
+        }
+        bodyEl.innerHTML = `
+          <p style="color: #d96e6e;">Failed to load post body.</p>
+          <pre><code>${String(e).replace(/[<>&]/g, c => ({'<':'&lt;','>':'&gt;','&':'&amp;'})[c])}</code></pre>
+        `;
+      }
+    }
+
+    /* ─── Router ─── */
+    function route() {
+      const slug = location.hash.replace(/^#/, '').trim();
+      const list = document.getElementById('view-list');
+      const reader = document.getElementById('view-reader');
+      if (slug) {
+        list.style.display = 'none';
+        reader.style.display = 'block';
+        window.scrollTo({ top: 0, behavior: 'instant' });
+        renderReader(slug);
+      } else {
+        reader.style.display = 'none';
+        list.style.display = 'block';
+        renderTagBar();
+        renderList();
+      }
+    }
+
+    window.addEventListener('hashchange', route);
+
+    /* ─── Boot ─── */
+    loadManifest();         // synchronous now (script-tag loaded)
+    applyLang(currentLang); // sets static labels and routes
+    bindFadeIn();
+  </script>
+</body>
+</html>

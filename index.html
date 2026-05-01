@@ -159,6 +159,127 @@
       transition: transform 0.1s ease-out;
     }
 
+    /* ─── BRAND SWITCHER (logo + dropdown as one unit) ─── */
+    .page-switcher { position: relative; font-family: inherit; }
+
+    .brand-switcher {
+      display: inline-flex;
+      align-items: baseline;
+      gap: 4px;
+      padding: 6px 10px 6px 8px;
+      margin-left: -8px;          /* visually align "louie" with original logo position */
+      background: transparent;
+      border: 1px solid transparent;
+      border-radius: 8px;
+      color: var(--text);
+      font-family: inherit;
+      font-size: 18px;
+      font-weight: 700;
+      letter-spacing: 0.05em;
+      cursor: pointer;
+      text-decoration: none;
+      transition: background 0.25s ease, border-color 0.25s ease;
+    }
+
+    .brand-switcher:hover,
+    .page-switcher.open .brand-switcher {
+      background: rgba(255, 255, 255, 0.03);
+      border-color: rgba(255, 255, 255, 0.06);
+    }
+
+    .brand-switcher-static { color: var(--text); }
+    .brand-switcher-static .accent { color: var(--accent); }
+
+    .brand-switcher-current {
+      color: var(--muted);
+      font-weight: 500;
+      transition: color 0.25s ease;
+    }
+    .brand-switcher:hover .brand-switcher-current,
+    .page-switcher.open .brand-switcher-current {
+      color: var(--accent);
+    }
+
+    .brand-switcher-chevron {
+      width: 10px; height: 10px;
+      align-self: center;
+      margin-left: 2px;
+      opacity: 0.35;
+      color: var(--muted);
+      transition: opacity 0.2s ease, transform 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
+    }
+    .brand-switcher:hover .brand-switcher-chevron { opacity: 0.7; }
+    .page-switcher.open .brand-switcher-chevron {
+      opacity: 0.85;
+      transform: rotate(180deg);
+      color: var(--accent);
+    }
+
+    .page-switcher-menu {
+      position: absolute;
+      top: calc(100% + 8px);
+      left: 0;
+      min-width: 170px;
+      background: rgba(20, 20, 26, 0.92);
+      backdrop-filter: blur(28px) saturate(180%);
+      -webkit-backdrop-filter: blur(28px) saturate(180%);
+      border: 1px solid rgba(255, 255, 255, 0.08);
+      border-radius: 10px;
+      padding: 5px;
+      display: flex;
+      flex-direction: column;
+      gap: 2px;
+      box-shadow: 0 16px 48px rgba(0, 0, 0, 0.45), 0 0 0 1px rgba(217, 140, 112, 0.04);
+      opacity: 0;
+      pointer-events: none;
+      transform: translateY(-6px) scale(0.97);
+      transform-origin: top left;
+      transition: opacity 0.22s ease, transform 0.22s cubic-bezier(0.34, 1.56, 0.64, 1);
+      z-index: 10001;
+    }
+    .page-switcher.open .page-switcher-menu {
+      opacity: 1;
+      pointer-events: auto;
+      transform: translateY(0) scale(1);
+    }
+
+    .page-switcher-item {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 16px;
+      padding: 8px 12px;
+      border-radius: 6px;
+      color: var(--muted);
+      text-decoration: none;
+      font-size: 14px;
+      font-weight: 600;
+      letter-spacing: 0.02em;
+      transition: color 0.2s ease, background 0.2s ease;
+    }
+    .page-switcher-item:hover {
+      color: var(--text);
+      background: rgba(255, 255, 255, 0.04);
+    }
+    .page-switcher-item.active {
+      color: var(--text);
+      background: rgba(217, 140, 112, 0.08);
+    }
+    .page-switcher-item .accent { color: var(--accent); }
+
+    .page-switcher-item-dot {
+      width: 5px; height: 5px; border-radius: 50%;
+      background: var(--accent);
+      box-shadow: 0 0 8px rgba(217, 140, 112, 0.6);
+      opacity: 0;
+      transform: scale(0.6);
+      transition: opacity 0.2s ease, transform 0.2s ease;
+    }
+    .page-switcher-item.active .page-switcher-item-dot {
+      opacity: 1;
+      transform: scale(1);
+    }
+
     nav {
       position: fixed;
       top: 0;
@@ -827,6 +948,32 @@
       100% { color: #0f0;    text-shadow: none; }
     }
 
+    /* Cat pet heart */
+    .cat-heart {
+      position: absolute;
+      pointer-events: none;
+      font-size: 22px;
+      color: #ff6f9c;
+      text-shadow: 0 0 6px rgba(255, 111, 156, 0.6);
+      animation: catHeartFloat 1.4s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+      z-index: 30;
+      user-select: none;
+    }
+
+    @keyframes catHeartFloat {
+      0%   { opacity: 0; transform: translateY(0) scale(0.4); }
+      20%  { opacity: 1; transform: translateY(-12px) scale(1.2); }
+      100% { opacity: 0; transform: translateY(-72px) scale(0.9); }
+    }
+
+    #cat-mascot {
+      transition: transform 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
+    }
+
+    #cat-mascot.pet {
+      transform: translateX(-50%) translateY(-4px) scale(1.04);
+    }
+
     /* ─── PARTICLE SECTION ─── */
     #particle-canvas {
       display: block;
@@ -843,7 +990,7 @@
       section { padding: 80px 24px; }
       .licenses-list { grid-template-columns: 1fr; }
       #win-profile, #win-terminal { display: none !important; }
-      #win-coming-soon { left: 50% !important; transform: translateX(-50%) !important; bottom: 16px !important; }
+      #cat-mascot { width: 8rem !important; left: 50% !important; }
     }
   </style>
 </head>
@@ -857,8 +1004,25 @@
   <canvas id="grid-dots"></canvas>
 
   <nav id="navbar">
-    <div class="magnetic-wrap">
-      <a href="#hero" class="nav-logo magnetic-inner">louie<span>.</span></a>
+    <div class="page-switcher" id="page-switcher">
+      <button class="brand-switcher" type="button" aria-haspopup="listbox" aria-expanded="false" onclick="togglePageSwitcher(event)">
+        <span class="brand-switcher-static">louie<span class="accent">.</span></span><span class="brand-switcher-current">home</span>
+        <svg class="brand-switcher-chevron" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"></polyline></svg>
+      </button>
+      <div class="page-switcher-menu" role="listbox">
+        <a href="index.html" class="page-switcher-item active" role="option" aria-current="page">
+          <span>louie<span class="accent">.</span>home</span>
+          <span class="page-switcher-item-dot"></span>
+        </a>
+        <a href="blog.html" class="page-switcher-item" role="option">
+          <span>louie<span class="accent">.</span>blog</span>
+          <span class="page-switcher-item-dot"></span>
+        </a>
+        <a href="95.html" class="page-switcher-item" role="option">
+          <span>louie<span class="accent">.</span>95</span>
+          <span class="page-switcher-item-dot"></span>
+        </a>
+      </div>
     </div>
     <ul class="nav-links">
       <li class="magnetic-wrap"><a href="#about" class="magnetic-inner" data-i18n="nav-about">About</a></li>
@@ -919,7 +1083,7 @@
           </svg>
           <span data-i18n="hero-email-btn">Email Me</span>
         </a>
-        <a href="https://blog.louie1.com" target="_blank" class="hero-blog-btn">
+        <a href="blog.html" class="hero-blog-btn">
           <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
             <path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"></path>
             <polyline points="15 3 21 3 21 9"></polyline>
@@ -1174,21 +1338,10 @@
   </section>
 
   <div class="relative h-0 -mb-px z-20" style="pointer-events: none;">
-    <!-- 吉祥物暂时注释（版权问题处理中，解决后重新启用）
-    <img src="lib/pp_clean_p.webp" class="w-28 h-auto absolute bottom-0 left-1/4 -translate-x-1/2 block" alt="">
-    -->
-    <div id="win-coming-soon" class="win-window" data-base-transform="translateX(-50%) rotate(-2deg)" style="position: absolute; bottom: 20px; left: 38%; transform: translateX(-50%) rotate(-2deg); pointer-events: all;" onmousedown="elasticStartDrag(event, 'win-coming-soon')">
-      <div class="win-titlebar">
-        <span>Coming Soon.exe</span>
-        <button class="win-btn-close" onclick="denyClose('Coming Soon')">X</button>
-      </div>
-      <div class="win-content" style="background: #fdf5d3;">
-        <div class="win-inset" style="background: #fdf5d3; font-size: 13px; line-height: 1.9; color: #333;">
-          <div>更多内容即将到来</div>
-          <div style="color: #888; margin-top: 2px;">Something cool is coming.</div>
-        </div>
-      </div>
-    </div>
+    <img id="cat-mascot" src="lib/cat_t.webp"
+         alt="sleeping cat"
+         style="position: absolute; bottom: 0; left: 33.333%; transform: translateX(-50%); width: 11rem; height: auto; image-rendering: pixelated; pointer-events: auto; cursor: pointer; filter: drop-shadow(0 6px 16px rgba(0,0,0,0.45));"
+         onclick="petCat()" title="zzz... (click to pet)">
   </div>
 
   <footer>
@@ -1366,7 +1519,7 @@
 
     /* ─── Rolling Hero ─── */
     (function () {
-      const words = ['Louie', 'Developer', 'Creator', 'CS Student'];
+      const words = ['Louie', 'Developer', 'Creator', 'AI Enjoyer', 'CS Student'];
       const el = document.getElementById('hero-roll-text');
       if (!el) return;
       let idx = 0;
@@ -1391,6 +1544,32 @@
 
       setInterval(rollNext, 2800);
     })();
+
+    /* ─── Page switcher dropdown ─── */
+    function togglePageSwitcher(e) {
+      if (e) e.stopPropagation();
+      const sw = document.getElementById('page-switcher');
+      if (!sw) return;
+      const opening = !sw.classList.contains('open');
+      sw.classList.toggle('open');
+      const trigger = sw.querySelector('.page-switcher-trigger');
+      if (trigger) trigger.setAttribute('aria-expanded', opening ? 'true' : 'false');
+    }
+    document.addEventListener('click', (e) => {
+      const sw = document.getElementById('page-switcher');
+      if (!sw) return;
+      if (!sw.contains(e.target)) {
+        sw.classList.remove('open');
+        const trigger = sw.querySelector('.page-switcher-trigger');
+        if (trigger) trigger.setAttribute('aria-expanded', 'false');
+      }
+    });
+    document.addEventListener('keydown', (e) => {
+      if (e.key === 'Escape') {
+        const sw = document.getElementById('page-switcher');
+        if (sw) sw.classList.remove('open');
+      }
+    });
 
     /* ─── Magnetic ─── */
     document.querySelectorAll('.magnetic-wrap').forEach((el) => {
@@ -1665,6 +1844,38 @@
     document.addEventListener('mouseup', elasticStopDrag);
     document.addEventListener('touchmove', elasticDoDrag, { passive: false });
     document.addEventListener('touchend', elasticStopDrag);
+
+    /* ─── Cat petting ─── */
+    const CAT_HEARTS = ['❤', '♥', '✦', '♡'];
+    const CAT_PURRS = ['purr~', 'mew~', 'zzz...', 'nya~', 'meow~'];
+    let catPetCount = 0;
+    function petCat() {
+      const cat = document.getElementById('cat-mascot');
+      if (!cat) return;
+      catPetCount++;
+      cat.classList.remove('pet');
+      void cat.offsetWidth;
+      cat.classList.add('pet');
+      setTimeout(() => cat.classList.remove('pet'), 320);
+
+      const rect = cat.getBoundingClientRect();
+      const heart = document.createElement('span');
+      heart.className = 'cat-heart';
+      const symbol = catPetCount % 7 === 0
+        ? CAT_PURRS[Math.floor(Math.random() * CAT_PURRS.length)]
+        : CAT_HEARTS[Math.floor(Math.random() * CAT_HEARTS.length)];
+      heart.textContent = symbol;
+      heart.style.left = (rect.left + rect.width / 2 + (Math.random() * 40 - 20) + window.scrollX) + 'px';
+      heart.style.top = (rect.top + rect.height * 0.18 + window.scrollY) + 'px';
+      heart.style.position = 'absolute';
+      if (catPetCount % 7 === 0) {
+        heart.style.fontSize = '14px';
+        heart.style.color = '#f0d4b8';
+        heart.style.fontStyle = 'italic';
+      }
+      document.body.appendChild(heart);
+      setTimeout(() => heart.remove(), 1500);
+    }
 
   </script>
 </body>
