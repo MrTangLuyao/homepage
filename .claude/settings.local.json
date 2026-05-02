@@ -19,7 +19,17 @@
       "Bash(curl -sL \"https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/addon/edit/matchbrackets.min.js\" -o matchbrackets.min.js)",
       "Bash(node -e ' *)",
       "Bash(curl -sL \"https://cdnjs.cloudflare.com/ajax/libs/sql.js/1.10.3/sql-asm.js\" -o \"C:/Users/Louie/Documents/GitHub/homepage/lib/sql-asm.js\")",
-      "Bash(grep -nB2 \"id: 2[8-9],\\\\|id: 3[0-7],\" learn_data/sql/course.js)"
+      "Bash(grep -nB2 \"id: 2[8-9],\\\\|id: 3[0-7],\" learn_data/sql/course.js)",
+      "WebSearch",
+      "WebFetch(domain:cdn.jsdelivr.net)",
+      "WebFetch(domain:unpkg.com)",
+      "WebFetch(domain:github.com)",
+      "WebFetch(domain:raw.githubusercontent.com)",
+      "WebFetch(domain:killtube.org)",
+      "Bash(grep -E \"^[0-9]+\\\\.[0-9]+\\\\.[0-9]+$\")",
+      "Bash(curl -sL \"https://cdn.jsdelivr.net/npm/JSCPP@2.2.1/dist/JSCPP.es5.min.js\" -o /Users/louietang/Documents/GitHub/homepage/lib/JSCPP.es5.min.js)",
+      "Bash(curl -sL \"https://registry.npmjs.org/jscpp\")",
+      "Bash(curl -s \"https://registry.npmjs.org/jscpp/latest\")"
     ]
   }
 }

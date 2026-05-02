@@ -140,9 +140,12 @@ const FINAL_SCHEMA = `
   slug: 'sql',
   title: { zh: 'SQL 基本语法', en: 'SQL · Core Syntax' },
   desc: {
-    zh: '基于路易的《SQL 语法大全》三篇博客。每一关聚焦一个语法点，写一句查询通过。',
-    en: "Built on Louie's three-part SQL syntax guide. Each level focuses on one piece of syntax — solve it with a single query."
+    zh: '学习 SQL 的基本查询语句',
+    en: 'Learn the fundamentals of SQL queries',
   },
+  hasPlayground: true,
+  playgroundTitle: { zh: '自定义 SQL 语句', en: 'Custom SQL Playground' },
+  playgroundSetup: FINAL_SCHEMA,
 
   lessons: [
 

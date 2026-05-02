@@ -8,7 +8,6 @@
   <title>Louie — Learn</title>
   <link rel="icon" href="lib/po.webp">
   <link rel="stylesheet" href="lib/fonts.css">
-  <link rel="stylesheet" href="lib/codemirror/codemirror.min.css">
   <script src="lib/tailwindcss.js"></script>
   <style>
     *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
@@ -378,6 +377,9 @@
     .reset-btn-inline:hover { transform: none; }
     .reset-btn-inline svg { width: 13px; height: 13px; }
 
+    /* ─── PLAYGROUND ─── */
+    .pg-action-bar { display: flex; gap: 8px; flex-wrap: wrap; margin-bottom: 18px; }
+
     /* ─── COURSE VIEW (lesson list) ─── */
     .course-back, .lesson-back {
       display: inline-flex; align-items: center; gap: 8px;
@@ -510,8 +512,7 @@
        editor area gets a comfortable min-height so it never collapses. */
     .lesson-right { display: block; }
     .lesson-right > * + * { margin-top: 14px; }
-    .lesson-right .editor-host { min-height: 280px; }
-    .lesson-right .editor-host .CodeMirror { min-height: 280px; height: auto; }
+    .lesson-right .editor-host { min-height: 200px; }
     .lesson-right .result-box { max-height: 38vh; overflow: auto; }
 
     /* Hint panel that slides out below the task block when toggled. */
@@ -694,59 +695,22 @@
     }
     .editor-mini-btn:hover { color: var(--accent); border-color: rgba(217,140,112,0.3); }
 
-    /* CodeMirror host — proper code-editor look with line numbers + SQL highlighting. */
+    /* Ace editor host */
     .editor-host {
       border: 1px solid rgba(217, 140, 112, 0.18);
       border-radius: 8px;
       overflow: hidden;
-      background: #08080c;
       transition: border-color 0.25s ease, box-shadow 0.25s ease;
-      display: flex;
     }
     .editor-host.is-focused {
       border-color: var(--accent);
       box-shadow: 0 0 0 3px rgba(217,140,112,0.08);
     }
-    .editor-host .CodeMirror {
-      flex: 1;
-      height: 100%;
-      min-height: 240px;
-      background: transparent;
-      color: var(--text);
-      font-family: 'JetBrains Mono', monospace;
+    .editor-host .ace_editor {
+      font-family: 'JetBrains Mono', monospace !important;
       font-size: 13.5px;
       line-height: 1.7;
-      padding: 6px 0;
-    }
-    .editor-host .CodeMirror-gutters {
-      background: rgba(255,255,255,0.02);
-      border-right: 1px solid rgba(255,255,255,0.05);
-    }
-    .editor-host .CodeMirror-linenumber {
-      color: var(--muted);
-      opacity: 0.55;
-      font-size: 12px;
-      padding: 0 8px 0 6px;
-    }
-    .editor-host .CodeMirror-cursor { border-left: 2px solid var(--accent); }
-    .editor-host .CodeMirror-selected { background: rgba(217,140,112,0.18) !important; }
-    .editor-host .CodeMirror-focused .CodeMirror-selected { background: rgba(217,140,112,0.22) !important; }
-    .editor-host .CodeMirror-line { padding-left: 4px; }
-    .editor-host .cm-keyword   { color: #f0a878; font-weight: 600; }
-    .editor-host .cm-operator  { color: #f0d4b8; }
-    .editor-host .cm-number    { color: #b6d8a4; }
-    .editor-host .cm-string    { color: #d8c098; }
-    .editor-host .cm-string-2  { color: #d8c098; }
-    .editor-host .cm-comment   { color: #5c5c70; font-style: italic; }
-    .editor-host .cm-variable, .editor-host .cm-variable-2 { color: #d8d8e8; }
-    .editor-host .cm-builtin   { color: #d98c70; }
-    .editor-host .cm-atom      { color: #b388e0; }
-    .editor-host .cm-bracket   { color: #f0d4b8; }
-    .editor-host .cm-punctuation { color: var(--muted); }
-    .editor-host .CodeMirror-matchingbracket {
-      color: var(--accent) !important;
-      background: rgba(217,140,112,0.12);
-      border-radius: 2px;
+      border-radius: 8px;
     }
 
     .editor-bar {
@@ -817,6 +781,71 @@
       white-space: pre-wrap;
       word-break: break-word;
     }
+
+    .c-output-pre {
+      background: rgba(8, 8, 12, 0.6);
+      border: 1px solid rgba(255, 255, 255, 0.05);
+      border-radius: 8px;
+      padding: 10px 14px;
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 12.5px;
+      color: var(--text);
+      white-space: pre-wrap;
+      word-break: break-word;
+      margin: 4px 0;
+      min-height: 24px;
+    }
+    .c-output-pre:empty::after { content: '(no output)'; color: var(--muted); font-style: italic; }
+
+    /* C terminal window */
+    .c-terminal-win {
+      background: rgba(8, 8, 12, 0.9);
+      border: 1px solid rgba(255,255,255,0.1);
+      border-radius: 8px;
+      overflow: hidden;
+      display: flex;
+      flex-direction: column;
+      margin-top: 10px;
+    }
+    .c-term-out {
+      padding: 12px 16px;
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 13px;
+      color: #d4d4d4;
+      white-space: pre-wrap;
+      word-break: break-word;
+      min-height: 80px;
+      max-height: 40vh;
+      overflow-y: auto;
+      flex: 1;
+    }
+    .c-term-out.is-error { color: #f0a8a8; }
+    .c-term-in-row {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      padding: 7px 14px;
+      border-top: 1px solid rgba(255,255,255,0.07);
+      background: rgba(255,255,255,0.02);
+    }
+    .c-term-prompt {
+      color: var(--accent);
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 13px;
+      user-select: none;
+      flex-shrink: 0;
+    }
+    .c-term-in {
+      flex: 1;
+      background: transparent;
+      border: none;
+      outline: none;
+      color: #d4d4d4;
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 13px;
+      caret-color: var(--accent);
+    }
+    .c-term-in::placeholder { color: rgba(255,255,255,0.2); }
 
     .lesson-nav-foot {
       display: flex; justify-content: space-between; align-items: center;
@@ -1001,10 +1030,10 @@
   </footer>
 
   <script src="lib/sql-asm.js"></script>
-  <script src="lib/codemirror/codemirror.min.js"></script>
-  <script src="lib/codemirror/sql.min.js"></script>
-  <script src="lib/codemirror/matchbrackets.min.js"></script>
-  <script src="lib/codemirror/closebrackets.min.js"></script>
+  <script src="lib/ace/ace.min.js"></script>
+  <script src="lib/ace/mode-mysql.min.js"></script>
+  <script src="lib/ace/mode-c_cpp.min.js"></script>
+  <script src="lib/ace/theme-tomorrow_night.min.js"></script>
   <script src="learn_data/manifest.js"></script>
   <script>
     /* ─── i18n ─── */
@@ -1059,6 +1088,16 @@
         'reset-progress': '清除进度',
         'reset-confirm': '确定要清除「{course}」的所有进度吗？\n\n该操作不可撤销 —— 已通过的关卡会全部重置为未完成。',
         'reset-no-progress': '还没有任何进度可清除。',
+        'playground-label': '自定义 SQL 语句',
+        'playground-load-demo': '加载 Demo 表',
+        'playground-reset': '重置表',
+        'playground-tables-label': '当前数据库',
+        'playground-empty': '暂无表 — 点击"加载 Demo 表"或用 CREATE TABLE 自行建表。',
+        'c-no-engine': 'C 解释器未加载，刷新页面后重试。',
+        'c-output-label': '输出',
+        'c-timeout': '超时：程序运行超过时间限制，检查是否有死循环。',
+        'c-pass': '输出正确！',
+        'c-fail-output': '输出不匹配',
       },
       en: {
         'learn-greeting': 'interactive · code to win',
@@ -1110,6 +1149,16 @@
         'reset-progress': 'Clear progress',
         'reset-confirm': 'Clear all progress for "{course}"?\n\nThis cannot be undone — every passed lesson will be marked unfinished again.',
         'reset-no-progress': 'There is no progress to clear yet.',
+        'playground-label': 'Custom SQL Playground',
+        'playground-load-demo': 'Load Demo Tables',
+        'playground-reset': 'Reset Tables',
+        'playground-tables-label': 'Current Database',
+        'playground-empty': 'No tables yet — load demos or CREATE TABLE yourself.',
+        'c-no-engine': 'C interpreter not loaded — refresh the page.',
+        'c-output-label': 'Output',
+        'c-timeout': 'Timeout: program exceeded time limit. Check for infinite loops.',
+        'c-pass': 'Output matches!',
+        'c-fail-output': 'Output mismatch',
       }
     };
 
@@ -1383,7 +1432,18 @@
               </button>
             </div>
           </div>
-          <div class="lesson-list">${sectionsHtml}</div>
+          <div class="lesson-list">
+            ${course.hasPlayground ? `
+            <a class="lesson-row" href="#${slug}/playground">
+              <span class="lesson-row-num" style="color:var(--accent); display:inline-flex; align-items:center; justify-content:center;"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 20h9"/><path d="M16.5 3.5a2.121 2.121 0 0 1 3 3L7 19l-4 1 1-4 12.5-12.5z"/></svg></span>
+              <div>
+                <div class="lesson-row-title">${course.playgroundTitle ? pickLang(course.playgroundTitle) : tt('playground-label')}</div>
+              </div>
+              <span class="lesson-row-status"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="9 18 15 12 9 6"></polyline></svg></span>
+            </a>
+            ` : ''}
+            ${sectionsHtml}
+          </div>
         </div>
       `;
       const detailBtn = wrap.querySelector('.js-reset-course-detail');
@@ -1396,6 +1456,388 @@
         const wr = wrap.querySelector('.fade-in');
         if (wr) wr.classList.add('visible');
       });
+    }
+
+    /* ─── SQL Playground view ─── */
+    async function renderPlayground(courseSlug) {
+      const wrap = document.getElementById('lesson-content');
+      wrap.innerHTML = `<div class="result-empty" style="padding:80px 24px;">${currentLang === 'zh' ? '加载中…' : 'Loading…'}</div>`;
+
+      let course;
+      try {
+        course = await loadCourse(courseSlug);
+        if (course.type === 'c') await ensureC();
+        else await ensureSql();
+      } catch(e) {
+        wrap.innerHTML = `<div class="not-found"><h2>${tt('not-found-title')}</h2><p>${tt('not-found-desc')}</p><pre style="margin-top:14px;color:var(--err);font-size:12px;">${escapeHtml(String(e.message || e))}</pre></div>`;
+        return;
+      }
+
+      if (course.type === 'c') {
+        renderCPlayground(course, wrap);
+        return;
+      }
+
+      let playgroundDb = freshDb();
+
+      wrap.innerHTML = `
+        <div class="lesson-pane lesson-pane-left fade-in">
+          <div class="lesson-meta-row">
+            <span class="lesson-pill">${pickLang(course.title)}</span>
+          </div>
+          <div class="lesson-title-row">
+            <h1 class="lesson-title">${tt('playground-label')}</h1>
+          </div>
+          <p style="color:var(--muted); font-size:14px; line-height:1.8; margin-bottom:18px;">${currentLang === 'zh'
+            ? '自由编写 SQL。可 CREATE TABLE、INSERT、SELECT — 无任务、无判题。'
+            : 'Free-form SQL. CREATE TABLE, INSERT, SELECT — no task, no grading.'
+          }</p>
+          <div class="pg-action-bar">
+            <button class="editor-mini-btn" id="pg-load-demo">${tt('playground-load-demo')}</button>
+            <button class="editor-mini-btn" id="pg-reset">${tt('playground-reset')}</button>
+          </div>
+          <h2>${tt('playground-tables-label')}</h2>
+          <div id="pg-schema">
+            <div class="result-empty" style="padding:8px 0;">${tt('playground-empty')}</div>
+          </div>
+        </div>
+        <div class="lesson-pane lesson-pane-right lesson-right fade-in">
+          <div class="editor-wrap">
+            <div class="editor-label"><span>${tt('editor-label')}</span></div>
+            <div class="editor-host" id="editor-host">
+              <div id="sql-editor"></div>
+            </div>
+          </div>
+          <div class="editor-bar">
+            <button class="btn btn-ghost" id="btn-run">▶  ${tt('btn-run')}</button>
+          </div>
+          <div class="result-box" id="result-box">
+            <div class="result-status is-info"><span class="dot"></span><span>—</span></div>
+            <div class="result-message" style="color:var(--muted);">${currentLang === 'zh' ? '点击运行查看结果。' : 'Click Run to see results.'}</div>
+          </div>
+        </div>
+      `;
+
+      requestAnimationFrame(() => {
+        wrap.querySelectorAll('.fade-in').forEach(el => el.classList.add('visible'));
+      });
+
+      const schemaContainer = document.getElementById('pg-schema');
+
+      function refreshSchema() {
+        let tableNames;
+        try {
+          const rows = execToRows(playgroundDb, `SELECT name FROM sqlite_master WHERE type='table' ORDER BY name`);
+          tableNames = rows.map(r => r.name);
+        } catch(e) { tableNames = []; }
+        schemaContainer.innerHTML = tableNames.length
+          ? renderSchemaPreview(playgroundDb, tableNames)
+          : `<div class="result-empty" style="padding:8px 0;">${tt('playground-empty')}</div>`;
+      }
+
+      document.getElementById('pg-load-demo').addEventListener('click', () => {
+        if (!course.playgroundSetup) return;
+        playgroundDb = freshDb();
+        try { runSetup(playgroundDb, course.playgroundSetup); } catch(e) {
+          schemaContainer.innerHTML = `<div class="result-error">${escapeHtml(e.message || String(e))}</div>`;
+          return;
+        }
+        refreshSchema();
+      });
+
+      document.getElementById('pg-reset').addEventListener('click', () => {
+        playgroundDb = freshDb();
+        refreshSchema();
+      });
+
+      const editorHost = document.getElementById('editor-host');
+      const resultBox = document.getElementById('result-box');
+      const aceEd = ace.edit(document.getElementById('sql-editor'));
+      aceEd.setTheme('ace/theme/tomorrow_night');
+      aceEd.session.setMode('ace/mode/mysql');
+      aceEd.session.setUseWorker(false);
+      aceEd.setOptions({ minLines: 8, maxLines: 25, showPrintMargin: false, fontSize: '13px', fontFamily: "'JetBrains Mono', monospace", useSoftTabs: true, tabSize: 2, behavioursEnabled: true, wrap: true });
+      aceEd.on('focus', () => editorHost.classList.add('is-focused'));
+      aceEd.on('blur',  () => editorHost.classList.remove('is-focused'));
+      const editor = { get value() { return aceEd.getValue(); } };
+
+      document.getElementById('btn-run').addEventListener('click', () => {
+        const sql = (editor.value || '').trim();
+        if (!sql) {
+          resultBox.innerHTML = `<div class="result-status is-info"><span class="dot"></span><span>—</span></div><div class="result-message">${tt('msg-empty-query')}</div>`;
+          return;
+        }
+        try {
+          const rows = runSingleSelect(playgroundDb, sql);
+          resultBox.innerHTML = `<div class="result-status is-info"><span class="dot"></span><span>${tt('result-runonly')}</span></div>${renderResultTable(rows)}`;
+        } catch(e) {
+          resultBox.innerHTML = `<div class="result-status is-fail"><span class="dot"></span><span>${tt('result-error')}</span></div><div class="result-error">${escapeHtml(e.message || String(e))}</div>`;
+        }
+        refreshSchema();
+      });
+    }
+
+    /* ─── C Playground view ─── */
+    function renderCPlayground(course, wrap) {
+      const pgTitle = course.playgroundTitle ? pickLang(course.playgroundTitle) : tt('playground-label');
+      wrap.innerHTML = `
+        <div class="lesson-pane lesson-pane-left fade-in">
+          <div class="lesson-meta-row">
+            <span class="lesson-pill">${pickLang(course.title)}</span>
+          </div>
+          <div class="lesson-title-row">
+            <h1 class="lesson-title">${pgTitle}</h1>
+          </div>
+          <p style="color:var(--muted); font-size:14px; line-height:1.8;">${currentLang === 'zh'
+            ? '自由编写 C 代码，无任务、无判题。'
+            : 'Write any C code — no task, no grading.'
+          }</p>
+        </div>
+        <div class="lesson-pane lesson-pane-right lesson-right fade-in">
+          <div class="editor-wrap">
+            <div class="editor-label"><span>${tt('editor-label')}</span></div>
+            <div class="editor-host" id="editor-host">
+              <div id="sql-editor"></div>
+            </div>
+          </div>
+          <div class="editor-bar">
+            <button class="btn btn-ghost" id="btn-run">▶  ${tt('btn-run')}</button>
+          </div>
+          <div class="c-terminal-win">
+            <div id="result-box" class="c-term-out" style="color:rgba(255,255,255,0.25);font-style:italic;">${currentLang === 'zh' ? '点击运行，或在 $ 处输入后回车。' : 'Click Run, or type stdin below and press Enter.'}</div>
+            <div class="c-term-in-row">
+              <span class="c-term-prompt">$</span>
+              <input id="pg-stdin" class="c-term-in" type="text" placeholder="${currentLang === 'zh' ? 'stdin 输入（回车重新运行）' : 'stdin input (Enter to re-run)'}" spellcheck="false" autocomplete="off">
+            </div>
+          </div>
+        </div>
+      `;
+      requestAnimationFrame(() => {
+        wrap.querySelectorAll('.fade-in').forEach(el => el.classList.add('visible'));
+      });
+      mountCEditor(
+        document.getElementById('sql-editor'),
+        document.getElementById('editor-host'),
+        document.getElementById('result-box'),
+        null
+      );
+    }
+
+    /* ─── C engine (JSCPP, lazy-loaded) ──��� */
+    let _jscppReady = null;
+    function ensureC() {
+      if (_jscppReady) return _jscppReady;
+      _jscppReady = new Promise((res, rej) => {
+        if (window.JSCPP) { res(window.JSCPP); return; }
+        const s = document.createElement('script');
+        s.src = 'lib/JSCPP.es5.min.js';
+        s.onload = () => window.JSCPP ? res(window.JSCPP) : rej(new Error(tt('c-no-engine')));
+        s.onerror = () => rej(new Error('Failed to load C engine'));
+        document.head.appendChild(s);
+      });
+      return _jscppReady;
+    }
+
+    function runC(code) {
+      // returns a Promise — real interactive terminal via Web Worker + SharedArrayBuffer
+      return new Promise((resolve, reject) => {
+        if (!window.JSCPP) { reject(new Error(tt('c-no-engine'))); return; }
+        if (typeof SharedArrayBuffer === 'undefined') {
+          reject(new Error(currentLang === 'zh'
+            ? '浏览器不支持 SharedArrayBuffer（需要 HTTPS + 跨域隔离）。'
+            : 'SharedArrayBuffer not available. Requires HTTPS + cross-origin isolation.'));
+          return;
+        }
+        const sharedCtrl = new SharedArrayBuffer(16);
+        const sharedData = new SharedArrayBuffer(4096);
+        const ctrl = new Int32Array(sharedCtrl);
+        resolve({ sharedCtrl, sharedData, ctrl });
+      });
+    }
+
+    function spawnCWorker(code, outputEl, stdinEl) {
+      // Returns a Promise<stdout string>
+      return new Promise((resolve) => {
+        if (typeof SharedArrayBuffer === 'undefined') {
+          outputEl.className = 'c-term-out is-error';
+          outputEl.textContent = currentLang === 'zh'
+            ? '需要通过 HTTPS 访问本站才能使用 C 语言运行功能。'
+            : 'Please access via HTTPS to run C code.';
+          resolve(null); return;
+        }
+
+        const sharedCtrl = new SharedArrayBuffer(16);
+        const sharedData = new SharedArrayBuffer(4096);
+        const ctrl = new Int32Array(sharedCtrl);
+
+        outputEl.className = 'c-term-out';
+        outputEl.textContent = '';
+
+        let stdoutOnly = '';
+        const stdinRow = stdinEl?.closest('.c-term-in-row');
+
+        // hide input while running
+        if (stdinRow) stdinRow.style.opacity = '0.3';
+        if (stdinEl) { stdinEl.disabled = true; stdinEl.value = ''; }
+
+        const worker = new Worker('lib/jscpp-worker.js');
+        let pendingInputHandler = null;
+
+        worker.onmessage = (e) => {
+          const msg = e.data;
+          if (msg.type === 'output') {
+            stdoutOnly += msg.text;
+            outputEl.textContent += msg.text;
+            outputEl.scrollTop = outputEl.scrollHeight;
+          } else if (msg.type === 'need-input') {
+            // program needs stdin — show input, wait for Enter
+            if (stdinRow) stdinRow.style.opacity = '1';
+            if (stdinEl) {
+              stdinEl.disabled = false;
+              stdinEl.focus();
+            }
+            pendingInputHandler = (evt) => {
+              if (evt.key !== 'Enter') return;
+              if (!stdinEl) return;
+              stdinEl.removeEventListener('keydown', pendingInputHandler);
+              pendingInputHandler = null;
+
+              const input = stdinEl.value;
+              stdinEl.value = '';
+              if (stdinRow) stdinRow.style.opacity = '0.3';
+              stdinEl.disabled = true;
+
+              // echo input in terminal
+              outputEl.textContent += input + '\n';
+              outputEl.scrollTop = outputEl.scrollHeight;
+
+              // send to worker
+              const encoded = new TextEncoder().encode(input + '\n');
+              new Uint8Array(sharedData).set(encoded);
+              Atomics.store(ctrl, 1, encoded.length);
+              Atomics.store(ctrl, 0, 1);
+              Atomics.notify(ctrl, 0, 1);
+            };
+            if (stdinEl) stdinEl.addEventListener('keydown', pendingInputHandler);
+          } else if (msg.type === 'done' || msg.type === 'error') {
+            worker.terminate();
+            if (pendingInputHandler && stdinEl)
+              stdinEl.removeEventListener('keydown', pendingInputHandler);
+            if (stdinRow) stdinRow.style.opacity = '1';
+            if (stdinEl) stdinEl.disabled = false;
+            if (msg.type === 'error') {
+              outputEl.className = 'c-term-out is-error';
+              outputEl.textContent += (outputEl.textContent ? '\n' : '') + msg.message;
+            }
+            resolve(msg.type === 'done' ? stdoutOnly : null);
+          }
+        };
+
+        worker.onerror = (e) => {
+          worker.terminate();
+          if (stdinRow) stdinRow.style.opacity = '1';
+          if (stdinEl) stdinEl.disabled = false;
+          outputEl.className = 'c-term-out is-error';
+          outputEl.textContent = e.message || 'Worker error';
+          resolve(null);
+        };
+
+        worker.postMessage({ type: 'run', code, sharedCtrl, sharedData });
+      });
+    }
+
+    /* Ace-based C editor mount. Pass lessonCtx to enable Submit/Reset/Answer. */
+    function mountCEditor(editorDiv, editorHost, resultBox, lessonCtx) {
+      const aceEd = ace.edit(editorDiv);
+      aceEd.setTheme('ace/theme/tomorrow_night');
+      aceEd.session.setMode('ace/mode/c_cpp');
+      aceEd.session.setUseWorker(false);
+      aceEd.setOptions({
+        minLines: 10, maxLines: 30,
+        showPrintMargin: false,
+        fontSize: '13px',
+        fontFamily: "'JetBrains Mono', monospace",
+        useSoftTabs: true, tabSize: 2,
+        behavioursEnabled: true, wrap: true,
+      });
+      if (lessonCtx && lessonCtx.initial) aceEd.setValue(lessonCtx.initial, -1);
+      aceEd.on('focus', () => editorHost.classList.add('is-focused'));
+      aceEd.on('blur',  () => editorHost.classList.remove('is-focused'));
+      aceEd.commands.addCommand({
+        name: 'run', bindKey: { win: 'Ctrl-Enter', mac: 'Cmd-Enter' },
+        exec: () => document.getElementById('btn-run')?.click(),
+      });
+      aceEd.commands.addCommand({
+        name: 'check', bindKey: { win: 'Ctrl-Shift-Enter', mac: 'Cmd-Shift-Enter' },
+        exec: () => document.getElementById('btn-check')?.click(),
+      });
+      const editor = { get value() { return aceEd.getValue(); }, set value(v) { aceEd.setValue(v, -1); } };
+
+      const stdinInput = document.getElementById('pg-stdin');
+
+      async function doRun() {
+        const code = (editor.value || '').trim();
+        if (!code) {
+          resultBox.className = 'c-term-out';
+          resultBox.innerHTML = `<span style="color:rgba(255,255,255,0.25);font-style:italic;">${currentLang === 'zh' ? '先写点代码再运行。' : 'Write some code first.'}</span>`;
+          return null;
+        }
+        return await spawnCWorker(code, resultBox, stdinInput);
+      }
+
+      const runBtn = document.getElementById('btn-run');
+      if (runBtn) runBtn.addEventListener('click', () => { doRun(); });
+
+      if (lessonCtx) {
+        const { courseSlug, lessonId, expectedOutput, initial, answer } = lessonCtx;
+        const checkBtn = document.getElementById('btn-check');
+        const resetBtn = document.getElementById('btn-reset');
+        const answerBtn = document.getElementById('btn-show-answer');
+        const hintToggle = document.getElementById('hint-toggle');
+        const hintBody = document.getElementById('hint-body');
+        let answerVisible = false;
+
+        if (checkBtn) checkBtn.addEventListener('click', async () => {
+          const output = await doRun();
+          if (output === null) return;
+          const norm = s => (s || '').replace(/\r\n/g, '\n').replace(/\r/g, '\n').trim();
+          const passed = norm(output) === norm(expectedOutput || '');
+          if (passed) {
+            markDone(courseSlug, lessonId);
+            resultBox.className = 'c-term-out';
+            resultBox.innerHTML = `<span style="color:var(--ok);">✓ ${tt('result-pass')}</span>\n\n${escapeHtml(output)}`;
+          } else {
+            resultBox.className = 'c-term-out is-error';
+            resultBox.innerHTML =
+              `<span style="color:#f0a8a8;">✗ ${currentLang === 'zh' ? '输出不匹配' : 'Output mismatch'}</span>\n\n` +
+              `<span style="color:rgba(255,255,255,0.4);">${currentLang === 'zh' ? '你的输出:' : 'Your output:'}</span>\n` +
+              escapeHtml(output || `(${tt('result-empty')})`) +
+              `\n\n<span style="color:rgba(255,255,255,0.4);">${currentLang === 'zh' ? '期望输出:' : 'Expected:'}</span>\n` +
+              escapeHtml(expectedOutput || '');
+          }
+        });
+
+        if (resetBtn) resetBtn.addEventListener('click', () => {
+          editor.value = initial;
+          resultBox.className = 'c-term-out';
+          resultBox.innerHTML = `<span style="color:rgba(255,255,255,0.25);font-style:italic;">${currentLang === 'zh' ? '已重置。' : 'Reset.'}</span>`;
+        });
+
+        if (answerBtn) answerBtn.addEventListener('click', () => {
+          answerVisible = !answerVisible;
+          answerBtn.textContent = answerVisible ? tt('btn-hide-answer') : tt('btn-show-answer');
+          if (answer) editor.value = answerVisible ? answer : initial;
+        });
+
+        if (hintToggle && hintBody) {
+          hintToggle.addEventListener('click', () => {
+            const hidden = hintBody.style.display === 'none';
+            hintBody.style.display = hidden ? 'block' : 'none';
+            hintToggle.textContent = hidden ? tt('hide-hint') : tt('show-hint');
+          });
+        }
+      }
+      return { editor, cm };
     }
 
     /* ─── SQL engine (sql.js / SQLite, pure JS asm.js build) ─── */
@@ -1561,12 +2003,20 @@
       let course;
       try {
         wrap.innerHTML = `<div class="result-empty" style="padding: 80px 24px;">${currentLang === 'zh' ? '加载中…' : 'Loading…'}</div>`;
-        await ensureSql();
         course = await loadCourse(courseSlug);
+        if (course.type === 'c') {
+          await ensureC();
+        } else {
+          await ensureSql();
+        }
       } catch (e) {
         wrap.innerHTML = `<div class="not-found"><h2>${tt('not-found-title')}</h2><p>${tt('not-found-desc')}</p><pre style="margin-top:18px; color:var(--err); font-size:12px;">${escapeHtml(String(e.message || e))}</pre></div>`;
         return;
       }
+      if (course.type === 'c') {
+        return renderCLesson(courseSlug, lessonIdRaw, course);
+      }
+
       const lessonId = parseInt(lessonIdRaw, 10);
       const lesson = (course.lessons || []).find(l => l.id === lessonId);
       if (!lesson) {
@@ -1655,7 +2105,7 @@
                   </span>
                 </div>
                 <div class="editor-host" id="editor-host">
-                  <textarea id="sql-editor">${escapeHtml(initialSql)}</textarea>
+                  <div id="sql-editor"></div>
                 </div>
               </div>
 
@@ -1683,38 +2133,20 @@
         wrap.querySelectorAll('.fade-in').forEach(el => el.classList.add('visible'));
       });
 
-      // Mount CodeMirror onto the textarea (replaces it with a real code editor:
-      // line numbers, SQL syntax highlighting, bracket matching).
-      const textarea = document.getElementById('sql-editor');
       const editorHost = document.getElementById('editor-host');
-      const cm = (window.CodeMirror && CodeMirror.fromTextArea)
-        ? CodeMirror.fromTextArea(textarea, {
-            mode: 'text/x-mysql',
-            lineNumbers: true,
-            indentUnit: 2,
-            tabSize: 2,
-            smartIndent: true,
-            matchBrackets: true,
-            autoCloseBrackets: true,
-            lineWrapping: true,
-            inputStyle: 'contenteditable',
-            spellcheck: false,
-            autofocus: false,
-            extraKeys: {
-              'Tab': (cm) => cm.replaceSelection('  ', 'end'),
-            },
-          })
-        : null;
-      // Make the editor stretch to fill the host on tall screens.
-      if (cm) {
-        cm.on('focus', () => editorHost.classList.add('is-focused'));
-        cm.on('blur',  () => editorHost.classList.remove('is-focused'));
-        // Re-flow CM after the layout settles so the editor fills its parent.
-        setTimeout(() => { try { cm.refresh(); } catch(e) {} }, 30);
-      }
+      const aceEd = ace.edit(document.getElementById('sql-editor'));
+      aceEd.setTheme('ace/theme/tomorrow_night');
+      aceEd.session.setMode('ace/mode/mysql');
+      aceEd.session.setUseWorker(false);
+      aceEd.setValue(initialSql, -1);
+      aceEd.setOptions({ minLines: 10, maxLines: 30, showPrintMargin: false, fontSize: '13px', fontFamily: "'JetBrains Mono', monospace", useSoftTabs: true, tabSize: 2, behavioursEnabled: true, wrap: true });
+      aceEd.on('focus', () => editorHost.classList.add('is-focused'));
+      aceEd.on('blur',  () => editorHost.classList.remove('is-focused'));
+      aceEd.commands.addCommand({ name: 'run',   bindKey: { win: 'Ctrl-Enter',       mac: 'Cmd-Enter'       }, exec: () => document.getElementById('btn-run')?.click() });
+      aceEd.commands.addCommand({ name: 'check', bindKey: { win: 'Ctrl-Shift-Enter', mac: 'Cmd-Shift-Enter' }, exec: () => document.getElementById('btn-check')?.click() });
       const editor = {
-        get value() { return cm ? cm.getValue() : textarea.value; },
-        set value(v) { if (cm) cm.setValue(v); else textarea.value = v; },
+        get value() { return aceEd.getValue(); },
+        set value(v) { aceEd.setValue(v, -1); },
       };
       const resultBox = document.getElementById('result-box');
       const initial = initialSql;
@@ -1829,17 +2261,121 @@
         });
       }
 
-      // Keyboard shortcut: Ctrl/Cmd + Enter → run; +Shift → submit. Bound on the
-      // CodeMirror instance when present, otherwise on the underlying textarea.
+    }
+
+    /* ─── C lesson view ─── */
+    async function renderCLesson(courseSlug, lessonIdRaw, course) {
+      const wrap = document.getElementById('lesson-content');
+      const lessonId = parseInt(lessonIdRaw, 10);
+      const lessons = course.lessons || [];
+      const lesson = lessons.find(l => l.id === lessonId);
+      if (!lesson) {
+        wrap.innerHTML = `<div class="not-found"><h2>${tt('not-found-title')}</h2><p>${tt('not-found-desc')}</p></div>`;
+        return;
+      }
+
+      const prog = loadProgress(courseSlug);
+      const idx  = lessons.findIndex(l => l.id === lessonId);
+      const prev = idx > 0 ? lessons[idx - 1] : null;
+      const next = idx >= 0 && idx < lessons.length - 1 ? lessons[idx + 1] : null;
+
+      const intro    = pickLang(lesson.intro) || '';
+      const task     = pickLang(lesson.task)  || '';
+      const hint     = pickLang(lesson.hint)  || '';
+      const initial  = lesson.starter ? pickLang(lesson.starter) : '';
+      const answer   = lesson.answer  ? pickLang(lesson.answer)  : '';
+
+      wrap.innerHTML = `
+        <div class="lesson-pane lesson-pane-left fade-in">
+          <div class="lesson-meta-row">
+            <span class="lesson-pill">${pickLang(course.title)}</span>
+            <span>${tt('lessons-count')} ${String(lesson.id).padStart(2,'0')} / ${String(lessons.length).padStart(2,'0')}</span>
+            ${lesson.chapter ? `<span>· ${pickLang(lesson.chapter)}</span>` : ''}
+            ${lesson.difficulty ? `<span>· ${tt('difficulty')}: ${pickLang(lesson.difficulty)}</span>` : ''}
+          </div>
+          <div class="lesson-title-row">
+            <h1 class="lesson-title">${pickLang(lesson.title)}</h1>
+            ${lesson.chapterRef ? `
+              <a class="tutorial-link" href="blog.html#${lesson.chapterRef}" target="_blank" rel="noopener">
+                <span>${tt('tutorial-link')}</span>
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+                  <path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"></path>
+                  <polyline points="15 3 21 3 21 9"></polyline>
+                  <line x1="10" y1="14" x2="21" y2="3"></line>
+                </svg>
+              </a>` : ''}
+          </div>
+          ${lesson.subtitle ? `<p class="lesson-subtitle">${pickLang(lesson.subtitle)}</p>` : ''}
+          <div id="lesson-intro">${intro}</div>
+        </div>
+
+        <div class="lesson-pane lesson-pane-right lesson-right fade-in">
+          <div class="task-block">
+            <div class="task-label">${tt('task-label')}</div>
+            <div class="task-text">${task}</div>
+          </div>
+
+          ${hint ? `
+          <div class="hint-panel" id="hint-body" style="display:none;">
+            <div class="task-label">${tt('hint-label')}</div>
+            <div>${hint}</div>
+          </div>` : ''}
+
+          <div class="editor-wrap">
+            <div class="editor-label">
+              <span>${tt('editor-label')}</span>
+              <span class="editor-actions">
+                <button class="editor-mini-btn" id="btn-reset">${tt('btn-reset')}</button>
+                ${hint ? `<button class="editor-mini-btn" id="hint-toggle">${tt('show-hint')}</button>` : ''}
+                <button class="editor-mini-btn" id="btn-show-answer">${tt('btn-show-answer')}</button>
+              </span>
+            </div>
+            <div class="editor-host" id="editor-host">
+              <div id="sql-editor"></div>
+            </div>
+          </div>
+
+          <div class="editor-bar">
+            <button class="btn btn-ghost" id="btn-run">▶  ${tt('btn-run')}</button>
+            ${lesson.expectedOutput !== undefined ? `<button class="btn btn-primary" id="btn-check">✓  ${tt('btn-check')}</button>` : ''}
+          </div>
+
+          <div class="c-terminal-win">
+            <div id="result-box" class="c-term-out" style="color:rgba(255,255,255,0.25);font-style:italic;">${currentLang === 'zh' ? '点击运行查看输出，点击提交检查答案。' : 'Click Run to see output. Click Submit to check.'}</div>
+            <div class="c-term-in-row">
+              <span class="c-term-prompt">$</span>
+              <input id="pg-stdin" class="c-term-in" type="text" placeholder="${currentLang === 'zh' ? 'stdin 输入（回车重新运行）' : 'stdin input (Enter to re-run)'}" spellcheck="false" autocomplete="off">
+            </div>
+          </div>
+
+          <div class="lesson-nav-foot">
+            <a class="nav-btn" href="#${courseSlug}/${prev ? prev.id : ''}" aria-disabled="${prev ? 'false' : 'true'}">← ${tt('btn-prev')}</a>
+            <a class="nav-btn" href="#${courseSlug}">${tt('btn-back-list')}</a>
+            <a class="nav-btn" href="#${courseSlug}/${next ? next.id : ''}" aria-disabled="${next ? 'false' : 'true'}">${tt('btn-next')} →</a>
+          </div>
+        </div>
+      `;
+
+      requestAnimationFrame(() => {
+        wrap.querySelectorAll('.fade-in').forEach(el => el.classList.add('visible'));
+      });
+
+      mountCEditor(
+        document.getElementById('sql-editor'),
+        document.getElementById('editor-host'),
+        document.getElementById('result-box'),
+        { courseSlug, lessonId, expectedOutput: lesson.expectedOutput, initial, answer }
+      );
+
       const onShortcut = (e) => {
         if ((e.ctrlKey || e.metaKey) && (e.key === 'Enter' || e.code === 'Enter')) {
           e.preventDefault();
-          if (e.shiftKey) document.getElementById('btn-check').click();
-          else document.getElementById('btn-run').click();
+          const target = e.shiftKey ? 'btn-check' : 'btn-run';
+          const btn = document.getElementById(target);
+          if (btn) btn.click();
         }
       };
-      if (cm) cm.getWrapperElement().addEventListener('keydown', onShortcut);
-      else textarea.addEventListener('keydown', onShortcut);
+      wrap.addEventListener('keydown', onShortcut);
     }
 
     /* ─── Router ─── */
@@ -1874,6 +2410,12 @@
         courseView.style.display = 'block';
         lessonView.style.display = 'none';
         renderCourse(parts[0]);
+        window.scrollTo({ top: 0, behavior: 'instant' });
+      } else if (parts[1] === 'playground') {
+        courseList.style.display = 'none';
+        courseView.style.display = 'none';
+        lessonView.style.display = '';
+        renderPlayground(parts[0]);
         window.scrollTo({ top: 0, behavior: 'instant' });
       } else {
         courseList.style.display = 'none';
