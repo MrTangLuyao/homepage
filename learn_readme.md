@@ -8,7 +8,7 @@
 
 **Zero build step, zero backend, zero `fetch()`.**
 
-- All code runs 100% in the browser — SQL via sql.js (SQLite asm.js), C via JSCPP (pure-JS C interpreter).
+- All code runs 100% in the browser — SQL via sql.js (SQLite asm.js).
 - All data is loaded via `<script>` tags so the site works when opened as `file://` locally.
 - `learn_data/manifest.js` — course index (metadata only).
 - `learn_data/<slug>/course.js` — full course content, lazy-injected when the user opens that course.
@@ -21,18 +21,13 @@
 learn.html                         ← the entire interactive UI (routing, rendering, engines)
 learn_data/
 ├── manifest.js                    ← INDEX ONLY. Sets window.__LEARN_MANIFEST.
-├── sql/
-│   └── course.js                  ← SQL course. Sets window.__LEARN_COURSES['sql'].
-└── c/
-    └── course.js                  ← C course.  Sets window.__LEARN_COURSES['c'].
+└── sql/
+    └── course.js                  ← SQL course. Sets window.__LEARN_COURSES['sql'].
 lib/
 ├── sql-asm.js                     ← sql.js engine (SQLite, asm.js build). Loaded eagerly.
-├── JSCPP.es5.min.js               ← JSCPP C interpreter (pure JS, ~620 KB). Lazy-loaded.
-├── picoc.min.js                   ← PicoC WASM C interpreter (backup, NOT currently used — causes main-thread freeze on load due to synchronous WASM compilation).
 ├── ace/
 │   ├── ace.min.js                 ← Ace code editor. Loaded eagerly.
 │   ├── mode-mysql.min.js          ← SQL syntax highlighting.
-│   ├── mode-c_cpp.min.js          ← C/C++ syntax highlighting.
 │   └── theme-tomorrow_night.min.js← Dark theme for the editor.
 └── (fonts, images, etc.)
 learn_readme.md                    ← this file
@@ -105,58 +100,6 @@ window.__LEARN_MANIFEST = {
 
 ---
 
-## course.js schema — C course
-
-```js
-(window.__LEARN_COURSES = window.__LEARN_COURSES || {})['c'] = {
-  slug: 'c',
-  type: 'c',                     // REQUIRED for C courses. Tells learn.html to use the C rendering path.
-  title: { zh: '...', en: '...' },
-  desc:  { zh: '...', en: '...' },
-
-  hasPlayground: true,
-  playgroundTitle: { zh: '自定义 C 语言代码', en: 'Custom C Playground' },
-  // No playgroundSetup for C — the playground starts with an empty environment.
-
-  lessons: [
-    {
-      id: 1,
-      section: 'main',
-      slug: 'hello-world',
-      title:    { zh: '...', en: '...' },
-      chapter:  { zh: '...', en: '...' },
-      intro:    { zh: 'HTML', en: 'HTML' },
-      task:     { zh: '...', en: '...' },
-      hint:     { zh: '...', en: '...' },
-      starter:  { zh: '#include <stdio.h>...', en: '...' },
-      answer:   { zh: '#include <stdio.h>...', en: '...' },  // Shown when user clicks "Show Answer"
-      expectedOutput: 'Hello World!\n',  // Exact stdout the program must produce
-    }
-  ]
-};
-```
-
-### C validation
-- JSCPP runs the user's code and captures stdout.
-- `norm(output) === norm(expectedOutput)` — both are `.trim()`-ed and `\r\n` normalized before comparing.
-- `answer` is the reference solution shown by the "Show Answer" button.
-- There is no `expectedSql` for C — use `expectedOutput` instead.
-
----
-
-## How the course type system works
-
-`learn.html` checks `course.type` after loading the course file:
-
-| `course.type` | Lesson renderer | Playground renderer |
-|---|---|---|
-| `undefined` / `'sql'` | `renderLesson` (SQL editor, row comparison) | `renderPlayground` (SQL with DB viewer) |
-| `'c'` | `renderCLesson` (C editor, stdout comparison) | `renderCPlayground` (bare C editor) |
-
-The playground entry row in the course list is rendered by `renderCourse` when `course.hasPlayground === true`. The label comes from `course.playgroundTitle` (falls back to `tt('playground-label')` if not set).
-
----
-
 ## Engines
 
 ### SQL engine — sql.js
@@ -165,50 +108,14 @@ The playground entry row in the course list is rendered by `renderCourse` when `
 - Each lesson or query runs against a **fresh in-memory DB** — previous queries can't bleed state.
 - The SQL Playground maintains a **persistent DB** for the session (tables survive between queries). "加载 Demo 表" resets and reloads the full schema. "重置表" resets to empty.
 
-### C engine — JSCPP
-- **Lazy-loaded** — only downloaded when the user first opens a C lesson or playground. (~620 KB, pure JS, no WASM → no main-thread freeze.)
-- `ensureC()` injects `<script src="lib/JSCPP.es5.min.js">` the first time it is needed and caches the result.
-- JSCPP runs synchronously; the result is available immediately after `runC(code)` returns.
-- The bundle has been **patched**: the default `stdio.write` function was changed to call `window.__cOut(s)` if that global is set. `runC` sets this global before calling JSCPP and deletes it afterwards. This approach completely bypasses JSCPP's internal `mergeConfig` / `CRuntime` config system, which was unreliable.
-
-#### ⚠️ JSCPP known bug — comma + space in string literals
-
-**Bug**: In JSCPP's PEG parser, a **space character immediately after a comma inside a C string literal is silently dropped**.
-
-```c
-printf("Hello, World!\n");  // outputs "Hello,World!\n"  ← WRONG
-printf("Hello World!\n");   // outputs "Hello World!\n"  ← correct
-printf("a, b, c\n");        // outputs "a,b,c\n"         ← spaces after commas stripped
-```
-
-Char code evidence: for `printf("Hello, World!\n")`, the captured char codes were `72 101 108 108 111 44 87 111 114 108 100 33 10` — char 32 (space) is completely absent between 44 (`,`) and 87 (`W`).
-
-The bug is deep in JSCPP's minified PEG parser; it was not fixable by patching the `stdio.write` or config system. Workaround: **avoid spaces immediately after commas in C string literals when writing course content**.
-
-```c
-// OK — spaces elsewhere work fine:
-printf("Hello World!\n");
-printf("name: %s\n", name);
-printf("sum = %d\n", a + b);
-
-// AVOID in expectedOutput / answer:
-printf("Hello, World!\n");   // space after comma will be stripped
-printf("x = 1, y = 2\n");   // spaces after commas will be stripped
-```
-
-#### ⚠️ picoc.min.js — do NOT use for main-thread execution
-
-`lib/picoc.min.js` is a WASM-compiled PicoC interpreter that was evaluated as an alternative to JSCPP. It was found to **freeze the browser** because its WASM binary (~600 KB) is compiled synchronously on the main thread when `picoc()` is called. It is kept in `lib/` for reference but is **not loaded or used**. To use it safely, it would need to run in a Web Worker.
-
 ---
 
 ## Code editor — Ace
 
-All code editors (SQL and C) use **Ace editor** (`lib/ace/`). The four files are loaded eagerly:
+All code editors use **Ace editor** (`lib/ace/`). The three files are loaded eagerly:
 - `ace.min.js` — core editor
 - `mode-mysql.min.js` — SQL syntax
-- `mode-c_cpp.min.js` — C/C++ syntax
-- `theme-tomorrow_night.min.js` — shared dark theme for both SQL and C
+- `theme-tomorrow_night.min.js` — shared dark theme
 
 Editors are initialised via `ace.edit(div)` with `setUseWorker(false)` (disables background syntax-check workers that would need separate files). The `minLines`/`maxLines` options control auto-height.
 
@@ -224,10 +131,6 @@ Any course can have a playground (free-form editor, no grading) by setting `hasP
 - "重置表" button: resets to empty DB.
 - Each Run re-uses the same DB instance (tables persist between queries).
 
-### C playground
-- Left pane shows the course title and a brief description. No DB viewer.
-- Each Run is independent (no persistent state between runs).
-
 ---
 
 ## How to add a new SQL course
@@ -236,13 +139,6 @@ Any course can have a playground (free-form editor, no grading) by setting `hasP
 2. Create `learn_data/<slug>/course.js`. Use the `sql` course as a template. Do NOT set `type`.
 3. Define lessons. Keep `setup` SQL small (3–5 rows per table).
 4. Add the entry to `learn_data/manifest.js`.
-
-## How to add a new C lesson
-
-1. Add a new object to the `lessons` array in `learn_data/c/course.js`.
-2. Set `id`, `slug`, `title`, `intro`, `task`, `hint`, `starter`, `answer`, `expectedOutput`.
-3. Update `lessonsCount` in `manifest.js`.
-4. **Avoid spaces after commas in `expectedOutput` and `answer`** (JSCPP bug — see above).
 
 ---
 
@@ -257,11 +153,3 @@ Any course can have a playground (free-form editor, no grading) by setting `hasP
 6. **Hints should nudge, not solve**: "Try using WHERE" beats giving the full answer.
 7. **Write setup SQL first**, then task, then expectedSql — this ensures the problem is solvable.
 
-### C
-1. **Bilingual**: same as SQL.
-2. **JSCPP limitations**: no file I/O, no OS calls, no dynamic libraries. Stick to `stdio.h`, `stdlib.h`, `string.h`, `math.h`.
-3. **No spaces after commas in string literals** (JSCPP bug). Use `Hello World!` not `Hello, World!`. For format strings like `printf("x=%d, y=%d\n", x, y)` the space after `,` will be stripped in output — design `expectedOutput` accordingly, or avoid the pattern.
-4. **Simple programs only**: no recursion-heavy programs (JSCPP stack is limited), no large arrays, no complex pointer arithmetic.
-5. **`expectedOutput` must match exactly** (after trim + `\r\n` normalisation). Include `\n` for newlines.
-6. `starter` should give students the scaffolding (`main()` boilerplate) without giving away the answer.
-7. `answer` is the canonical solution shown by "Show Answer". Make it clean and idiomatic.

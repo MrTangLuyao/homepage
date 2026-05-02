@@ -26,7 +26,7 @@ window.__LEARN_MANIFEST = {
       },
       level: { zh: '入门', en: 'Beginner' },
       lessonsCount: 1,
-      coming: false,
+      coming: true,
     },
   ]
 };
