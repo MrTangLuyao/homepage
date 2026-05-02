@@ -9,7 +9,17 @@
       "Bash(python3 *)",
       "Bash(ffmpeg -i blog_data/sql-syntax-guide-1/cover.png -quality 90 blog_data/sql-syntax-guide-1/cover.webp -y)",
       "Bash(sips -s format webp /Users/louietang/Documents/GitHub/homepage/blog_data/sql-syntax-guide-1/cover.png --out /Users/louietang/Documents/GitHub/homepage/blog_data/sql-syntax-guide-1/cover.webp)",
-      "Bash(cwebp -q 90 /Users/louietang/Documents/GitHub/homepage/blog_data/sql-syntax-guide-1/cover.png -o /Users/louietang/Documents/GitHub/homepage/blog_data/sql-syntax-guide-1/cover.webp)"
+      "Bash(cwebp -q 90 /Users/louietang/Documents/GitHub/homepage/blog_data/sql-syntax-guide-1/cover.png -o /Users/louietang/Documents/GitHub/homepage/blog_data/sql-syntax-guide-1/cover.webp)",
+      "Bash(pip install *)",
+      "Bash(curl -sL \"https://cdn.jsdelivr.net/npm/alasql@4.5.2/dist/alasql.min.js\" -o \"C:/Users/Louie/Documents/GitHub/homepage/lib/alasql.min.js\")",
+      "Bash(mkdir -p \"C:/Users/Louie/Documents/GitHub/homepage/lib/codemirror\")",
+      "Bash(curl -sL \"https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/codemirror.min.js\" -o codemirror.min.js)",
+      "Bash(curl -sL \"https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/codemirror.min.css\" -o codemirror.min.css)",
+      "Bash(curl -sL \"https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/mode/sql/sql.min.js\" -o sql.min.js)",
+      "Bash(curl -sL \"https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/addon/edit/matchbrackets.min.js\" -o matchbrackets.min.js)",
+      "Bash(node -e ' *)",
+      "Bash(curl -sL \"https://cdnjs.cloudflare.com/ajax/libs/sql.js/1.10.3/sql-asm.js\" -o \"C:/Users/Louie/Documents/GitHub/homepage/lib/sql-asm.js\")",
+      "Bash(grep -nB2 \"id: 2[8-9],\\\\|id: 3[0-7],\" learn_data/sql/course.js)"
     ]
   }
 }
