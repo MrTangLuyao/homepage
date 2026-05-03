@@ -92,41 +92,44 @@
       <div class="relative" id="brand-dropdown-container">
         <button id="brand-dropdown-btn" class="ripple-surface ripple-surface-variant px-3 py-2 rounded-m3-full font-bold text-lg flex items-center cursor-pointer">
           <span class="text-m3-onSurface">louie</span>
-          <span class="text-m3-primary mx-1.5">.</span>
+          <span class="text-m3-primary">.</span>
           <span class="text-m3-onSurface/60 font-medium tracking-wide">home</span>
           <svg id="brand-dropdown-icon" class="w-4 h-4 ml-1.5 text-m3-onSurface/60 transition-transform duration-200" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"></polyline></svg>
         </button>
         <div id="brand-dropdown-menu" class="absolute top-full left-0 mt-2 w-48 bg-m3-surfaceContainer rounded-m3-sm shadow-lg shadow-black/40 border border-m3-outlineVariant opacity-0 pointer-events-none transition-opacity duration-200 z-[110] py-2 overflow-hidden">
-          <a href="index.html" class="ripple-surface ripple-surface-variant block px-4 py-3 text-sm font-medium text-m3-primary bg-m3-primaryContainer/30 hover:bg-m3-surfaceContainerHigh transition-colors">louie.home</a>
-          <a href="blog.html" class="ripple-surface ripple-surface-variant block px-4 py-3 text-sm font-medium text-m3-onSurfaceVariant hover:text-m3-onSurface hover:bg-m3-surfaceContainerHigh transition-colors">louie.blog</a>
-          <a href="learn.html" class="ripple-surface ripple-surface-variant block px-4 py-3 text-sm font-medium text-m3-onSurfaceVariant hover:text-m3-onSurface hover:bg-m3-surfaceContainerHigh transition-colors">louie.learn</a>
-          <a href="95.html" class="ripple-surface ripple-surface-variant block px-4 py-3 text-sm font-medium text-m3-onSurfaceVariant hover:text-m3-onSurface hover:bg-m3-surfaceContainerHigh transition-colors">louie.95</a>
+          <a href="index.html" class="ripple-surface ripple-surface-variant block px-4 py-3 text-sm font-medium bg-m3-primaryContainer/30 hover:bg-m3-surfaceContainerHigh transition-colors"><span class="text-m3-onSurface">louie</span><span class="text-m3-primary">.</span><span class="text-m3-primary font-semibold">home</span></a>
+          <a href="blog.html" class="ripple-surface ripple-surface-variant block px-4 py-3 text-sm font-medium hover:bg-m3-surfaceContainerHigh transition-colors"><span class="text-m3-onSurface">louie</span><span class="text-m3-primary">.</span><span class="text-m3-onSurface/60">blog</span></a>
+          <a href="learn.html" class="ripple-surface ripple-surface-variant block px-4 py-3 text-sm font-medium hover:bg-m3-surfaceContainerHigh transition-colors"><span class="text-m3-onSurface">louie</span><span class="text-m3-primary">.</span><span class="text-m3-onSurface/60">learn</span></a>
+          <a href="95.html" class="ripple-surface ripple-surface-variant block px-4 py-3 text-sm font-medium hover:bg-m3-surfaceContainerHigh transition-colors"><span class="text-m3-onSurface">louie</span><span class="text-m3-primary">.</span><span class="text-m3-onSurface/60">95</span></a>
         </div>
       </div>
     </div>
 
-    <nav class="hidden md:flex items-center gap-1">
-      <a href="#about" class="ripple-surface ripple-surface-variant px-4 py-2 rounded-m3-full text-sm font-medium text-m3-onSurfaceVariant hover:text-m3-onSurface transition-colors">About</a>
-      <a href="#projects" class="ripple-surface ripple-surface-variant px-4 py-2 rounded-m3-full text-sm font-medium text-m3-onSurfaceVariant hover:text-m3-onSurface transition-colors">Projects</a>
-      <a href="#social" class="ripple-surface ripple-surface-variant px-4 py-2 rounded-m3-full text-sm font-medium text-m3-onSurfaceVariant hover:text-m3-onSurface transition-colors">Social</a>
-      <a href="#links" class="ripple-surface ripple-surface-variant px-4 py-2 rounded-m3-full text-sm font-medium text-m3-onSurfaceVariant hover:text-m3-onSurface transition-colors">Links</a>
-      <a href="#licenses" class="ripple-surface ripple-surface-variant px-4 py-2 rounded-m3-full text-sm font-medium text-m3-onSurfaceVariant hover:text-m3-onSurface transition-colors">Licenses</a>
-      <div class="w-[1px] h-6 bg-m3-outlineVariant mx-2"></div>
-      <button onclick="toggleLang()" id="lang-toggle" class="ripple-surface ripple-surface-variant border border-m3-outline px-4 py-1.5 rounded-m3-full text-sm font-medium text-m3-primary hover:bg-m3-primaryContainer transition-colors">EN</button>
-    </nav>
-
-    <button id="menu-btn" class="md:hidden ripple-surface px-3 py-3 rounded-m3-full text-m3-onSurface">
-      <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="3" y1="12" x2="21" y2="12"></line><line x1="3" y1="6" x2="21" y2="6"></line><line x1="3" y1="18" x2="21" y2="18"></line></svg>
-    </button>
+    <div class="flex items-center gap-1">
+      <nav class="hidden md:flex items-center gap-1 mr-1">
+        <a href="#about" class="ripple-surface ripple-surface-variant px-4 py-2 rounded-m3-full text-sm font-medium text-m3-onSurfaceVariant hover:text-m3-onSurface transition-colors">About</a>
+        <a href="#projects" class="ripple-surface ripple-surface-variant px-4 py-2 rounded-m3-full text-sm font-medium text-m3-onSurfaceVariant hover:text-m3-onSurface transition-colors">Projects</a>
+        <a href="#social" class="ripple-surface ripple-surface-variant px-4 py-2 rounded-m3-full text-sm font-medium text-m3-onSurfaceVariant hover:text-m3-onSurface transition-colors">Social</a>
+        <a href="#links" class="ripple-surface ripple-surface-variant px-4 py-2 rounded-m3-full text-sm font-medium text-m3-onSurfaceVariant hover:text-m3-onSurface transition-colors">Links</a>
+        <a href="#licenses" class="ripple-surface ripple-surface-variant px-4 py-2 rounded-m3-full text-sm font-medium text-m3-onSurfaceVariant hover:text-m3-onSurface transition-colors">Licenses</a>
+        <div class="w-[1px] h-6 bg-m3-outlineVariant mx-1"></div>
+      </nav>
+      <button onclick="toggleLang()" id="lang-toggle" class="ripple-surface ripple-surface-variant border border-m3-outline px-3 py-1.5 rounded-m3-full text-sm font-medium text-m3-primary hover:bg-m3-primaryContainer transition-colors flex items-center gap-1.5">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="shrink-0"><path d="m5 8 6 6"/><path d="m4 14 6-6 2-3"/><path d="M2 5h12"/><path d="M7 2h1"/><path d="m22 22-5-10-5 10"/><path d="M14 18h6"/></svg>
+        <span id="lang-label">EN ⇄ 文</span>
+      </button>
+      <button id="menu-btn" class="md:hidden ripple-surface px-3 py-3 rounded-m3-full text-m3-onSurface">
+        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="3" y1="12" x2="21" y2="12"></line><line x1="3" y1="6" x2="21" y2="6"></line><line x1="3" y1="18" x2="21" y2="18"></line></svg>
+      </button>
+    </div>
   </header>
 
-  <div id="mobile-menu" class="fixed top-16 left-0 w-full bg-m3-surfaceContainer border-b border-m3-outlineVariant z-[90] flex flex-col p-4 shadow-xl md:hidden">
-    <a href="#about" class="px-4 py-3 text-m3-onSurface rounded-m3-md hover:bg-m3-surfaceContainerHigh">About</a>
-    <a href="#projects" class="px-4 py-3 text-m3-onSurface rounded-m3-md hover:bg-m3-surfaceContainerHigh">Projects</a>
-    <a href="#social" class="px-4 py-3 text-m3-onSurface rounded-m3-md hover:bg-m3-surfaceContainerHigh">Social</a>
-    <a href="#links" class="px-4 py-3 text-m3-onSurface rounded-m3-md hover:bg-m3-surfaceContainerHigh">Links</a>
-    <a href="#licenses" class="px-4 py-3 text-m3-onSurface rounded-m3-md hover:bg-m3-surfaceContainerHigh">Licenses</a>
-    <button onclick="toggleLang()" class="mt-2 text-left px-4 py-3 text-m3-primary rounded-m3-md hover:bg-m3-primaryContainer">Switch Lang</button>
+  <div id="mobile-menu" class="fixed top-16 left-0 w-full bg-m3-surfaceContainer border-b border-m3-outlineVariant z-[90] flex flex-col p-3 shadow-xl md:hidden">
+    <a href="#about" class="ripple-surface ripple-surface-variant px-4 py-3 text-m3-onSurface rounded-m3-md hover:bg-m3-surfaceContainerHigh transition-colors">About</a>
+    <a href="#projects" class="ripple-surface ripple-surface-variant px-4 py-3 text-m3-onSurface rounded-m3-md hover:bg-m3-surfaceContainerHigh transition-colors">Projects</a>
+    <a href="#social" class="ripple-surface ripple-surface-variant px-4 py-3 text-m3-onSurface rounded-m3-md hover:bg-m3-surfaceContainerHigh transition-colors">Social</a>
+    <a href="#links" class="ripple-surface ripple-surface-variant px-4 py-3 text-m3-onSurface rounded-m3-md hover:bg-m3-surfaceContainerHigh transition-colors">Links</a>
+    <a href="#licenses" class="ripple-surface ripple-surface-variant px-4 py-3 text-m3-onSurface rounded-m3-md hover:bg-m3-surfaceContainerHigh transition-colors">Licenses</a>
   </div>
 
   <main class="pt-32 pb-20 px-6 max-w-4xl mx-auto flex flex-col items-start min-h-[80vh] justify-center">
@@ -291,7 +294,7 @@
         <div class="text-sm text-m3-onSurfaceVariant tracking-wide">Copyright (c) Huawei Device Co., Ltd.</div>
       </div>
     </div>
-    <p class="mt-6 text-sm text-m3-onSurfaceVariant/60">本站视觉设计参考了 <a href="https://m3.material.io" target="_blank" rel="noopener" class="ripple-surface ripple-surface-variant inline-flex items-center text-m3-primary px-2 py-0.5 rounded-m3-sm hover:bg-m3-primaryContainer transition-colors">Material Design 3</a> 规范，并非使用其官方组件库。</p>
+    <p class="mt-6 text-sm text-m3-onSurfaceVariant/60" data-i18n-html="m3-note">本站视觉设计参考了 <a href="https://m3.material.io" target="_blank" rel="noopener" class="ripple-surface ripple-surface-variant inline-flex items-center text-m3-primary px-2 py-0.5 rounded-m3-sm hover:bg-m3-primaryContainer transition-colors">Material Design 3</a> 规范，并非使用其官方组件库。</p>
   </section>
 
   <footer class="text-center py-20 border-t border-m3-outlineVariant bg-m3-surfaceContainer/50">
@@ -326,8 +329,21 @@
       if (existingRipple) { existingRipple.remove(); }
       button.appendChild(circle);
     }
-    const buttons = document.querySelectorAll('.ripple-surface');
-    for (const button of buttons) { button.addEventListener('mousedown', createRipple); }
+    function bindRipples() {
+      document.querySelectorAll('.ripple-surface').forEach(el => {
+        if (el.dataset.rippleBound) return;
+        el.dataset.rippleBound = '1';
+        el.addEventListener('touchstart', (e) => {
+          el._lastTouch = Date.now();
+          createRipple({ currentTarget: el, clientX: e.touches[0].clientX, clientY: e.touches[0].clientY });
+        }, { passive: true });
+        el.addEventListener('mousedown', (e) => {
+          if (Date.now() - (el._lastTouch || 0) < 500) return;
+          createRipple(e);
+        });
+      });
+    }
+    bindRipples();
 
     const brandBtn = document.getElementById('brand-dropdown-btn');
     const brandMenu = document.getElementById('brand-dropdown-menu');
@@ -376,7 +392,8 @@
         'project-sync-desc': '私有跨设备同步工具，支持文本与文件的实时共享，基于 WebSocket 实现即时更新，提供双视图布局与 PIN 锁保护。',
         'project-primer-desc': 'PCR 引物设计工具的网页化实现，支持 BLAST 校验与表达感知评分，提升了生信工具的交互体验与可访问性。',
         'links-cohen-name': 'Cohenjikan 的主页',
-        'contact-desc': '我的收件箱始终敞开。无论是有项目合作、技术交流，还是简单地打个招呼，我都会尽量回复。'
+        'contact-desc': '我的收件箱始终敞开。无论是有项目合作、技术交流，还是简单地打个招呼，我都会尽量回复。',
+        'm3-note': '本站视觉设计参考了 <a href="https://m3.material.io" target="_blank" rel="noopener" class="ripple-surface ripple-surface-variant inline-flex items-center text-m3-primary px-2 py-0.5 rounded-m3-sm hover:bg-m3-primaryContainer transition-colors">Material Design 3</a> 规范，并非使用其官方组件库。'
       },
       en: {
         'hero-greeting': 'hello, world!',
@@ -393,7 +410,8 @@
         'project-sync-desc': 'Private cross-device synchronization tool. Real-time text/file sharing via WebSocket. Features dual-view layout and PIN lock.',
         'project-primer-desc': 'A web-based implementation of a PCR primer design tool with BLAST validation and expression-aware scoring.',
         'links-cohen-name': "Cohen's Homepage",
-        'contact-desc': "My inbox is always open. Whether it's a collaboration proposal, a tech chat, or just a hello — I'll do my best to reply."
+        'contact-desc': "My inbox is always open. Whether it's a collaboration proposal, a tech chat, or just a hello — I'll do my best to reply.",
+        'm3-note': 'Visual design inspired by the <a href="https://m3.material.io" target="_blank" rel="noopener" class="ripple-surface ripple-surface-variant inline-flex items-center text-m3-primary px-2 py-0.5 rounded-m3-sm hover:bg-m3-primaryContainer transition-colors">Material Design 3</a> spec — not using the official component library.'
       }
     };
 
@@ -409,9 +427,10 @@
         const key = el.getAttribute('data-i18n-html');
         if (t[key]) el.innerHTML = t[key];
       });
-      const toggleBtn = document.getElementById('lang-toggle');
-      if(toggleBtn) toggleBtn.textContent = lang === 'zh' ? 'EN' : '中';
+      const langLabel = document.getElementById('lang-label');
+      if (langLabel) langLabel.textContent = lang === 'zh' ? '文 ⇄ EN' : 'EN ⇄ 文';
       document.documentElement.lang = lang === 'zh' ? 'zh-CN' : 'en';
+      bindRipples();
     }
 
     function toggleLang() {
