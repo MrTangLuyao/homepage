@@ -1,6 +1,4 @@
-/* Post body — vision-networks-fttb / en
-   Registers into window.__BLOG_POSTS, loaded on demand by blog.html.
-   See blog_readme.md for authoring conventions and template-literal escaping. */
+/* Post body — vision-networks-fttb / en */
 
 (window.__BLOG_POSTS = window.__BLOG_POSTS || {})['vision-networks-fttb:en'] = `
 <p class="lead">If you're an apartment-dwelling international student in Australia like me, you've probably gone to sign up for internet only to find out that NBN at your address uses the telephone line — i.e., FTTB — caps out at 100 Mbps, and is wildly expensive. So you grumble about Australia's awful internet and resign yourself to that speed for years. Right? Here's the most thorough English-language guide to Vision Networks ever written.</p>

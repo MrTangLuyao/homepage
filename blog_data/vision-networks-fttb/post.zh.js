@@ -1,6 +1,4 @@
-/* Post body — vision-networks-fttb / zh
-   Registers into window.__BLOG_POSTS, loaded on demand by blog.html.
-   See blog_readme.md for authoring conventions and template-literal escaping. */
+/* Post body — vision-networks-fttb / zh */
 
 (window.__BLOG_POSTS = window.__BLOG_POSTS || {})['vision-networks-fttb:zh'] = `
 <p class="lead">很多人尤其是像我一样的留学生选了公寓之后，开网会发现NBN由于采用电话线也就是FTTB最高只能有100M，而且巨贵，这个时候就很苦恼，吐槽澳洲的垃圾网络，然后只能忍受这个速度用几年了，吗？史上中文最全VISION networks 介绍。</p>

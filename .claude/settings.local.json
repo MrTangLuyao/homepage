@@ -29,7 +29,12 @@
       "Bash(grep -E \"^[0-9]+\\\\.[0-9]+\\\\.[0-9]+$\")",
       "Bash(curl -sL \"https://cdn.jsdelivr.net/npm/JSCPP@2.2.1/dist/JSCPP.es5.min.js\" -o /Users/louietang/Documents/GitHub/homepage/lib/JSCPP.es5.min.js)",
       "Bash(curl -sL \"https://registry.npmjs.org/jscpp\")",
-      "Bash(curl -s \"https://registry.npmjs.org/jscpp/latest\")"
+      "Bash(curl -s \"https://registry.npmjs.org/jscpp/latest\")",
+      "Bash(Move-Item \"C:\\\\Users\\\\Louie\\\\Documents\\\\GitHub\\\\homepage\\\\blog_readme.md\" \"C:\\\\Users\\\\Louie\\\\Documents\\\\GitHub\\\\homepage\\\\blog_data\\\\blog_readme.md\")",
+      "Bash(Move-Item \"C:\\\\Users\\\\Louie\\\\Documents\\\\GitHub\\\\homepage\\\\learn_readme.md\" \"C:\\\\Users\\\\Louie\\\\Documents\\\\GitHub\\\\homepage\\\\learn_data\\\\learn_readme.md\")",
+      "Bash(New-Item -ItemType Directory -Path \"C:\\\\Users\\\\Louie\\\\Documents\\\\GitHub\\\\homepage\\\\blog_data\\\\editor\" -Force)",
+      "Bash(Out-Null)",
+      "Bash(Write-Host \"Done\")"
     ]
   }
 }

@@ -20,7 +20,7 @@
 <p>Put together, it's roughly "inspired by Material Design, but grown into something of its own."</p>
 
 <h2>About AI</h2>
-<p>One thing I can't leave out: from the little 95.exe gimmick to this blog itself, <strong>a lot of the code, design ideas, docs, and even the draft of this post lean heavily on AI</strong> (mostly Claude).</p>
+<p>One thing I can't leave out: from the little 95.exe gimmick to this blog itself, <strong>a lot of the code, design ideas, docs, and even the draft of this post lean heavily on AI</strong> </p>
 <p>I treat AI as an extremely patient pair-programming partner. It writes a draft, I read, edit, delete, redirect, then iterate until it feels like "this is what I actually wanted." It turns vague ideas into something concrete I can poke holes in; the poking, judgment, and final decisions still sit with me.</p>
 <p>I genuinely enjoy working this way. So if you find something on this site that reads particularly well, that's probably AI and me grinding it out together; if something reads weirdly, that's probably me not grinding it enough.</p>
 
