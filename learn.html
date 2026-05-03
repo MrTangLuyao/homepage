@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="zh-CN">
+<html lang="zh-CN" class="scroll-smooth">
 
 <head>
   <meta charset="UTF-8">
@@ -9,20 +9,52 @@
   <link rel="icon" href="lib/po.webp">
   <link rel="stylesheet" href="lib/fonts.css">
   <script src="lib/tailwindcss.js"></script>
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          colors: {
+            m3: {
+              surface: '#1f1f1e',
+              surfaceContainer: '#2a2a29',
+              surfaceContainerHigh: '#333332',
+              primary: '#d97757',
+              onPrimary: '#ffffff',
+              primaryContainer: 'rgba(217, 119, 87, 0.15)',
+              onPrimaryContainer: '#ffb49d',
+              outline: '#4a4a49',
+              outlineVariant: '#3a3a39',
+              onSurface: '#e8e8e8',
+              onSurfaceVariant: '#a1a1a0'
+            }
+          },
+          fontFamily: {
+            sans: ['JetBrains Mono', 'HarmonyOS Sans', 'PingFang SC', 'Microsoft YaHei', 'sans-serif'],
+          },
+          borderRadius: {
+            'm3-xs': '4px', 'm3-sm': '8px', 'm3-md': '12px',
+            'm3-lg': '16px', 'm3-xl': '24px', 'm3-full': '9999px',
+          }
+        }
+      }
+    }
+  </script>
   <style>
     *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
 
     :root {
-      --bg: #06060a;
-      --surface: #0e0e14;
-      --border: #1c1c28;
+      --bg: #1f1f1e;
+      --surface: #2a2a29;
+      --surface-high: #333332;
+      --border: #3a3a39;
+      --outline: #4a4a49;
       --text: #e8e8e8;
-      --muted: #7a7a8c;
-      --accent: #d98c70;
-      --accent-dim: rgba(217, 140, 112, 0.08);
+      --muted: #a1a1a0;
+      --accent: #d97757;
+      --accent-dim: rgba(217, 119, 87, 0.15);
+      --accent-on: #ffb49d;
       --accent2: #8b70d9;
-      --accent2-dim: rgba(139, 112, 217, 0.06);
-      --glow: rgba(217, 140, 112, 0.12);
+      --accent2-dim: rgba(139, 112, 217, 0.08);
       --ok: #6dc198;
       --err: #d96e6e;
     }
@@ -30,18 +62,15 @@
     html { scroll-behavior: smooth; background-color: var(--bg); overscroll-behavior: none; }
 
     body {
-      background-color: transparent;
+      background-color: var(--bg);
       color: var(--text);
-      font-family: 'JetBrains Mono', 'HarmonyOS Sans', 'PingFang SC', 'Microsoft YaHei', sans-serif;
+      font-family: 'JetBrains Mono', 'HarmonyOS Sans', 'PingFang SC', 'Microsoft YaHei', sans-serif !important;
       font-size: 16px;
       line-height: 1.8;
       -webkit-font-smoothing: antialiased;
-      -moz-osx-font-smoothing: grayscale;
-      text-rendering: optimizeLegibility;
+      -webkit-tap-highlight-color: transparent;
       overflow-x: hidden;
       overscroll-behavior: none;
-      -webkit-user-select: text;
-      user-select: text;
       display: flex;
       flex-direction: column;
       min-height: 100vh;
@@ -51,218 +80,121 @@
 
     ::-webkit-scrollbar { width: 3px; }
     ::-webkit-scrollbar-track { background: var(--bg); }
-    ::-webkit-scrollbar-thumb { background: rgba(217, 140, 112, 0.3); border-radius: 2px; }
+    ::-webkit-scrollbar-thumb { background: rgba(217, 119, 87, 0.3); border-radius: 2px; }
 
-    /* ─── BACKGROUND ─── */
-    #bg-layer { position: fixed; inset: 0; z-index: -2; background: var(--bg); }
-    #bg-layer::before {
-      content: ''; position: absolute; inset: 0;
-      background:
-        radial-gradient(ellipse 70% 55% at 20% 20%, rgba(217, 140, 112, 0.07) 0%, transparent 60%),
-        radial-gradient(ellipse 60% 50% at 80% 75%, rgba(139, 112, 217, 0.06) 0%, transparent 60%),
-        radial-gradient(ellipse 50% 40% at 60% 10%, rgba(112, 170, 217, 0.04) 0%, transparent 55%),
-        radial-gradient(ellipse 80% 60% at 10% 85%, rgba(217, 140, 112, 0.04) 0%, transparent 60%);
-      animation: auroraShift 18s ease-in-out infinite alternate;
-    }
-    #bg-layer::after {
-      content: ''; position: absolute; inset: 0;
-      background-image:
-        linear-gradient(rgba(255,255,255,0.018) 1px, transparent 1px),
-        linear-gradient(90deg, rgba(255,255,255,0.018) 1px, transparent 1px);
-      background-size: 60px 60px;
-      mask-image: radial-gradient(ellipse 90% 80% at 50% 50%, black 30%, transparent 100%);
-    }
-    @keyframes auroraShift {
-      0%   { opacity: 1; transform: scale(1) rotate(0deg); }
-      50%  { opacity: 0.7; transform: scale(1.06) rotate(1deg); }
-      100% { opacity: 1; transform: scale(1.02) rotate(-0.5deg); }
-    }
-
-    #grain {
-      position: fixed; inset: -50%; width: 200%; height: 200%;
-      z-index: -1; opacity: 0.028; pointer-events: none;
-      background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 512 512' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.75' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)'/%3E%3C/svg%3E");
-      animation: grainMove 0.4s steps(1) infinite;
-    }
-    @keyframes grainMove {
-      0%   { transform: translate(0, 0); }
-      25%  { transform: translate(-3%, -5%); }
-      50%  { transform: translate(5%, 2%); }
-      75%  { transform: translate(-2%, 6%); }
-      100% { transform: translate(4%, -3%); }
-    }
-
-    #scanline {
-      position: fixed; inset: 0; z-index: -1; pointer-events: none;
-      background: repeating-linear-gradient(0deg, transparent, transparent 3px, rgba(0,0,0,0.06) 3px, rgba(0,0,0,0.06) 4px);
-      opacity: 0.4;
-    }
-
-    /* ─── NAV ─── */
-    nav {
+    /* ─── NAV (M3) ─── */
+    #navbar {
       position: fixed; top: 0; left: 0; right: 0; z-index: 9999;
       display: flex; align-items: center; justify-content: space-between;
-      padding: 24px 48px;
-      background: rgba(29, 29, 31, 0.65);
-      backdrop-filter: blur(24px) saturate(180%);
-      -webkit-backdrop-filter: blur(24px) saturate(180%);
-      border-bottom: 1px solid rgba(255, 255, 255, 0.08);
-      transition: border-color 0.4s ease, padding 0.4s ease, background 0.4s ease;
-    }
-    nav.scrolled { padding: 14px 48px; }
-
-    .nav-logo {
-      color: var(--text); font-weight: 700; font-size: 18px;
-      text-decoration: none; letter-spacing: 0.05em;
-    }
-    .nav-logo span { color: var(--accent); }
-
-    .nav-links {
-      display: flex; align-items: center; gap: 36px; list-style: none;
-    }
-    .lang-toggle {
-      background: none; border: 1px solid rgba(217, 140, 112, 0.2);
-      color: var(--muted); font-family: inherit; font-size: 13px;
-      letter-spacing: 0.1em; padding: 5px 12px; border-radius: 8px;
-      cursor: pointer; white-space: nowrap;
-      transition: color 0.3s ease, border-color 0.3s ease, background 0.3s ease, box-shadow 0.3s ease;
-    }
-    .lang-toggle:hover {
-      color: var(--accent); border-color: rgba(217, 140, 112, 0.5);
-      background: rgba(217, 140, 112, 0.06);
-      box-shadow: 0 0 12px rgba(217, 140, 112, 0.1);
+      height: 64px; padding: 0 24px;
+      background: rgba(31, 31, 30, 0.95);
+      backdrop-filter: blur(8px); -webkit-backdrop-filter: blur(8px);
+      border-bottom: 1px solid var(--border);
     }
 
-    /* ─── BRAND SWITCHER ─── */
-    .page-switcher { position: relative; font-family: inherit; }
+    .nav-brand-wrap { position: relative; }
 
-    .brand-switcher {
-      display: inline-flex;
-      align-items: baseline;
-      gap: 4px;
-      padding: 6px 10px 6px 8px;
-      margin-left: -8px;
-      background: transparent;
-      border: 1px solid transparent;
-      border-radius: 8px;
-      color: var(--text);
-      font-family: inherit;
-      font-size: 18px;
-      font-weight: 700;
-      letter-spacing: 0.05em;
-      cursor: pointer;
-      text-decoration: none;
-      transition: background 0.25s ease, border-color 0.25s ease;
+    #brand-dropdown-btn {
+      position: relative; overflow: hidden;
+      display: inline-flex; align-items: center;
+      padding: 8px 12px; border-radius: 9999px;
+      border: none; background: transparent;
+      font-family: inherit; font-size: 18px; font-weight: 700;
+      cursor: pointer; letter-spacing: 0.05em;
+      transition: background 0.2s ease;
     }
-    .brand-switcher:hover,
-    .page-switcher.open .brand-switcher {
-      background: rgba(255, 255, 255, 0.03);
-      border-color: rgba(255, 255, 255, 0.06);
+    #brand-dropdown-btn:hover { background: var(--accent-dim); }
+    #brand-dropdown-btn .b-static { color: var(--text); }
+    #brand-dropdown-btn .b-dot { color: var(--accent); margin: 0 5px; }
+    #brand-dropdown-btn .b-page { color: rgba(232, 232, 232, 0.6); font-weight: 500; }
+    #brand-dropdown-icon {
+      width: 16px; height: 16px; margin-left: 6px;
+      color: rgba(232, 232, 232, 0.6); transition: transform 0.2s ease;
     }
-    .brand-switcher-static { color: var(--text); }
-    .brand-switcher-static .accent { color: var(--accent); }
-    .brand-switcher-current {
-      color: var(--muted);
-      font-weight: 500;
-      transition: color 0.25s ease;
+
+    #brand-dropdown-menu {
+      position: absolute; top: 100%; left: 0; margin-top: 8px;
+      width: 192px; background: var(--surface); border-radius: 8px;
+      box-shadow: 0 8px 24px rgba(0,0,0,0.4); border: 1px solid var(--border);
+      padding: 8px 0; overflow: hidden;
+      opacity: 0; pointer-events: none; transition: opacity 0.2s ease; z-index: 110;
     }
-    .brand-switcher:hover .brand-switcher-current,
-    .page-switcher.open .brand-switcher-current {
-      color: var(--accent);
-    }
-    .brand-switcher-chevron {
-      width: 10px; height: 10px;
-      align-self: center;
-      margin-left: 2px;
-      opacity: 0.35;
-      color: var(--muted);
-      transition: opacity 0.2s ease, transform 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
-    }
-    .brand-switcher:hover .brand-switcher-chevron { opacity: 0.7; }
-    .page-switcher.open .brand-switcher-chevron {
-      opacity: 0.85;
-      transform: rotate(180deg);
-      color: var(--accent);
-    }
-    .page-switcher-menu {
-      position: absolute; top: calc(100% + 8px); left: 0;
-      min-width: 170px;
-      background: rgba(20, 20, 26, 0.92);
-      backdrop-filter: blur(28px) saturate(180%);
-      -webkit-backdrop-filter: blur(28px) saturate(180%);
-      border: 1px solid rgba(255, 255, 255, 0.08);
-      border-radius: 10px;
-      padding: 5px;
-      display: flex; flex-direction: column; gap: 2px;
-      box-shadow: 0 16px 48px rgba(0, 0, 0, 0.45), 0 0 0 1px rgba(217, 140, 112, 0.04);
-      opacity: 0; pointer-events: none;
-      transform: translateY(-6px) scale(0.97);
-      transform-origin: top left;
-      transition: opacity 0.22s ease, transform 0.22s cubic-bezier(0.34, 1.56, 0.64, 1);
-      z-index: 10001;
-    }
-    .page-switcher.open .page-switcher-menu {
-      opacity: 1; pointer-events: auto;
-      transform: translateY(0) scale(1);
-    }
-    .page-switcher-item {
-      display: flex; align-items: center; justify-content: space-between;
-      gap: 16px; padding: 8px 12px; border-radius: 8px;
-      color: var(--muted); text-decoration: none;
-      font-size: 14px; font-weight: 600; letter-spacing: 0.02em;
+    #brand-dropdown-menu.is-open { opacity: 1; pointer-events: auto; }
+
+    .nav-dd-item {
+      position: relative; overflow: hidden;
+      display: block; padding: 12px 16px;
+      font-size: 14px; font-weight: 500; text-decoration: none; color: var(--muted);
       transition: color 0.2s ease, background 0.2s ease;
     }
-    .page-switcher-item:hover { color: var(--text); background: rgba(255, 255, 255, 0.04); }
-    .page-switcher-item.active {
-      color: var(--text);
-      background: rgba(217, 140, 112, 0.08);
+    .nav-dd-item:hover { color: var(--text); background: var(--surface-high); }
+    .nav-dd-item.nav-active { color: var(--accent); background: var(--accent-dim); }
+
+    .nav-right { display: flex; align-items: center; gap: 8px; }
+
+    #lang-toggle {
+      background: none; border: 1px solid var(--outline);
+      color: var(--accent); font-family: inherit; font-size: 13px; font-weight: 500;
+      padding: 6px 16px; border-radius: 9999px; cursor: pointer; letter-spacing: 0.1em;
+      position: relative; overflow: hidden;
+      transition: background 0.2s ease, border-color 0.2s ease;
     }
-    .page-switcher-item .accent { color: var(--accent); }
-    .page-switcher-item-dot {
-      width: 5px; height: 5px; border-radius: 50%;
-      background: var(--accent);
-      box-shadow: 0 0 8px rgba(217, 140, 112, 0.6);
-      opacity: 0; transform: scale(0.6);
-      transition: opacity 0.2s ease, transform 0.2s ease;
+    #lang-toggle:hover { background: var(--accent-dim); border-color: rgba(217, 119, 87, 0.5); }
+
+    #menu-btn {
+      display: none; align-items: center; justify-content: center;
+      background: none; border: none; color: var(--text); cursor: pointer;
+      padding: 10px; border-radius: 9999px; position: relative; overflow: hidden;
     }
-    .page-switcher-item.active .page-switcher-item-dot { opacity: 1; transform: scale(1); }
+    #menu-btn:hover { background: rgba(255, 255, 255, 0.06); }
+
+    @media (max-width: 767px) {
+      #menu-btn { display: flex; }
+      #lang-toggle { display: none; }
+    }
+
+    #mobile-menu {
+      position: fixed; top: 64px; left: 0; width: 100%;
+      background: var(--surface); border-bottom: 1px solid var(--border);
+      z-index: 90; display: flex; flex-direction: column;
+      padding: 16px; box-shadow: 0 8px 24px rgba(0,0,0,0.3);
+      transition: clip-path 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+      clip-path: circle(0% at top right);
+    }
+    #mobile-menu.open { clip-path: circle(150% at top right); }
+    .mobile-lang-btn {
+      text-align: left; background: none; border: none;
+      color: var(--accent); font-family: inherit; font-size: 15px; font-weight: 500;
+      padding: 12px 16px; border-radius: 12px; cursor: pointer;
+      transition: background 0.2s ease;
+    }
+    .mobile-lang-btn:hover { background: var(--accent-dim); }
+
+    /* ─── RIPPLE ─── */
+    .ripple-surface { position: relative; overflow: hidden; }
+    .ripple {
+      position: absolute; border-radius: 50%; transform: scale(0);
+      animation: ripple-anim 600ms linear; pointer-events: none;
+      background-color: rgba(255, 255, 255, 0.12);
+    }
+    @keyframes ripple-anim { to { transform: scale(4); opacity: 0; } }
 
     /* ─── LAYOUT ─── */
-    main { padding: 140px 24px 80px; max-width: 1100px; margin: 0 auto; position: relative; z-index: 10; flex: 1 0 auto; width: 100%; }
+    main { padding: 112px 24px 80px; max-width: 1100px; margin: 0 auto; position: relative; flex: 1 0 auto; width: 100%; }
 
-    /* Lesson view layout — engineered for independent pane scrolling.
-       The whole view is taken out of normal flow with position: fixed so it
-       locks to the viewport, and the layout uses CSS Grid (which gives
-       definite track heights to the panes) instead of a flex chain. */
+    /* Lesson view — fixed fullscreen workbench */
     body.lesson-mode { overflow: hidden; }
     body.lesson-mode footer { display: none; }
-    /* In lesson mode the nav is permanently in its collapsed/compact state,
-       regardless of scroll position. */
-    body.lesson-mode nav { padding: 14px 48px; }
-    @media (max-width: 768px) {
-      body.lesson-mode nav { padding: 14px 24px; }
-    }
 
     body.lesson-mode #view-lesson {
-      position: fixed;
-      top: 56px;        /* matches collapsed nav height */
-      left: 0; right: 0; bottom: 0;
-      display: grid;
-      grid-template-rows: auto minmax(0, 1fr);
-      z-index: 5;
+      position: fixed; top: 64px; left: 0; right: 0; bottom: 0;
+      display: grid; grid-template-rows: auto minmax(0, 1fr); z-index: 5;
+      background: var(--surface);
     }
-    body.lesson-mode #lesson-back-link {
-      justify-self: start;
-      margin: 36px 0 14px 28px;
-    }
-    /* The board is the actual two-pane area. Grid with min:0 rows/cols so
-       each pane gets a definite size and overflow can clip & scroll. */
+    body.lesson-mode #lesson-back-link { justify-self: start; margin: 36px 0 14px 28px; }
     body.lesson-mode #lesson-content {
-      min-height: 0;
-      min-width: 0;
-      display: grid;
-      grid-template-columns: 1fr;
-      grid-template-rows: minmax(0, 1fr) minmax(0, 1fr);
+      min-height: 0; min-width: 0; display: grid;
+      grid-template-columns: 1fr; grid-template-rows: minmax(0, 1fr) minmax(0, 1fr);
     }
     @media (min-width: 1100px) {
       body.lesson-mode #lesson-content {
@@ -271,8 +203,7 @@
       }
     }
 
-
-    /* ─── HERO (course list) ─── */
+    /* ─── HERO ─── */
     .learn-hero { margin-bottom: 64px; }
     .learn-hero-greeting {
       color: var(--accent); font-size: 13px; letter-spacing: 0.25em;
@@ -280,327 +211,218 @@
       display: inline-flex; align-items: center; gap: 12px;
     }
     .learn-hero-greeting::before {
-      content: ''; display: inline-block; width: 32px; height: 1px;
-      background: var(--accent); opacity: 0.6;
+      content: ''; display: inline-block; width: 32px; height: 2px; background: var(--accent);
     }
     .learn-hero-title {
-      display: block;
-      font-size: clamp(2.4rem, 6vw, 4rem);
-      font-weight: 800; line-height: 1.2; letter-spacing: -0.03em;
-      background: linear-gradient(135deg, #FFFFFF 0%, #F0D4B8 100%);
-      color: transparent; -webkit-background-clip: text; background-clip: text;
-      margin-bottom: 18px;
-      padding-bottom: 0.12em;
+      font-size: clamp(2.6rem, 6vw, 4.5rem);
+      font-weight: 800; line-height: 1.1; letter-spacing: -0.03em;
+      color: var(--text); margin-bottom: 18px;
     }
-    .learn-hero-sub {
-      color: var(--muted); font-size: 17px; line-height: 1.9; max-width: 600px;
-    }
+    .learn-hero-sub { color: var(--muted); font-size: 17px; line-height: 1.9; max-width: 600px; }
 
     /* ─── COURSE LIST ─── */
-    .course-list { display: grid; grid-template-columns: repeat(auto-fill, minmax(320px, 1fr)); gap: 18px; }
+    .course-list { display: grid; grid-template-columns: repeat(auto-fill, minmax(320px, 1fr)); gap: 20px; }
 
     .course-card {
-      background: rgba(35, 35, 37, 0.4);
-      backdrop-filter: blur(40px) saturate(150%);
-      -webkit-backdrop-filter: blur(40px) saturate(150%);
-      border: 1px solid rgba(255, 255, 255, 0.06);
-      box-shadow: 0 8px 32px rgba(0, 0, 0, 0.25);
-      border-radius: 8px;
-      padding: 28px;
+      background: var(--surface); border: 1px solid var(--border);
+      border-radius: 24px; padding: 28px;
       text-decoration: none; color: inherit;
       display: flex; flex-direction: column; gap: 14px;
-      transition: transform 0.4s cubic-bezier(0.16, 1, 0.3, 1), border-color 0.4s, background 0.4s, box-shadow 0.4s;
+      transition: background 0.2s ease, box-shadow 0.2s ease, transform 0.2s ease;
       position: relative; overflow: hidden;
     }
     .course-card:hover {
-      transform: translateY(-3px);
-      background: rgba(50, 50, 53, 0.5);
-      border-color: rgba(217, 140, 112, 0.18);
-      box-shadow: 0 16px 48px rgba(0, 0, 0, 0.4);
+      background: var(--surface-high);
+      box-shadow: 0 8px 16px rgba(0,0,0,0.2);
+      transform: translateY(-2px);
     }
-    .course-card-icon {
-      font-size: 36px; line-height: 1;
-      color: var(--accent); font-weight: 800;
-    }
-    .course-card-title { color: #fff; font-size: 22px; font-weight: 700; letter-spacing: -0.01em; }
+    .course-card-icon { font-size: 32px; line-height: 1; }
+    .course-card-title { color: var(--text); font-size: 20px; font-weight: 700; }
     .course-card-desc { color: var(--muted); font-size: 14px; line-height: 1.7; }
     .course-card-meta {
-      display: flex; align-items: center; gap: 12px;
-      font-size: 12px; color: var(--muted);
-      letter-spacing: 0.04em;
-      margin-top: 4px;
+      display: flex; align-items: center; gap: 8px;
+      font-size: 12px; color: var(--muted); margin-top: 4px; flex-wrap: wrap;
     }
     .course-card-pill {
-      font-size: 11px; color: var(--accent);
-      background: rgba(217, 140, 112, 0.06);
-      padding: 2px 9px; border-radius: 3px;
-      border: 1px solid rgba(217, 140, 112, 0.12);
-      letter-spacing: 0.05em;
+      font-size: 11px; color: var(--accent-on); background: var(--accent-dim);
+      padding: 3px 10px; border-radius: 4px;
+      font-family: 'JetBrains Mono', monospace;
     }
-    .course-card-coming {
-      filter: grayscale(0.6) opacity(0.55);
-      pointer-events: none;
-    }
+    .course-card-coming { filter: grayscale(0.6) opacity(0.55); pointer-events: none; }
 
-    /* ─── reset-progress button (course list + course detail) ─── */
+    /* ─── RESET BUTTON ─── */
     .reset-btn {
-      position: absolute;
-      top: 14px; right: 14px;
-      width: 30px; height: 30px;
-      border-radius: 8px;
-      border: 1px solid rgba(255,255,255,0.08);
-      background: rgba(0,0,0,0.25);
-      color: var(--muted);
-      cursor: pointer;
+      position: absolute; top: 12px; right: 12px;
+      width: 36px; height: 36px; border-radius: 9999px;
+      border: 1px solid var(--border); background: transparent;
+      color: var(--muted); cursor: pointer;
       display: inline-flex; align-items: center; justify-content: center;
-      font-family: inherit;
-      transition: color 0.2s ease, border-color 0.2s ease, background 0.2s ease, transform 0.2s ease;
+      font-family: inherit; overflow: hidden;
+      transition: color 0.2s ease, border-color 0.2s ease, background 0.2s ease;
       z-index: 2;
-      backdrop-filter: blur(6px);
-      -webkit-backdrop-filter: blur(6px);
     }
-    .reset-btn svg { width: 14px; height: 14px; transition: transform 0.25s ease; }
-    .reset-btn:hover {
-      color: var(--err);
-      border-color: rgba(217, 110, 110, 0.45);
-      background: rgba(217, 110, 110, 0.10);
-    }
-    .reset-btn:hover svg { transform: rotate(-90deg); }
+    .reset-btn svg { width: 15px; height: 15px; flex-shrink: 0; transition: transform 0.35s ease; }
+    .reset-btn:hover { color: var(--err); border-color: rgba(217,110,110,0.4); background: rgba(217,110,110,0.08); }
+    .reset-btn:hover svg { transform: rotate(-180deg); }
+
     .reset-btn-inline {
-      position: static;
-      width: auto; height: auto;
-      padding: 6px 12px 6px 10px;
-      gap: 6px;
-      font-size: 12px;
-      letter-spacing: 0.04em;
+      position: relative; width: auto; height: auto;
+      border-radius: 9999px; padding: 6px 16px 6px 12px; gap: 6px;
+      font-size: 12px; font-weight: 500; letter-spacing: 0.04em;
+      display: inline-flex; align-items: center;
+      top: auto; right: auto;
     }
-    .reset-btn-inline:hover { transform: none; }
     .reset-btn-inline svg { width: 13px; height: 13px; }
 
     /* ─── PLAYGROUND ─── */
     .pg-action-bar { display: flex; gap: 8px; flex-wrap: wrap; margin-bottom: 18px; }
 
-    /* ─── COURSE VIEW (lesson list) ─── */
+    /* ─── BACK LINKS ─── */
     .course-back, .lesson-back {
       display: inline-flex; align-items: center; gap: 8px;
       color: var(--muted); text-decoration: none;
-      font-size: 13px; letter-spacing: 0.06em;
-      padding: 8px 14px 8px 10px; border-radius: 8px;
-      border: 1px solid rgba(255, 255, 255, 0.06);
-      background: rgba(255, 255, 255, 0.02);
-      transition: all 0.25s ease;
+      font-size: 13px; font-weight: 500;
+      padding: 8px 20px 8px 16px; border-radius: 9999px;
+      border: 1px solid var(--outline);
+      position: relative; overflow: hidden;
+      transition: color 0.2s ease, background 0.2s ease, border-color 0.2s ease;
       margin-bottom: 28px;
     }
     .course-back:hover, .lesson-back:hover {
-      color: var(--accent); border-color: rgba(217, 140, 112, 0.3);
-      background: rgba(217, 140, 112, 0.06);
-      transform: translateX(-2px);
+      color: var(--text); background: var(--surface); border-color: var(--border);
     }
 
+    /* ─── COURSE HEADER ─── */
     .course-header { margin-bottom: 36px; }
     .course-header-title {
-      font-size: clamp(1.8rem, 4vw, 2.6rem);
-      font-weight: 800; line-height: 1.2; letter-spacing: -0.025em;
-      color: #fff; margin-bottom: 12px;
+      font-size: clamp(1.8rem, 4vw, 2.6rem); font-weight: 800;
+      line-height: 1.2; color: var(--text); margin-bottom: 12px;
     }
     .course-header-sub { color: var(--muted); font-size: 15px; line-height: 1.8; max-width: 700px; }
 
     .course-progress {
       display: flex; align-items: center; gap: 14px;
-      margin-top: 20px;
-      font-size: 13px; color: var(--muted);
+      margin-top: 20px; font-size: 13px; color: var(--muted); flex-wrap: wrap;
     }
-    .progress-bar {
-      flex: 1; max-width: 360px;
-      height: 6px; border-radius: 3px;
-      background: rgba(255,255,255,0.06);
-      overflow: hidden;
-    }
+    .progress-bar { flex: 1; max-width: 360px; height: 6px; border-radius: 3px; background: var(--border); overflow: hidden; }
     .progress-bar-inner {
-      height: 100%; background: linear-gradient(90deg, var(--accent), #f0c0a0);
+      height: 100%; background: linear-gradient(90deg, var(--accent), var(--accent-on));
       transition: width 0.5s ease;
     }
 
-    .lesson-list { display: grid; gap: 10px; }
+    /* ─── LESSON LIST ─── */
+    .lesson-list { display: grid; gap: 8px; }
 
     .lesson-section-label {
       color: var(--accent); font-size: 11px; letter-spacing: 0.18em;
       text-transform: uppercase; font-weight: 700;
-      margin-top: 28px; margin-bottom: 8px;
-      padding-bottom: 6px;
-      border-bottom: 1px solid rgba(217, 140, 112, 0.12);
+      margin-top: 28px; margin-bottom: 6px;
+      padding-bottom: 8px; border-bottom: 1px solid var(--accent-dim);
     }
     .lesson-section-label:first-child { margin-top: 0; }
 
     .lesson-row {
-      display: grid;
-      grid-template-columns: 36px 1fr auto;
-      gap: 16px;
-      align-items: center;
+      display: grid; grid-template-columns: 36px 1fr auto;
+      gap: 16px; align-items: center;
       padding: 14px 18px;
-      background: rgba(35, 35, 37, 0.3);
-      border: 1px solid rgba(255, 255, 255, 0.05);
-      border-radius: 8px;
+      background: var(--surface); border: 1px solid var(--border); border-radius: 12px;
       text-decoration: none; color: inherit;
-      transition: all 0.25s ease;
+      transition: background 0.2s ease, box-shadow 0.2s ease;
     }
-    .lesson-row:hover {
-      background: rgba(50, 50, 53, 0.45);
-      border-color: rgba(217, 140, 112, 0.18);
-      transform: translateX(2px);
-    }
-    .lesson-row-num {
-      font-size: 13px; font-weight: 700;
-      color: var(--muted); font-variant-numeric: tabular-nums;
-    }
+    .lesson-row:hover { background: var(--surface-high); box-shadow: 0 4px 8px rgba(0,0,0,0.15); }
+    .lesson-row-num { font-size: 13px; font-weight: 700; color: var(--muted); font-variant-numeric: tabular-nums; }
     .lesson-row-title { color: var(--text); font-size: 15px; font-weight: 600; }
-    .lesson-row-sub { color: var(--muted); font-size: 12px; margin-top: 2px; letter-spacing: 0.03em; }
-    .lesson-row-status { display: inline-flex; align-items: center; color: var(--muted); opacity: 0.6; transition: color 0.2s ease, opacity 0.2s ease, transform 0.2s ease; }
+    .lesson-row-sub { color: var(--muted); font-size: 12px; margin-top: 2px; }
+    .lesson-row-status {
+      display: inline-flex; align-items: center; color: var(--muted); opacity: 0.6;
+      transition: color 0.2s ease, opacity 0.2s ease;
+    }
     .lesson-row-status svg { width: 18px; height: 18px; }
-    .lesson-row:hover .lesson-row-status { color: var(--accent); opacity: 1; transform: translateX(3px); }
-    .lesson-row.is-done .lesson-row-status { transform: none; }
+    .lesson-row:hover .lesson-row-status { color: var(--accent); opacity: 1; }
     .lesson-row.is-done .lesson-row-num { color: var(--ok); }
-    .lesson-row.is-done .lesson-row-status { color: var(--ok); }
-    .lesson-row.is-current { border-color: rgba(217, 140, 112, 0.4); background: rgba(217,140,112,0.06); }
+    .lesson-row.is-done .lesson-row-status { color: var(--ok); opacity: 1; }
+    .lesson-row.is-current { border-color: rgba(217, 119, 87, 0.4); background: var(--accent-dim); }
     .lesson-row.is-current .lesson-row-num { color: var(--accent); }
 
-    /* ─── LESSON VIEW (full-screen workbench) ─── */
+    /* ─── LESSON PANES ─── */
     .lesson-wrap {
-      display: grid;
-      grid-template-columns: 1fr;
-      /* Mobile: stacked, two equal-height rows so each side gets half. */
+      display: grid; grid-template-columns: 1fr;
       grid-template-rows: minmax(0, 1fr) minmax(0, 1fr);
-      gap: 0;
-      height: 100%;
-      width: 100%;
+      gap: 0; height: 100%; width: 100%;
     }
     @media (min-width: 1100px) {
-      /* Desktop: two side-by-side halves. The single row is forced to fill
-         the grid container so neither pane's content can drag the other taller. */
-      .lesson-wrap {
-        grid-template-columns: 1fr 1fr;
-        grid-template-rows: minmax(0, 1fr);
-        align-items: stretch;
-      }
+      .lesson-wrap { grid-template-columns: 1fr 1fr; grid-template-rows: minmax(0, 1fr); align-items: stretch; }
     }
 
-    /* Lesson-mode panes are direct grid items of #lesson-content. The grid
-       gives each pane a definite track size; min-width/height: 0 + overflow:auto
-       on the pane itself makes the *pane* the scroll container (not the page). */
     body.lesson-mode .lesson-pane {
-      background: rgba(20, 20, 26, 0.55);
-      border: none;
-      border-radius: 0;
-      padding: 22px 26px;
-      min-width: 0;
-      min-height: 0;
-      overflow-y: auto;
-      overflow-x: hidden;
+      background: var(--surface); border: none; border-radius: 0;
+      padding: 22px 26px; min-width: 0; min-height: 0;
+      overflow-y: auto; overflow-x: hidden;
     }
-    body.lesson-mode .lesson-pane-left {
-      border-right: 1px solid rgba(255,255,255,0.06);
-    }
+    body.lesson-mode .lesson-pane-left { border-right: 1px solid var(--border); }
     @media (max-width: 1099px) {
-      body.lesson-mode .lesson-pane-left {
-        border-right: none;
-        border-bottom: 1px solid rgba(255,255,255,0.06);
-      }
+      body.lesson-mode .lesson-pane-left { border-right: none; border-bottom: 1px solid var(--border); }
     }
 
-    /* Right pane vertical layout: task → hint → editor (grows) → buttons →
-       result → nav. We use simple block flow + the pane's own scroll. The
-       editor area gets a comfortable min-height so it never collapses. */
     .lesson-right { display: block; }
     .lesson-right > * + * { margin-top: 14px; }
     .lesson-right .editor-host { min-height: 200px; }
     .lesson-right .result-box { max-height: 38vh; overflow: auto; }
 
-    /* Hint panel that slides out below the task block when toggled. */
     .hint-panel {
-      background: rgba(139, 112, 217, 0.06);
-      border: 1px solid rgba(139, 112, 217, 0.18);
-      border-radius: 8px;
-      padding: 12px 16px;
-      color: var(--text);
-      font-size: 13.5px;
-      line-height: 1.7;
+      background: var(--accent2-dim); border: 1px solid rgba(139, 112, 217, 0.2);
+      border-radius: 12px; padding: 12px 16px; color: var(--text); font-size: 13.5px; line-height: 1.7;
     }
     .hint-panel .task-label { color: var(--accent2); margin-bottom: 4px; }
 
     .lesson-pane {
-      background: rgba(20, 20, 26, 0.55);
-      border: 1px solid rgba(255,255,255,0.06);
-      border-radius: 8px;
-      padding: 26px 28px;
+      background: var(--surface); border: 1px solid var(--border);
+      border-radius: 16px; padding: 26px 28px;
     }
     .lesson-pane h2 {
-      font-size: 20px; font-weight: 700; color: #fff;
-      letter-spacing: -0.01em; margin-top: 28px; margin-bottom: 12px;
+      font-size: 20px; font-weight: 700; color: var(--text);
+      margin-top: 28px; margin-bottom: 12px;
+      padding-top: 16px; border-top: 1px solid var(--border);
     }
-    .lesson-pane h2:first-child { margin-top: 0; }
-    .lesson-pane h3 { font-size: 15px; font-weight: 700; color: #fff; margin-top: 20px; margin-bottom: 8px; }
+    .lesson-pane h2:first-child { margin-top: 0; padding-top: 0; border-top: none; }
+    .lesson-pane h3 { font-size: 15px; font-weight: 700; color: var(--text); margin-top: 20px; margin-bottom: 8px; }
     .lesson-pane p { color: var(--text); font-size: 14.5px; line-height: 1.85; margin-bottom: 10px; }
     .lesson-pane strong { color: var(--accent); font-weight: 700; }
-    .lesson-pane em { color: #f0d4b8; }
+    .lesson-pane em { color: var(--accent-on); }
     .lesson-pane ul, .lesson-pane ol { padding-left: 22px; margin: 6px 0 14px; }
     .lesson-pane li { margin: 4px 0; color: var(--text); font-size: 14.5px; }
     .lesson-pane code {
-      font-family: 'JetBrains Mono', monospace;
-      font-size: 0.92em; color: var(--accent);
-      background: rgba(217, 140, 112, 0.07);
-      padding: 2px 6px; border-radius: 8px;
-      border: 1px solid rgba(217, 140, 112, 0.12);
+      font-family: 'JetBrains Mono', monospace; font-size: 0.9em;
+      color: var(--accent-on); background: var(--accent-dim);
+      padding: 2px 6px; border-radius: 6px;
     }
     .lesson-pane pre {
-      background: rgba(8, 8, 12, 0.7);
-      border: 1px solid rgba(255, 255, 255, 0.05);
-      border-radius: 8px;
-      padding: 14px 18px;
-      overflow-x: auto;
-      font-size: 13px; line-height: 1.7;
-      margin: 10px 0;
+      background: var(--bg); border: 1px solid var(--border);
+      border-radius: 12px; padding: 14px 18px; overflow-x: auto;
+      font-size: 13px; line-height: 1.7; margin: 10px 0;
     }
-    .lesson-pane pre code {
-      color: var(--text); background: none;
-      padding: 0; border: none; font-size: 13px;
-    }
+    .lesson-pane pre code { color: var(--text); background: none; padding: 0; font-size: 13px; }
     .lesson-pane blockquote {
-      border-left: 3px solid var(--accent);
-      padding: 6px 16px; margin: 12px 0;
-      color: var(--muted); font-style: italic;
-      background: rgba(217, 140, 112, 0.04);
-      border-radius: 0 6px 6px 0;
-      font-size: 13.5px;
+      border-left: 4px solid rgba(217, 119, 87, 0.6); padding: 8px 16px; margin: 12px 0;
+      color: var(--muted); font-style: italic; background: var(--accent-dim);
+      border-radius: 0 12px 12px 0;
     }
 
     .lesson-meta-row {
-      display: flex; align-items: center; gap: 12px;
-      flex-wrap: wrap;
-      font-size: 12px; letter-spacing: 0.04em; color: var(--muted);
-      margin-bottom: 14px;
+      display: flex; align-items: center; gap: 12px; flex-wrap: wrap;
+      font-size: 12px; color: var(--muted); margin-bottom: 14px;
     }
     .lesson-pill {
-      color: var(--accent);
-      background: rgba(217, 140, 112, 0.06);
-      padding: 3px 10px; border-radius: 8px;
-      border: 1px solid rgba(217, 140, 112, 0.18);
-      font-size: 11px; font-weight: 600;
+      color: var(--accent-on); background: var(--accent-dim);
+      padding: 3px 10px; border-radius: 6px; font-size: 11px; font-weight: 600;
     }
     .lesson-title {
-      font-size: clamp(1.6rem, 3.4vw, 2.2rem);
-      font-weight: 800; color: #fff; line-height: 1.2;
-      margin-bottom: 8px; letter-spacing: -0.02em;
+      font-size: clamp(1.6rem, 3.4vw, 2.2rem); font-weight: 800;
+      color: var(--text); line-height: 1.2; margin-bottom: 8px;
     }
     .lesson-subtitle { color: var(--muted); font-size: 14px; margin-bottom: 22px; }
 
-    /* Title + tutorial link share a row, link aligned to the right edge. */
-    .lesson-title-row {
-      display: flex;
-      justify-content: space-between;
-      align-items: flex-start;
-      gap: 18px;
-      margin-bottom: 8px;
-    }
+    .lesson-title-row { display: flex; justify-content: space-between; align-items: flex-start; gap: 18px; margin-bottom: 8px; }
     .lesson-title-row .lesson-title { margin-bottom: 0; flex: 1 1 auto; min-width: 0; }
     .lesson-title-row .tutorial-link { margin-top: 6px; flex: 0 0 auto; white-space: nowrap; }
     @media (max-width: 720px) {
@@ -609,195 +431,134 @@
     }
 
     .tutorial-link {
-      display: inline-flex; align-items: center; gap: 8px;
-      margin-top: 18px;
-      color: var(--accent); text-decoration: none;
-      font-size: 13px; letter-spacing: 0.04em;
-      padding: 7px 14px; border-radius: 8px;
-      background: rgba(217, 140, 112, 0.06);
-      border: 1px solid rgba(217, 140, 112, 0.2);
-      transition: all 0.25s ease;
+      display: inline-flex; align-items: center; gap: 8px; margin-top: 18px;
+      color: var(--accent); text-decoration: none; font-size: 13px;
+      padding: 7px 16px; border-radius: 9999px; border: 1px solid var(--outline);
+      position: relative; overflow: hidden;
+      transition: background 0.2s ease, border-color 0.2s ease;
     }
     .tutorial-link svg { transition: transform 0.25s ease; }
-    .tutorial-link:hover {
-      background: rgba(217, 140, 112, 0.12);
-      border-color: rgba(217, 140, 112, 0.4);
-    }
+    .tutorial-link:hover { background: var(--accent-dim); border-color: rgba(217,119,87,0.4); }
     .tutorial-link:hover svg { transform: translate(2px, -2px); }
 
-    /* table block (for tables shown inside the lesson, e.g. schema preview) */
+    /* ─── TABLES ─── */
     .lesson-pane table, .data-table {
-      width: 100%; border-collapse: collapse;
-      font-size: 13px; margin: 10px 0;
-      border: 1px solid rgba(255,255,255,0.06);
-      border-radius: 8px; overflow: hidden;
+      width: 100%; border-collapse: collapse; font-size: 13px; margin: 10px 0;
+      border: 1px solid var(--border); border-radius: 8px; overflow: hidden;
     }
     .lesson-pane th, .data-table th {
-      background: rgba(217,140,112,0.10);
-      color: var(--accent); font-weight: 700;
+      background: var(--accent-dim); color: var(--accent-on); font-weight: 700;
       padding: 8px 12px; text-align: left;
-      border-bottom: 1px solid rgba(217,140,112,0.20);
-      font-size: 12px; letter-spacing: 0.02em;
+      border-bottom: 1px solid var(--border); font-size: 12px;
     }
     .lesson-pane td, .data-table td {
       padding: 6px 12px; color: var(--text);
-      border-bottom: 1px solid rgba(255,255,255,0.04);
-      vertical-align: top;
-      font-family: 'JetBrains Mono', monospace;
-      font-size: 12.5px;
+      border-bottom: 1px solid var(--border); vertical-align: top;
+      font-family: 'JetBrains Mono', monospace; font-size: 12.5px;
     }
     .lesson-pane tr:last-child td, .data-table tr:last-child td { border-bottom: none; }
     .data-table-name {
       color: var(--accent); font-size: 12px; font-weight: 700;
-      letter-spacing: 0.05em; margin: 14px 0 4px;
-      text-transform: lowercase;
+      letter-spacing: 0.05em; margin: 14px 0 4px; text-transform: lowercase;
     }
     .data-table-name::before { content: '▸ '; opacity: 0.7; }
 
     /* ─── TASK / EDITOR ─── */
     .task-block {
-      background: rgba(217, 140, 112, 0.05);
-      border: 1px solid rgba(217, 140, 112, 0.18);
-      border-radius: 8px;
-      padding: 16px 18px;
-      margin-bottom: 18px;
+      background: var(--accent-dim); border: 1px solid rgba(217, 119, 87, 0.25);
+      border-radius: 12px; padding: 16px 18px; margin-bottom: 18px;
     }
     .task-label {
       color: var(--accent); font-size: 11px; font-weight: 700;
-      letter-spacing: 0.18em; text-transform: uppercase;
-      margin-bottom: 6px;
+      letter-spacing: 0.18em; text-transform: uppercase; margin-bottom: 6px;
     }
     .task-text { color: var(--text); font-size: 14.5px; line-height: 1.8; }
     .task-text code {
-      font-family: 'JetBrains Mono', monospace;
-      font-size: 0.92em; color: var(--accent);
-      background: rgba(217, 140, 112, 0.07);
-      padding: 1px 6px; border-radius: 8px;
-      border: 1px solid rgba(217, 140, 112, 0.12);
+      font-family: 'JetBrains Mono', monospace; font-size: 0.9em;
+      color: var(--accent-on); background: var(--accent-dim);
+      padding: 1px 6px; border-radius: 6px;
     }
 
     .editor-wrap { position: relative; margin-bottom: 14px; }
     .editor-label {
       display: flex; justify-content: space-between; align-items: center;
       color: var(--muted); font-size: 11px; letter-spacing: 0.18em;
-      text-transform: uppercase; font-weight: 700;
-      margin-bottom: 8px;
+      text-transform: uppercase; font-weight: 700; margin-bottom: 8px;
     }
     .editor-actions { display: flex; gap: 6px; }
     .editor-mini-btn {
-      background: rgba(255,255,255,0.04);
-      border: 1px solid rgba(255,255,255,0.06);
-      color: var(--muted);
-      font-family: inherit; font-size: 11px;
-      letter-spacing: 0.05em; padding: 4px 10px; border-radius: 8px;
-      cursor: pointer;
-      transition: color 0.2s ease, border-color 0.2s ease;
+      background: var(--surface); border: 1px solid var(--border);
+      color: var(--muted); font-family: inherit; font-size: 11px;
+      letter-spacing: 0.05em; padding: 4px 10px; border-radius: 8px; cursor: pointer;
+      position: relative; overflow: hidden;
+      transition: color 0.2s ease, border-color 0.2s ease, background 0.2s ease;
     }
-    .editor-mini-btn:hover { color: var(--accent); border-color: rgba(217,140,112,0.3); }
+    .editor-mini-btn:hover { color: var(--accent); border-color: rgba(217,119,87,0.3); background: var(--surface-high); }
 
-    /* Ace editor host */
     .editor-host {
-      border: 1px solid rgba(217, 140, 112, 0.18);
-      border-radius: 8px;
-      overflow: hidden;
+      border: 1px solid var(--border); border-radius: 12px; overflow: hidden;
       transition: border-color 0.25s ease, box-shadow 0.25s ease;
     }
-    .editor-host.is-focused {
-      border-color: var(--accent);
-      box-shadow: 0 0 0 3px rgba(217,140,112,0.08);
-    }
+    .editor-host.is-focused { border-color: var(--accent); box-shadow: 0 0 0 3px rgba(217,119,87,0.1); }
     .editor-host .ace_editor {
       font-family: 'JetBrains Mono', monospace !important;
-      font-size: 13.5px;
-      line-height: 1.7;
-      border-radius: 8px;
+      font-size: 13.5px; line-height: 1.7; border-radius: 12px;
     }
 
-    .editor-bar {
-      display: flex; gap: 10px; align-items: center;
-      flex-wrap: wrap;
-      margin-top: 14px;
-    }
+    .editor-bar { display: flex; gap: 10px; align-items: center; flex-wrap: wrap; margin-top: 14px; }
     .btn {
-      font-family: inherit; cursor: pointer;
-      font-size: 13px; font-weight: 600; letter-spacing: 0.03em;
-      padding: 9px 18px; border-radius: 8px;
-      border: 1px solid transparent;
-      transition: all 0.25s ease;
-      display: inline-flex; align-items: center; gap: 8px;
+      font-family: inherit; cursor: pointer; font-size: 13px; font-weight: 600;
+      padding: 9px 20px; border-radius: 9999px; border: 1px solid transparent;
+      transition: all 0.2s ease; display: inline-flex; align-items: center; gap: 8px;
+      position: relative; overflow: hidden;
     }
-    .btn-primary {
-      background: var(--accent); color: #1a0e08;
-      border-color: var(--accent);
-    }
-    .btn-primary:hover { filter: brightness(1.08); transform: translateY(-1px); box-shadow: 0 8px 24px rgba(217,140,112,0.25); }
-    .btn-ghost {
-      background: rgba(255,255,255,0.03);
-      color: var(--muted);
-      border-color: rgba(255,255,255,0.08);
-    }
-    .btn-ghost:hover { color: var(--accent); border-color: rgba(217,140,112,0.3); }
+    .btn-primary { background: var(--accent); color: #fff; border-color: var(--accent); }
+    .btn-primary:hover { filter: brightness(1.08); box-shadow: 0 4px 12px rgba(217,119,87,0.3); }
+    .btn-ghost { background: var(--surface); color: var(--muted); border-color: var(--border); }
+    .btn-ghost:hover { color: var(--text); background: var(--surface-high); }
     .btn-ok { background: var(--ok); color: #07150e; border-color: var(--ok); }
     .btn-ok:hover { filter: brightness(1.08); }
 
     .result-box {
-      margin-top: 16px;
-      background: rgba(8, 8, 12, 0.5);
-      border: 1px solid rgba(255,255,255,0.06);
-      border-radius: 8px;
-      padding: 14px 16px;
-      min-height: 80px;
+      margin-top: 16px; background: var(--bg);
+      border: 1px solid var(--border); border-radius: 12px; padding: 14px 16px; min-height: 80px;
     }
     .result-status {
       display: flex; align-items: center; gap: 10px;
-      font-size: 12px; font-weight: 700;
-      letter-spacing: 0.1em; text-transform: uppercase;
-      margin-bottom: 10px;
+      font-size: 12px; font-weight: 700; letter-spacing: 0.1em;
+      text-transform: uppercase; margin-bottom: 10px;
     }
     .result-status.is-pass { color: var(--ok); }
     .result-status.is-fail { color: var(--err); }
     .result-status.is-info { color: var(--muted); }
-    .result-status .dot {
-      width: 8px; height: 8px; border-radius: 50%;
-      background: currentColor;
-      box-shadow: 0 0 10px currentColor;
-    }
+    .result-status .dot { width: 8px; height: 8px; border-radius: 50%; background: currentColor; box-shadow: 0 0 8px currentColor; }
     .result-message { color: var(--text); font-size: 13px; margin-bottom: 6px; }
     .result-tables-row { display: grid; gap: 14px; grid-template-columns: 1fr; }
-    @media (min-width: 700px) {
-      .result-tables-row.has-expected { grid-template-columns: 1fr 1fr; }
-    }
+    @media (min-width: 700px) { .result-tables-row.has-expected { grid-template-columns: 1fr 1fr; } }
     .result-table-wrap { min-width: 0; overflow-x: auto; }
     .result-table-label { font-size: 11px; color: var(--muted); margin-bottom: 4px; letter-spacing: 0.1em; text-transform: uppercase; font-weight: 700; }
     .result-empty { color: var(--muted); font-style: italic; padding: 8px 0; font-size: 13px; }
     .result-error {
-      background: rgba(217, 110, 110, 0.08);
-      border: 1px solid rgba(217, 110, 110, 0.25);
-      color: #f0a8a8;
-      border-radius: 8px;
-      padding: 10px 14px;
-      font-family: 'JetBrains Mono', monospace;
-      font-size: 12.5px;
-      white-space: pre-wrap;
-      word-break: break-word;
+      background: rgba(217, 110, 110, 0.08); border: 1px solid rgba(217, 110, 110, 0.25);
+      color: #f0a8a8; border-radius: 12px; padding: 10px 14px;
+      font-family: 'JetBrains Mono', monospace; font-size: 12.5px;
+      white-space: pre-wrap; word-break: break-word;
     }
 
     .lesson-nav-foot {
       display: flex; justify-content: space-between; align-items: center;
       gap: 12px; flex-wrap: wrap;
-      margin-top: 28px; padding-top: 22px;
-      border-top: 1px solid rgba(255,255,255,0.05);
+      margin-top: 28px; padding-top: 22px; border-top: 1px solid var(--border);
     }
     .nav-btn {
       display: inline-flex; align-items: center; gap: 8px;
-      color: var(--muted); text-decoration: none;
-      font-size: 13px; letter-spacing: 0.04em;
-      padding: 8px 14px; border-radius: 8px;
-      border: 1px solid rgba(255,255,255,0.06);
-      background: rgba(255,255,255,0.02);
-      transition: all 0.25s ease;
+      color: var(--muted); text-decoration: none; font-size: 13px;
+      padding: 8px 16px; border-radius: 9999px;
+      border: 1px solid var(--outline); background: transparent;
+      position: relative; overflow: hidden;
+      transition: color 0.2s ease, background 0.2s ease;
     }
-    .nav-btn:hover { color: var(--accent); border-color: rgba(217,140,112,0.3); }
+    .nav-btn:hover { color: var(--text); background: var(--surface); }
     .nav-btn[aria-disabled="true"] { opacity: 0.35; pointer-events: none; }
 
     /* ─── FADE IN ─── */
@@ -807,74 +568,20 @@
     }
     .fade-in.visible { opacity: 1; transform: none; }
 
-    /* ─── CURSOR GLOW ─── */
-    #cursor-glow {
-      position: fixed; width: 400px; height: 400px;
-      border-radius: 50%; pointer-events: none; z-index: 0;
-      background: radial-gradient(circle, rgba(217, 140, 112, 0.055) 0%, transparent 65%);
-      transform: translate(-50%, -50%);
-      transition: opacity 0.4s ease;
-      will-change: left, top;
-    }
-
     /* ─── FOOTER ─── */
     footer {
-      text-align: center; padding: 36px 24px;
+      text-align: center; padding: 40px 24px;
       color: var(--muted); font-size: 13px;
-      border-top: 1px solid rgba(255, 255, 255, 0.04);
-      background: rgba(0, 0, 0, 0.5); letter-spacing: 0.05em;
-      position: relative; z-index: 10;
+      border-top: 1px solid var(--border);
+      background: rgba(42, 42, 41, 0.3); letter-spacing: 0.05em;
     }
 
-    /* ─── INLINE NAV POINTER HINT ───
-       Sits next to "louie.learn" on the top bar, gently nudges left to draw
-       the eye toward the page-switcher dropdown. Hidden in lesson mode and
-       on narrow screens. */
-    .nav-left { display: inline-flex; align-items: center; gap: 14px; }
-    .nav-pointer-hint {
-      display: inline-flex;
-      align-items: center;
-      gap: 8px;
-      color: var(--muted);
-      font-size: 14px;
-      letter-spacing: 0.03em;
-      pointer-events: none;
-      white-space: nowrap;
-      opacity: 0;
-      transition: opacity 0.7s ease;
-    }
-    .nav-pointer-hint.show {
-      opacity: 0.85;
-      /* Whole hint (arrow + text) gently bounces left so the eye is led
-         toward the page-switcher dropdown on its left. */
-      animation: navPointerNudge 2.6s ease-in-out infinite;
-    }
-    .nav-pointer-hint .nav-pointer-arrow {
-      width: 14px;
-      height: 10px;
-      flex: 0 0 auto;
-      color: var(--muted);
-    }
-    @keyframes navPointerNudge {
-      0%, 100% { transform: translateX(0); }
-      50%      { transform: translateX(-6px); }
-    }
-    body.lesson-mode .nav-pointer-hint { display: none !important; }
-    @media (max-width: 880px) { .nav-pointer-hint { display: none; } }
-
-    .not-found {
-      text-align: center; padding: 80px 24px;
-      color: var(--muted);
-    }
-    .not-found h2 {
-      color: #fff; font-size: 24px; margin-bottom: 12px;
-    }
+    .not-found { text-align: center; padding: 80px 24px; color: var(--muted); }
+    .not-found h2 { color: var(--text); font-size: 24px; margin-bottom: 12px; }
 
     /* ─── RESPONSIVE ─── */
     @media (max-width: 768px) {
-      nav { padding: 16px 24px; }
-      nav.scrolled { padding: 14px 24px; }
-      main { padding: 110px 18px 60px; }
+      main { padding: 96px 18px 60px; }
       .lesson-pane { padding: 20px 18px; }
       .editor-bar .btn { flex: 1; justify-content: center; }
     }
@@ -883,51 +590,30 @@
 
 <body>
 
-  <div id="bg-layer"></div>
-  <div id="grain"></div>
-  <div id="scanline"></div>
-  <div id="cursor-glow"></div>
-
   <nav id="navbar">
-    <div class="nav-left">
-      <div class="page-switcher" id="page-switcher">
-        <button class="brand-switcher" type="button" aria-haspopup="listbox" aria-expanded="false" onclick="togglePageSwitcher(event)">
-          <span class="brand-switcher-static">louie<span class="accent">.</span></span><span class="brand-switcher-current">learn</span>
-          <svg class="brand-switcher-chevron" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"></polyline></svg>
-        </button>
-        <div class="page-switcher-menu" role="listbox">
-          <a href="index.html" class="page-switcher-item" role="option">
-            <span>louie<span class="accent">.</span>home</span>
-            <span class="page-switcher-item-dot"></span>
-          </a>
-          <a href="blog.html" class="page-switcher-item" role="option">
-            <span>louie<span class="accent">.</span>blog</span>
-            <span class="page-switcher-item-dot"></span>
-          </a>
-          <a href="learn.html" class="page-switcher-item active" role="option" aria-current="page">
-            <span>louie<span class="accent">.</span>learn</span>
-            <span class="page-switcher-item-dot"></span>
-          </a>
-          <a href="95.html" class="page-switcher-item" role="option">
-            <span>louie<span class="accent">.</span>95</span>
-            <span class="page-switcher-item-dot"></span>
-          </a>
-        </div>
-      </div>
-      <div id="nav-pointer-hint" class="nav-pointer-hint" aria-hidden="true">
-        <svg class="nav-pointer-arrow" viewBox="0 0 36 12" fill="none" stroke="currentColor" stroke-width="4" stroke-linecap="round" stroke-linejoin="round">
-          <line x1="34" y1="6" x2="7" y2="6"></line>
-          <polyline points="12 1 7 6 12 11"></polyline>
-        </svg>
-        <span data-i18n="nav-hint">点击这里能切换我的不同网页</span>
+    <div class="nav-brand-wrap" id="brand-dropdown-container">
+      <button id="brand-dropdown-btn" class="ripple-surface" type="button">
+        <span class="b-static">louie</span><span class="b-dot">.</span><span class="b-page">learn</span>
+        <svg id="brand-dropdown-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"></polyline></svg>
+      </button>
+      <div id="brand-dropdown-menu">
+        <a href="index.html" class="nav-dd-item ripple-surface">louie.home</a>
+        <a href="blog.html" class="nav-dd-item ripple-surface">louie.blog</a>
+        <a href="learn.html" class="nav-dd-item nav-active ripple-surface">louie.learn</a>
+        <a href="95.html" class="nav-dd-item ripple-surface">louie.95</a>
       </div>
     </div>
-    <ul class="nav-links">
-      <li>
-        <button class="lang-toggle" id="lang-toggle" onclick="toggleLang()">EN</button>
-      </li>
-    </ul>
+    <div class="nav-right">
+      <button id="lang-toggle" class="ripple-surface" onclick="toggleLang()">EN</button>
+      <button id="menu-btn" class="ripple-surface" aria-label="Menu">
+        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="3" y1="12" x2="21" y2="12"></line><line x1="3" y1="6" x2="21" y2="6"></line><line x1="3" y1="18" x2="21" y2="18"></line></svg>
+      </button>
+    </div>
   </nav>
+
+  <div id="mobile-menu">
+    <button class="mobile-lang-btn ripple-surface" onclick="toggleLang()">Switch Lang</button>
+  </div>
 
   <main id="main">
     <!-- COURSE LIST VIEW -->
@@ -943,7 +629,7 @@
 
     <!-- COURSE (lesson list) VIEW -->
     <div id="view-course" style="display:none;">
-      <a href="#" class="course-back" id="course-back-link">
+      <a href="#" class="course-back ripple-surface" id="course-back-link">
         <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><line x1="19" y1="12" x2="5" y2="12"></line><polyline points="12 19 5 12 12 5"></polyline></svg>
         <span data-i18n="course-back">All courses</span>
       </a>
@@ -952,7 +638,7 @@
 
     <!-- LESSON VIEW -->
     <div id="view-lesson" style="display:none;">
-      <a href="#" class="lesson-back" id="lesson-back-link">
+      <a href="#" class="lesson-back ripple-surface" id="lesson-back-link">
         <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><line x1="19" y1="12" x2="5" y2="12"></line><polyline points="12 19 5 12 12 5"></polyline></svg>
         <span data-i18n="lesson-back">Lessons</span>
       </a>
@@ -967,7 +653,7 @@
   <script src="lib/sql-asm.js"></script>
   <script src="lib/ace/ace.min.js"></script>
   <script src="lib/ace/mode-mysql.min.js"></script>
-<script src="lib/ace/theme-tomorrow_night.min.js"></script>
+  <script src="lib/ace/theme-tomorrow_night.min.js"></script>
   <script src="learn_data/manifest.js"></script>
   <script>
     /* ─── i18n ─── */
@@ -1122,48 +808,57 @@
       return field[currentLang] || field.en || field.zh || fallback;
     }
 
-    /* ─── Inline nav-pointer hint ─── */
-    (function() {
-      const hint = document.getElementById('nav-pointer-hint');
-      if (!hint) return;
-      // Fade in shortly after load so it's not part of the initial chrome.
-      setTimeout(() => hint.classList.add('show'), 600);
-      // Fade out after 12s so the user notices it but it doesn't linger.
-      setTimeout(() => hint.classList.remove('show'), 12000);
-    })();
-
-    /* ─── Nav ─── */
-    window.addEventListener('scroll', () => {
-      document.getElementById('navbar').classList.toggle('scrolled', window.scrollY > 50);
-    });
-    function togglePageSwitcher(e) {
-      if (e) e.stopPropagation();
-      const sw = document.getElementById('page-switcher');
-      if (!sw) return;
-      sw.classList.toggle('open');
+    /* ─── Ripple ─── */
+    const RIPPLE_SEL = '.ripple-surface, .btn, .editor-mini-btn, .nav-btn, .reset-btn, .tutorial-link, .course-back, .lesson-back';
+    function bindRipples() {
+      document.querySelectorAll(RIPPLE_SEL).forEach(el => {
+        if (el.classList.contains('ripple-bound')) return;
+        el.classList.add('ripple-bound');
+        el.addEventListener('mousedown', (event) => {
+          const circle = document.createElement('span');
+          const diameter = Math.max(el.clientWidth, el.clientHeight);
+          const radius = diameter / 2;
+          const rect = el.getBoundingClientRect();
+          circle.style.width = circle.style.height = `${diameter}px`;
+          circle.style.left = `${event.clientX - rect.left - radius}px`;
+          circle.style.top = `${event.clientY - rect.top - radius}px`;
+          circle.classList.add('ripple');
+          const existing = el.querySelector('.ripple');
+          if (existing) existing.remove();
+          el.appendChild(circle);
+        });
+      });
     }
-    document.addEventListener('click', (e) => {
-      const sw = document.getElementById('page-switcher');
-      if (sw && !sw.contains(e.target)) sw.classList.remove('open');
-    });
-    document.addEventListener('keydown', (e) => {
-      if (e.key === 'Escape') {
-        const sw = document.getElementById('page-switcher');
-        if (sw) sw.classList.remove('open');
+    bindRipples();
+
+    /* ─── Nav (M3) ─── */
+    const brandBtn = document.getElementById('brand-dropdown-btn');
+    const brandMenu = document.getElementById('brand-dropdown-menu');
+    const brandIcon = document.getElementById('brand-dropdown-icon');
+
+    brandBtn.addEventListener('click', (e) => {
+      e.stopPropagation();
+      const isOpen = brandMenu.classList.contains('is-open');
+      if (isOpen) {
+        brandMenu.classList.remove('is-open');
+        brandIcon.style.transform = 'rotate(0deg)';
+      } else {
+        brandMenu.classList.add('is-open');
+        brandIcon.style.transform = 'rotate(180deg)';
       }
     });
 
-    /* ─── Cursor glow ─── */
-    const cursorGlow = document.getElementById('cursor-glow');
-    let cx = -1000, cy = -1000, gcx = -1000, gcy = -1000;
-    window.addEventListener('mousemove', (e) => { cx = e.clientX; cy = e.clientY; });
-    function animateGlow() {
-      gcx += (cx - gcx) * 0.07; gcy += (cy - gcy) * 0.07;
-      cursorGlow.style.left = gcx + 'px';
-      cursorGlow.style.top  = gcy + 'px';
-      requestAnimationFrame(animateGlow);
-    }
-    animateGlow();
+    document.addEventListener('click', (e) => {
+      if (!brandBtn.contains(e.target) && !brandMenu.contains(e.target)) {
+        brandMenu.classList.remove('is-open');
+        brandIcon.style.transform = 'rotate(0deg)';
+      }
+    });
+
+    const menuBtn = document.getElementById('menu-btn');
+    const mobileMenu = document.getElementById('mobile-menu');
+    menuBtn.addEventListener('click', () => mobileMenu.classList.toggle('open'));
+    mobileMenu.addEventListener('click', () => mobileMenu.classList.remove('open'));
 
     /* ─── Fade in ─── */
     let fadeObserver = null;
@@ -1232,19 +927,15 @@
     function resetProgress(slug) {
       try { localStorage.removeItem(progKey(slug)); } catch(e) {}
     }
-    /* Confirm + wipe localStorage progress for one course. Used both from
-       the course list (per-card icon button) and the course detail header. */
     function promptResetCourse(slug, courseTitle) {
       const prog = loadProgress(slug);
       if (Object.keys(prog).length === 0) {
-        // Nothing to clear — fall through silently with a soft notice.
         alert(tt('reset-no-progress'));
         return;
       }
       const msg = tt('reset-confirm').replace('{course}', courseTitle);
       if (!confirm(msg)) return;
       resetProgress(slug);
-      // Re-render whatever view we're on so the visuals refresh.
       route();
     }
 
@@ -1261,11 +952,11 @@
         const lessonsLabel = c.lessonsCount ? `${c.lessonsCount} ${tt('lessons-count')}` : '';
         const href = isComing ? '#' : `#${c.slug}`;
         const resetBtn = isComing ? '' : `
-          <button class="reset-btn js-reset-btn" data-slug="${c.slug}" type="button" title="${tt('reset-progress')}" aria-label="${tt('reset-progress')}">
+          <button class="reset-btn ripple-surface js-reset-btn" data-slug="${c.slug}" type="button" title="${tt('reset-progress')}" aria-label="${tt('reset-progress')}">
             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><polyline points="1 4 1 10 7 10"></polyline><path d="M3.51 15a9 9 0 1 0 2.13-9.36L1 10"></path></svg>
           </button>`;
         return `
-          <a class="course-card fade-in${isComing ? ' course-card-coming' : ''}" href="${href}" style="position: relative;">
+          <a class="course-card ripple-surface fade-in${isComing ? ' course-card-coming' : ''}" href="${href}" style="position: relative;">
             ${resetBtn}
             <div class="course-card-icon">${c.icon || ''}</div>
             <div class="course-card-title">${pickLang(c.title)}</div>
@@ -1278,8 +969,6 @@
           </a>
         `;
       }).join('');
-      // The reset button lives inside the card <a>; intercept clicks before
-      // they bubble up and follow the link.
       wrap.querySelectorAll('.js-reset-btn').forEach(btn => {
         btn.addEventListener('click', e => {
           e.preventDefault();
@@ -1290,6 +979,7 @@
         });
       });
       bindFadeIn();
+      bindRipples();
     }
 
     /* ─── Course (lesson list) view ─── */
@@ -1299,7 +989,7 @@
       try {
         course = await loadCourse(slug);
       } catch (e) {
-        wrap.innerHTML = `<div class="not-found"><h2>${tt('not-found-title')}</h2><p>${tt('not-found-desc')}</p><p style="margin-top:18px;"><a class="reader-footer-link" href="#">→ ${tt('not-found-back')}</a></p></div>`;
+        wrap.innerHTML = `<div class="not-found"><h2>${tt('not-found-title')}</h2><p>${tt('not-found-desc')}</p><p style="margin-top:18px;"><a class="course-back" href="#">→ ${tt('not-found-back')}</a></p></div>`;
         return;
       }
       const lessons = course.lessons || [];
@@ -1307,7 +997,6 @@
       const doneCount = lessons.filter(l => prog[l.id]).length;
       const pct = lessons.length ? Math.round((doneCount / lessons.length) * 100) : 0;
 
-      // Group lessons by section
       const sections = {};
       const sectionOrder = [];
       for (const l of lessons) {
@@ -1325,7 +1014,7 @@
         const rows = sections[sec].map(l => {
           const isDone = !!prog[l.id];
           return `
-            <a class="lesson-row${isDone ? ' is-done' : ''}" href="#${slug}/${l.id}">
+            <a class="lesson-row ripple-surface${isDone ? ' is-done' : ''}" href="#${slug}/${l.id}">
               <span class="lesson-row-num">${String(l.id).padStart(2, '0')}</span>
               <div>
                 <div class="lesson-row-title">${pickLang(l.title)}</div>
@@ -1350,7 +1039,7 @@
               <span>${tt('progress-label')}</span>
               <div class="progress-bar"><div class="progress-bar-inner" style="width:${pct}%"></div></div>
               <span style="font-variant-numeric: tabular-nums; color: var(--accent); font-weight: 700;">${doneCount} / ${lessons.length}</span>
-              <button class="reset-btn reset-btn-inline js-reset-course-detail" type="button" title="${tt('reset-progress')}" aria-label="${tt('reset-progress')}">
+              <button class="reset-btn reset-btn-inline ripple-surface js-reset-course-detail" type="button" title="${tt('reset-progress')}" aria-label="${tt('reset-progress')}">
                 <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><polyline points="1 4 1 10 7 10"></polyline><path d="M3.51 15a9 9 0 1 0 2.13-9.36L1 10"></path></svg>
                 <span>${tt('reset-progress')}</span>
               </button>
@@ -1358,7 +1047,7 @@
           </div>
           <div class="lesson-list">
             ${course.hasPlayground ? `
-            <a class="lesson-row" href="#${slug}/playground">
+            <a class="lesson-row ripple-surface" href="#${slug}/playground">
               <span class="lesson-row-num" style="color:var(--accent); display:inline-flex; align-items:center; justify-content:center;"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 20h9"/><path d="M16.5 3.5a2.121 2.121 0 0 1 3 3L7 19l-4 1 1-4 12.5-12.5z"/></svg></span>
               <div>
                 <div class="lesson-row-title">${course.playgroundTitle ? pickLang(course.playgroundTitle) : tt('playground-label')}</div>
@@ -1380,6 +1069,7 @@
         const wr = wrap.querySelector('.fade-in');
         if (wr) wr.classList.add('visible');
       });
+      bindRipples();
     }
 
     /* ─── SQL Playground view ─── */
@@ -1438,6 +1128,7 @@
 
       requestAnimationFrame(() => {
         wrap.querySelectorAll('.fade-in').forEach(el => el.classList.add('visible'));
+        bindRipples();
       });
 
       const schemaContainer = document.getElementById('pg-schema');
@@ -1495,9 +1186,7 @@
       });
     }
 
-    /* ─── SQL engine (sql.js / SQLite, pure JS asm.js build) ─── */
-    // sql.js initialises asynchronously. We bootstrap once and queue any DB work
-    // until the engine is ready.
+    /* ─── SQL engine (sql.js / SQLite) ─── */
     let SQL = null;
     let _sqlReady = null;
     function ensureSql() {
@@ -1507,7 +1196,6 @@
         .then(s => { SQL = s; return s; });
       return _sqlReady;
     }
-    // Kick off init at boot.
     ensureSql().catch(e => console.error('sql.js init failed:', e));
 
     function freshDb() {
@@ -1515,13 +1203,6 @@
       return new SQL.Database();
     }
 
-    /* sql.js's `db.exec(sql)` returns an array of result sets, each shaped as
-       `{columns: string[], values: any[][]}`. We convert the LAST result set to
-       an array of plain objects so the rest of the app (compareRows, render)
-       can stay simple.
-
-       Multi-statement scripts (CREATE + INSERT + INSERT...) all execute via the
-       same db.exec call — we just return the last SELECT's rows. */
     function execToRows(db, sql) {
       const out = db.exec(sql);
       if (!out || out.length === 0) return [];
@@ -1534,7 +1215,6 @@
       });
     }
     function runSetup(db, sqlText) {
-      // Setup scripts may be empty.
       if (!sqlText || !sqlText.trim()) return;
       db.exec(sqlText);
     }
@@ -1542,61 +1222,38 @@
       return execToRows(db, sql);
     }
 
-    /* Compare two row sets: array of plain objects.
-       checkOrder: if true, row order must match. */
     function compareRows(actual, expected, checkOrder) {
       if (!Array.isArray(actual)) actual = [];
       if (!Array.isArray(expected)) expected = [];
       if (actual.length !== expected.length) {
         return { ok: false, code: 'rows', got: actual.length, want: expected.length };
       }
-      // Normalize: turn each row into a stable serialization. Track column order
-      // from the first row.
-      function rowKey(row, columnOrder) {
-        return columnOrder.map(c => normalizeCell(row[c])).join('');
-      }
       function normalizeCell(v) {
         if (v == null) return 'NULL';
         if (typeof v === 'number') {
-          // Treat ints and floats consistently; round to 6 dp.
           if (Number.isInteger(v)) return String(v);
           return v.toFixed(6).replace(/\.?0+$/, '');
         }
         return String(v);
       }
-      // Determine column set from expected (the source of truth for columns)
       const expectedCols = expected.length > 0 ? Object.keys(expected[0]) : [];
       const actualCols   = actual.length   > 0 ? Object.keys(actual[0])   : [];
+      if (expected.length === 0 && actual.length === 0) return { ok: true };
+      if (expectedCols.length !== actualCols.length) return { ok: false, code: 'cols' };
 
-      // If no rows on both sides, accept (special-case 0/0).
-      if (expected.length === 0 && actual.length === 0) {
-        return { ok: true };
-      }
-
-      // Column count must match.
-      if (expectedCols.length !== actualCols.length) {
-        return { ok: false, code: 'cols' };
-      }
-
-      // We compare values column-by-column using positional alignment (not by
-      // name) to allow learners to alias columns however they like.
-      function rowToTuple(row, cols) {
-        return cols.map(c => normalizeCell(row[c]));
-      }
+      function rowToTuple(row, cols) { return cols.map(c => normalizeCell(row[c])); }
       const actualTuples   = actual.map(r => rowToTuple(r, actualCols));
       const expectedTuples = expected.map(r => rowToTuple(r, expectedCols));
 
       if (checkOrder) {
         for (let i = 0; i < expectedTuples.length; i++) {
           for (let j = 0; j < expectedCols.length; j++) {
-            if (actualTuples[i][j] !== expectedTuples[i][j]) {
-              return { ok: false, code: 'data' };
-            }
+            if (actualTuples[i][j] !== expectedTuples[i][j]) return { ok: false, code: 'data' };
           }
         }
         return { ok: true };
       } else {
-        const sortKey = (t) => t.join('');
+        const sortKey = (t) => t.join('');
         const a = actualTuples.map(sortKey).sort();
         const e = expectedTuples.map(sortKey).sort();
         for (let i = 0; i < a.length; i++) {
@@ -1606,7 +1263,6 @@
       }
     }
 
-    /* ─── Render schema preview tables for a lesson ─── */
     function renderSchemaPreview(db, tables) {
       if (!tables || tables.length === 0) return '';
       let html = '';
@@ -1639,7 +1295,6 @@
     function formatCell(v) {
       if (v == null) return '<span style="color:var(--muted); font-style:italic;">NULL</span>';
       if (typeof v === 'number' && !Number.isInteger(v)) {
-        // Trim trailing zeros up to 6 dp
         return escapeHtml(Number(v.toFixed(6)).toString());
       }
       return escapeHtml(String(v));
@@ -1649,12 +1304,10 @@
     }
 
     /* ─── Lesson view ─── */
-    let _currentLesson = null; // {courseSlug, lessonId, course, lesson, db}
+    let _currentLesson = null;
 
     async function renderLesson(courseSlug, lessonIdRaw) {
       const wrap = document.getElementById('lesson-content');
-      // Both course definition AND the SQL engine must be loaded before we can
-      // build the schema preview. Either-or is not enough.
       let course;
       try {
         wrap.innerHTML = `<div class="result-empty" style="padding: 80px 24px;">${currentLang === 'zh' ? '加载中…' : 'Loading…'}</div>`;
@@ -1672,22 +1325,14 @@
         return;
       }
 
-      // Build the lesson DB
       const db = freshDb();
       let setupErr = null;
-      try {
-        runSetup(db, lesson.setup);
-      } catch (e) {
-        setupErr = e;
-        console.error('Lesson setup failed:', e);
-      }
+      try { runSetup(db, lesson.setup); } catch (e) { setupErr = e; console.error('Lesson setup failed:', e); }
 
-      // Schema preview HTML
       const schemaHtml = setupErr
         ? `<div class="result-error">Setup failed: ${escapeHtml(setupErr.message || String(setupErr))}</div>`
         : renderSchemaPreview(db, lesson.tables || []);
 
-      // Surrounding nav
       const lessons = course.lessons || [];
       const idx = lessons.findIndex(l => l.id === lessonId);
       const prev = idx > 0 ? lessons[idx - 1] : null;
@@ -1699,7 +1344,6 @@
       const initialSql = lesson.starter ? pickLang(lesson.starter) : '';
 
       wrap.innerHTML = `
-          <!-- LEFT pane: meta → title row (with tutorial link on the right) → intro → tables -->
           <div class="lesson-pane lesson-pane-left fade-in">
               <div class="lesson-meta-row">
                 <span class="lesson-pill">${pickLang(course.title)}</span>
@@ -1710,7 +1354,7 @@
               <div class="lesson-title-row">
                 <h1 class="lesson-title">${pickLang(lesson.title)}</h1>
                 ${lesson.chapterRef ? `
-                  <a class="tutorial-link" href="blog.html#${lesson.chapterRef}" target="_blank" rel="noopener">
+                  <a class="tutorial-link ripple-surface" href="blog.html#${lesson.chapterRef}" target="_blank" rel="noopener">
                     <span>${tt('tutorial-link')}</span>
                     <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
                       <path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"></path>
@@ -1729,7 +1373,6 @@
               ` : ''}
             </div>
 
-          <!-- RIGHT pane: task → (hint toggle slides out a body) → editor → result -->
           <div class="lesson-pane lesson-pane-right lesson-right fade-in">
               <div class="task-block">
                 <div class="task-label">${tt('task-label')}</div>
@@ -1776,9 +1419,9 @@
           </div>
       `;
 
-      // Reveal both panes together with the fade-in animation.
       requestAnimationFrame(() => {
         wrap.querySelectorAll('.fade-in').forEach(el => el.classList.add('visible'));
+        bindRipples();
       });
 
       const editorHost = document.getElementById('editor-host');
@@ -1813,8 +1456,6 @@
       function runUserSql() {
         const sql = (editor.value || '').trim();
         if (!sql) { setStatus('info', `<div class="result-message">${tt('msg-empty-query')}</div>`); return null; }
-        // Reset DB to lesson initial state for every run, so previous attempts
-        // can never leak side-effects into the next one.
         const fdb = freshDb();
         try { runSetup(fdb, lesson.setup); } catch (e) { showError(e); return null; }
         try {
@@ -1839,7 +1480,6 @@
       document.getElementById('btn-check').addEventListener('click', () => {
         const r = runUserSql();
         if (!r) return;
-        // Run expected query on a fresh DB.
         const edb = freshDb();
         try { runSetup(edb, lesson.setup); } catch (e) { showError(e); return; }
         let expectedRows;
@@ -1861,20 +1501,14 @@
 
         if (cmp.ok) {
           markDone(courseSlug, lesson.id);
-          setStatus('pass', `
-            <div class="result-message">${tt('msg-pass')}</div>
-            ${tablesRow}
-          `);
+          setStatus('pass', `<div class="result-message">${tt('msg-pass')}</div>${tablesRow}`);
         } else {
           let msg;
           if (cmp.code === 'rows') msg = tt('msg-fail-rows', { got: cmp.got, want: cmp.want });
           else if (cmp.code === 'cols') msg = tt('msg-fail-cols');
           else if (cmp.code === 'order') msg = tt('msg-fail-order');
           else msg = tt('msg-fail-data');
-          setStatus('fail', `
-            <div class="result-message">${msg}</div>
-            ${tablesRow}
-          `);
+          setStatus('fail', `<div class="result-message">${msg}</div>${tablesRow}`);
         }
       });
 
@@ -1908,7 +1542,6 @@
           hintToggle.textContent = open ? tt('show-hint') : tt('hide-hint');
         });
       }
-
     }
 
     /* ─── Router ─── */
@@ -1920,14 +1553,11 @@
       const lessonView = document.getElementById('view-lesson');
       const main = document.getElementById('main');
 
-      // Update back-links
       document.getElementById('course-back-link').href = '#';
       if (parts.length >= 1) {
         document.getElementById('lesson-back-link').href = '#' + parts[0];
       }
 
-      // Lesson view gets the wider max-width AND locks the page so the inner
-      // panes are the only scrollable areas.
       const inLesson = parts.length >= 2;
       main.classList.toggle('is-lesson', inLesson);
       document.body.classList.toggle('lesson-mode', inLesson);
@@ -1953,9 +1583,6 @@
       } else {
         courseList.style.display = 'none';
         courseView.style.display = 'none';
-        // Clear inline display so the lesson-mode CSS (display: grid) wins.
-        // Setting it to 'block' here would override the grid layout and break
-        // the pane scrolling (panes wouldn't get definite track heights).
         lessonView.style.display = '';
         renderLesson(parts[0], parts[1]);
         window.scrollTo({ top: 0, behavior: 'instant' });

@@ -1,1506 +1,416 @@
 <!DOCTYPE html>
-<html lang="zh-CN">
-
+<html lang="zh-CN" class="scroll-smooth">
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
-  <meta name="description" content="Louie — Developer, Creator, CS Student">
   <title>Louie — Portfolio</title>
-  <link rel="icon" href="lib/po.webp">
   <link rel="stylesheet" href="lib/fonts.css">
   <script src="lib/tailwindcss.js"></script>
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          colors: {
+            m3: {
+              surface: '#1f1f1e',
+              surfaceContainer: '#2a2a29',
+              surfaceContainerHigh: '#333332',
+              primary: '#d97757',
+              onPrimary: '#ffffff',
+              primaryContainer: 'rgba(217, 119, 87, 0.15)',
+              onPrimaryContainer: '#ffb49d',
+              outline: '#4a4a49',
+              outlineVariant: '#3a3a39',
+              onSurface: '#e8e8e8',
+              onSurfaceVariant: '#a1a1a0'
+            }
+          },
+          fontFamily: {
+            sans: ['JetBrains Mono', 'HarmonyOS Sans', 'PingFang SC', 'Microsoft YaHei', 'sans-serif'],
+          },
+          borderRadius: {
+            'm3-xs': '4px',
+            'm3-sm': '8px',
+            'm3-md': '12px',
+            'm3-lg': '16px',
+            'm3-xl': '24px',
+            'm3-full': '9999px',
+          }
+        }
+      }
+    }
+  </script>
   <style>
-    *,
-    *::before,
-    *::after {
-      box-sizing: border-box;
-      margin: 0;
-      padding: 0;
-    }
-
-    :root {
-      --bg: #06060a;
-      --surface: #0e0e14;
-      --border: #1c1c28;
-      --text: #e8e8e8;
-      --muted: #7a7a8c;
-      --accent: #d98c70;
-      --accent-dim: rgba(217, 140, 112, 0.08);
-      --accent2: #8b70d9;
-      --accent2-dim: rgba(139, 112, 217, 0.06);
-      --glow: rgba(217, 140, 112, 0.12);
-    }
-
-    html {
-      scroll-behavior: smooth;
-      background-color: var(--bg);
-      overscroll-behavior: none;
-    }
-
     body {
-      background-color: transparent;
-      color: var(--text);
-      font-family: 'JetBrains Mono', 'HarmonyOS Sans', 'PingFang SC', 'Microsoft YaHei', sans-serif;
-      font-size: 16px;
-      line-height: 1.8;
-      -webkit-font-smoothing: antialiased;
-      -moz-osx-font-smoothing: grayscale;
-      text-rendering: optimizeLegibility;
-      overflow-x: hidden;
-      overscroll-behavior: none;
+      font-family: 'JetBrains Mono', 'HarmonyOS Sans', 'PingFang SC', 'Microsoft YaHei', sans-serif !important;
+      background-color: #1f1f1e;
+      color: #e8e8e8;
+      -webkit-tap-highlight-color: transparent;
       -webkit-user-select: none;
       user-select: none;
     }
 
-    img, a {
-      -webkit-user-drag: none;
-    }
-
-    ::-webkit-scrollbar {
-      width: 3px;
-    }
-
-    ::-webkit-scrollbar-track {
-      background: var(--bg);
-    }
-
-    ::-webkit-scrollbar-thumb {
-      background: rgba(217, 140, 112, 0.3);
-      border-radius: 2px;
-    }
-
-    /* ─── BACKGROUND ─── */
-    #bg-layer {
-      position: fixed;
-      inset: 0;
-      z-index: -2;
-      background: var(--bg);
-    }
-
-    /* Aurora mesh blobs + hp2.html Orbs */
-    #bg-layer::before {
-      content: '';
-      position: absolute;
-      inset: 0;
-      background:
-        radial-gradient(ellipse 70% 55% at 20% 20%, rgba(217, 140, 112, 0.07) 0%, transparent 60%),
-        radial-gradient(ellipse 60% 50% at 80% 75%, rgba(139, 112, 217, 0.06) 0%, transparent 60%),
-        radial-gradient(ellipse 50% 40% at 60% 10%, rgba(112, 170, 217, 0.04) 0%, transparent 55%),
-        radial-gradient(ellipse 80% 60% at 10% 85%, rgba(217, 140, 112, 0.04) 0%, transparent 60%);
-      animation: auroraShift 18s ease-in-out infinite alternate;
-    }
-
-    #bg-layer::after {
-      content: '';
-      position: absolute;
-      inset: 0;
-      background-image:
-        linear-gradient(rgba(255,255,255,0.018) 1px, transparent 1px),
-        linear-gradient(90deg, rgba(255,255,255,0.018) 1px, transparent 1px);
-      background-size: 60px 60px;
-      mask-image: radial-gradient(ellipse 90% 80% at 50% 50%, black 30%, transparent 100%);
-    }
-
-    @keyframes auroraShift {
-      0%   { opacity: 1; transform: scale(1) rotate(0deg); }
-      50%  { opacity: 0.7; transform: scale(1.06) rotate(1deg); }
-      100% { opacity: 1; transform: scale(1.02) rotate(-0.5deg); }
-    }
-
-    /* Grain overlay */
-    #grain {
-      position: fixed;
-      inset: -50%;
-      width: 200%;
-      height: 200%;
-      z-index: -1;
-      opacity: 0.028;
-      pointer-events: none;
-      background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 512 512' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.75' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)'/%3E%3C/svg%3E");
-      animation: grainMove 0.4s steps(1) infinite;
-    }
-
-    @keyframes grainMove {
-      0%   { transform: translate(0, 0); }
-      25%  { transform: translate(-3%, -5%); }
-      50%  { transform: translate(5%, 2%); }
-      75%  { transform: translate(-2%, 6%); }
-      100% { transform: translate(4%, -3%); }
-    }
-
-    /* Scanline shimmer */
-    #scanline {
-      position: fixed;
-      inset: 0;
-      z-index: -1;
-      pointer-events: none;
-      background: repeating-linear-gradient(
-        0deg,
-        transparent,
-        transparent 3px,
-        rgba(0,0,0,0.06) 3px,
-        rgba(0,0,0,0.06) 4px
-      );
-      opacity: 0.4;
-    }
-
-    /* hp2.html Nav glass effect */
-    .magnetic-wrap {
-      display: inline-block;
-      position: relative;
-    }
-
-    .magnetic-inner {
-      display: inline-block;
-      transition: transform 0.3s cubic-bezier(0.25, 1, 0.5, 1);
-      will-change: transform;
-    }
-
-    .magnetic-wrap:hover .magnetic-inner {
-      transition: transform 0.1s ease-out;
-    }
-
-    /* ─── BRAND SWITCHER ─── */
-    .page-switcher { position: relative; font-family: inherit; }
-
-    .brand-switcher {
-      display: inline-flex;
-      align-items: baseline;
-      gap: 4px;
-      padding: 6px 10px 6px 8px;
-      margin-left: -8px;
-      background: transparent;
-      border: 1px solid transparent;
-      border-radius: 8px;
-      color: var(--text);
-      font-family: inherit;
-      font-size: 18px;
-      font-weight: 700;
-      letter-spacing: 0.05em;
-      cursor: pointer;
-      text-decoration: none;
-      transition: background 0.25s ease, border-color 0.25s ease;
-    }
-
-    .brand-switcher:hover,
-    .page-switcher.open .brand-switcher {
-      background: rgba(255, 255, 255, 0.03);
-      border-color: rgba(255, 255, 255, 0.06);
-    }
-
-    .brand-switcher-static { color: var(--text); }
-    .brand-switcher-static .accent { color: var(--accent); }
-
-    .brand-switcher-current {
-      color: var(--muted);
-      font-weight: 500;
-      transition: color 0.25s ease;
-    }
-    .brand-switcher:hover .brand-switcher-current,
-    .page-switcher.open .brand-switcher-current {
-      color: var(--accent);
-    }
-
-    .brand-switcher-chevron {
-      width: 10px; height: 10px;
-      align-self: center;
-      margin-left: 2px;
-      opacity: 0.35;
-      color: var(--muted);
-      transition: opacity 0.2s ease, transform 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
-    }
-    .brand-switcher:hover .brand-switcher-chevron { opacity: 0.7; }
-    .page-switcher.open .brand-switcher-chevron {
-      opacity: 0.85;
-      transform: rotate(180deg);
-      color: var(--accent);
-    }
-
-    .page-switcher-menu {
-      position: absolute;
-      top: calc(100% + 8px);
-      left: 0;
-      min-width: 170px;
-      background: rgba(20, 20, 26, 0.92);
-      backdrop-filter: blur(28px) saturate(180%);
-      -webkit-backdrop-filter: blur(28px) saturate(180%);
-      border: 1px solid rgba(255, 255, 255, 0.08);
-      border-radius: 10px;
-      padding: 5px;
-      display: flex;
-      flex-direction: column;
-      gap: 2px;
-      box-shadow: 0 16px 48px rgba(0, 0, 0, 0.45), 0 0 0 1px rgba(217, 140, 112, 0.04);
-      opacity: 0;
-      pointer-events: none;
-      transform: translateY(-6px) scale(0.97);
-      transform-origin: top left;
-      transition: opacity 0.22s ease, transform 0.22s cubic-bezier(0.34, 1.56, 0.64, 1);
-      z-index: 10001;
-    }
-    .page-switcher.open .page-switcher-menu {
-      opacity: 1;
-      pointer-events: auto;
-      transform: translateY(0) scale(1);
-    }
-
-    .page-switcher-item {
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      gap: 16px;
-      padding: 8px 12px;
-      border-radius: 8px;
-      color: var(--muted);
-      text-decoration: none;
-      font-size: 14px;
-      font-weight: 600;
-      letter-spacing: 0.02em;
-      transition: color 0.2s ease, background 0.2s ease;
-    }
-    .page-switcher-item:hover {
-      color: var(--text);
-      background: rgba(255, 255, 255, 0.04);
-    }
-    .page-switcher-item.active {
-      color: var(--text);
-      background: rgba(217, 140, 112, 0.08);
-    }
-    .page-switcher-item .accent { color: var(--accent); }
-
-    .page-switcher-item-dot {
-      width: 5px; height: 5px; border-radius: 50%;
-      background: var(--accent);
-      box-shadow: 0 0 8px rgba(217, 140, 112, 0.6);
-      opacity: 0;
-      transform: scale(0.6);
-      transition: opacity 0.2s ease, transform 0.2s ease;
-    }
-    .page-switcher-item.active .page-switcher-item-dot {
-      opacity: 1;
-      transform: scale(1);
-    }
-
-    /* ─── INLINE NAV POINTER HINT ─── */
-    .nav-left { display: inline-flex; align-items: center; gap: 14px; }
-    .nav-pointer-hint {
-      display: inline-flex;
-      align-items: center;
-      gap: 8px;
-      color: var(--muted);
-      font-size: 14px;
-      letter-spacing: 0.03em;
-      pointer-events: none;
-      white-space: nowrap;
-      opacity: 0;
-      transition: opacity 0.7s ease;
-    }
-    .nav-pointer-hint.show {
-      opacity: 0.85;
-      animation: navPointerNudge 2.6s ease-in-out infinite;
-    }
-    .nav-pointer-hint .nav-pointer-arrow {
-      width: 14px;
-      height: 10px;
-      flex: 0 0 auto;
-      color: var(--muted);
-    }
-    @keyframes navPointerNudge {
-      0%, 100% { transform: translateX(0); }
-      50%      { transform: translateX(-6px); }
-    }
-    @media (max-width: 880px) { .nav-pointer-hint { display: none; } }
-
-    nav {
-      position: fixed;
-      top: 0;
-      left: 0;
-      right: 0;
-      z-index: 9999;
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      padding: 24px 48px;
-      /* hp2.html glass style */
-      background: rgba(29, 29, 31, 0.65);
-      backdrop-filter: blur(24px) saturate(180%);
-      -webkit-backdrop-filter: blur(24px) saturate(180%);
-      border-bottom: 1px solid rgba(255, 255, 255, 0.08);
-      transition: border-color 0.4s ease, padding 0.4s ease, background 0.4s ease;
-    }
-
-    nav.scrolled {
-      padding: 14px 48px;
-    }
-
-    .nav-logo {
-      color: var(--text);
-      font-weight: 700;
-      font-size: 18px;
-      text-decoration: none;
-      letter-spacing: 0.05em;
-      position: relative;
-    }
-
-    .nav-logo span {
-      color: var(--accent);
-    }
-
-    .nav-links {
-      display: flex;
-      align-items: center;
-      gap: 36px;
-      list-style: none;
-    }
-
-    .nav-links a {
-      color: var(--muted);
-      text-decoration: none;
-      font-size: 13px;
-      letter-spacing: 0.08em;
-      text-transform: uppercase;
-      transition: color 0.3s ease;
-      display: block;
-      padding: 10px;
-      margin: -10px;
-      position: relative;
-    }
-
-    .nav-links a::after {
-      content: '';
-      position: absolute;
-      bottom: 4px;
-      left: 10px;
-      right: 10px;
-      height: 1px;
-      background: var(--accent);
-      transform: scaleX(0);
-      transform-origin: left;
-      transition: transform 0.3s cubic-bezier(0.25, 1, 0.5, 1);
-    }
-
-    .nav-links a:hover {
-      color: var(--accent);
-    }
-
-    .nav-links a:hover::after {
-      transform: scaleX(1);
-    }
-
-    .lang-toggle {
-      background: none;
-      border: 1px solid rgba(217, 140, 112, 0.2);
-      color: var(--muted);
-      font-family: inherit;
-      font-size: 13px;
-      letter-spacing: 0.1em;
-      padding: 5px 12px;
-      border-radius: 3px;
-      cursor: pointer;
-      transition: color 0.3s ease, border-color 0.3s ease, background 0.3s ease, box-shadow 0.3s ease;
-      white-space: nowrap;
-    }
-
-    .lang-toggle:hover {
-      color: var(--accent);
-      border-color: rgba(217, 140, 112, 0.5);
-      background: rgba(217, 140, 112, 0.06);
-      box-shadow: 0 0 12px rgba(217, 140, 112, 0.1);
-    }
-
-    /* ─── SECTIONS ─── */
-    section {
-      max-width: 800px;
-      margin: 0 auto;
-      padding: 120px 24px;
-      position: relative;
-      z-index: 10;
-    }
-
-    /* ─── HERO ─── */
-    #hero {
-      min-height: 100vh;
-      display: flex;
-      flex-direction: column;
-      justify-content: center;
-      padding-top: 0;
-      position: relative;
-    }
-
-    .hero-content-wrapper {
-      display: flex;
-      flex-direction: column;
-      align-items: flex-start;
-    }
-
-    .hero-greeting {
-      color: var(--accent);
-      font-size: 13px;
-      letter-spacing: 0.25em;
-      text-transform: uppercase;
-      margin-bottom: 24px;
-      display: inline-flex;
-      align-items: center;
-      gap: 12px;
-    }
-
-    .hero-greeting::before {
-      content: '';
-      display: inline-block;
-      width: 32px;
-      height: 1px;
-      background: var(--accent);
-      opacity: 0.6;
-    }
-
-    .hero-name-wrap {
-      min-height: calc(clamp(2.8rem, 8vw, 5rem) * 1.2 * 2);
-      margin-bottom: 40px;
-      display: flex;
-      flex-direction: column;
-      align-items: flex-start;
-    }
-
-    /* hp2.html title gradient */
-    .hero-name {
-      font-size: clamp(2.8rem, 8vw, 5rem);
-      font-weight: 800;
-      line-height: 1.2;
-      letter-spacing: -0.03em;
-      background: linear-gradient(135deg, #FFFFFF 0%, #F0D4B8 100%);
-      background-size: 300% auto;
-      color: transparent;
-      -webkit-background-clip: text;
-      background-clip: text;
-      display: block;
-    }
-
-    .hero-roll-line {
-      overflow: hidden;
-    }
-
-    #hero-roll-text {
-      display: inline-block;
-    }
-
-    .hero-cursor {
-      display: inline-block;
-      color: var(--accent);
-      font-weight: 300;
-      margin-left: 2px;
-      animation: cursorBlink 0.75s step-end infinite;
-      opacity: 1;
-    }
-
-    @keyframes cursorBlink {
-      0%, 100% { opacity: 1; }
-      50%       { opacity: 0; }
-    }
-
-    .hero-dynamic-text {
-      color: var(--accent);
-    }
-
-    .hero-email {
-      display: inline-flex;
-      align-items: center;
-      gap: 12px;
-      color: var(--bg);
-      background: linear-gradient(135deg, #e09a80 0%, var(--accent) 50%, #c8785a 100%);
-      background-size: 200% auto;
-      text-decoration: none;
-      font-size: 14px;
-      font-weight: 700;
-      letter-spacing: 0.05em;
-      padding: 14px 30px;
-      border-radius: 99px; /* hp2 style pill */
-      transition: background-position 0.5s ease, box-shadow 0.4s ease, transform 0.2s ease;
-      box-shadow: 0 4px 24px rgba(217, 140, 112, 0.25), 0 0 0 0 rgba(217, 140, 112, 0);
-    }
-
-    .hero-email:hover {
-      background-position: right center;
-      box-shadow: 0 8px 36px rgba(217, 140, 112, 0.45), 0 0 0 4px rgba(217, 140, 112, 0.1);
-      transform: translateY(-2px);
-    }
-
-    .hero-blog-btn {
-      display: inline-flex;
-      align-items: center;
-      gap: 10px;
-      color: var(--text);
-      /* hp2 style glass btn */
-      background: rgba(40, 40, 42, 0.5);
-      backdrop-filter: blur(24px) saturate(180%);
-      border: 1px solid rgba(255, 255, 255, 0.1);
-      text-decoration: none;
-      font-size: 14px;
-      font-weight: 700;
-      letter-spacing: 0.05em;
-      padding: 14px 30px;
-      border-radius: 99px;
-      transition: background 0.3s ease, border-color 0.3s ease, transform 0.2s ease;
-    }
-
-    .hero-blog-btn:hover {
-      background: rgba(60, 60, 62, 0.6);
-      border-color: rgba(255, 255, 255, 0.3);
-      transform: translateY(-2px);
-    }
-
-    /* Scroll indicator */
-    .scroll-indicator {
-      position: absolute;
-      bottom: calc(72px + env(safe-area-inset-bottom, 0px));
-      left: 50%;
-      transform: translateX(-50%);
-      opacity: 0.4;
-      transition: opacity 0.3s ease, color 0.3s ease;
-      color: var(--muted);
-    }
-
-    .scroll-indicator:hover { opacity: 0.9; color: var(--accent); }
-
-    .scroll-indicator svg {
-      animation: scrollBounce 2.4s ease-in-out infinite;
-    }
-
-    @keyframes scrollBounce {
-      0%, 100% { transform: translateY(0); }
-      50%       { transform: translateY(10px); }
-    }
-
-    /* ─── SECTION LABEL ─── */
-    .section-label {
-      display: flex;
-      align-items: center;
-      gap: 20px;
-      color: var(--text);
-      font-size: 22px;
-      font-weight: 700;
-      margin-bottom: 60px;
-      letter-spacing: -0.01em;
-    }
-
-    .section-label::after {
-      content: '';
-      flex: 1;
-      height: 1px;
-      background: linear-gradient(90deg, rgba(217, 140, 112, 0.2) 0%, transparent 100%);
-    }
-
-    .section-label span {
-      color: var(--accent);
-      font-size: 16px;
-      margin-right: 8px;
-      opacity: 0.8;
-    }
-
-    /* ─── ABOUT ─── */
-    .about-text {
-      color: var(--muted);
-      font-size: 17px;
-      line-height: 2;
-      max-width: 650px;
-    }
-
-    .about-text strong {
-      color: var(--accent);
-      font-weight: 700;
-    }
-
-    /* ─── PROJECTS ─── */
-    .projects-grid {
-      display: grid;
-      gap: 16px;
-    }
-
-    /* hp2.html apple-glass integration */
-    .project-card, .social-item {
-      background: rgba(35, 35, 37, 0.4);
-      backdrop-filter: blur(40px) saturate(150%);
-      -webkit-backdrop-filter: blur(40px) saturate(150%);
-      border: 1px solid rgba(255, 255, 255, 0.06);
-      box-shadow: 0 8px 32px rgba(0, 0, 0, 0.25);
-      border-radius: 1rem;
-      padding: 32px;
-      text-decoration: none;
-      display: block;
-      transition: transform 0.4s cubic-bezier(0.16, 1, 0.3, 1), box-shadow 0.4s cubic-bezier(0.16, 1, 0.3, 1), background 0.4s, border-color 0.4s;
+    .ripple-surface {
       position: relative;
       overflow: hidden;
     }
-
-    .project-card:hover, .social-item:hover {
-      transform: translateY(-4px);
-      background: rgba(50, 50, 53, 0.5);
-      border-color: rgba(255, 255, 255, 0.12);
-      box-shadow: 0 16px 48px rgba(0, 0, 0, 0.4);
-    }
-
-    .project-card-header {
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      margin-bottom: 16px;
-    }
-
-    .project-name {
-      color: #fff;
-      font-weight: 700;
-      font-size: 19px;
-      letter-spacing: -0.01em;
-    }
-
-    .project-arrow {
-      color: var(--muted);
-      font-size: 20px;
-      transition: color 0.3s ease, transform 0.3s ease;
-    }
-
-    .project-card:hover .project-arrow {
-      color: var(--accent);
-      transform: translate(5px, -5px);
-    }
-
-    .project-desc {
-      color: var(--muted);
-      font-size: 15px;
-      line-height: 1.9;
-      margin-bottom: 24px;
-    }
-
-    .project-tags {
-      display: flex;
-      flex-wrap: wrap;
-      gap: 8px;
-    }
-
-    .tag {
-      font-size: 12px;
-      color: var(--accent);
-      background: rgba(217, 140, 112, 0.06);
-      padding: 3px 10px;
-      border-radius: 3px;
-      border: 1px solid rgba(217, 140, 112, 0.12);
-      letter-spacing: 0.05em;
-      transition: background 0.3s ease, border-color 0.3s ease;
-    }
-
-    .project-card:hover .tag {
-      background: rgba(217, 140, 112, 0.1);
-      border-color: rgba(217, 140, 112, 0.22);
-    }
-
-    /* ─── SOCIAL / LINKS ─── */
-    .social-list {
-      display: grid;
-      grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
-      gap: 14px;
-    }
-
-    .social-item {
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      padding: 20px 24px;
-      color: var(--text);
-    }
-
-    .social-item-left {
-      display: flex;
-      align-items: center;
-      gap: 16px;
-    }
-
-    .social-icon {
-      width: 42px;
-      height: 42px;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      background: rgba(217, 140, 112, 0.05);
-      border-radius: 6px;
-      color: var(--accent);
-      border: 1px solid rgba(217, 140, 112, 0.08);
-      transition: transform 0.3s ease, background 0.3s ease, box-shadow 0.3s ease;
-    }
-
-    .social-item:hover .social-icon {
-      transform: scale(1.08) rotate(-4deg);
-      background: rgba(217, 140, 112, 0.1);
-      box-shadow: 0 0 12px rgba(217, 140, 112, 0.15);
-    }
-
-    .social-name {
-      font-size: 16px;
-      font-weight: 700;
-      color: #fff;
-      letter-spacing: -0.01em;
-    }
-
-    .social-handle {
-      font-size: 13px;
-      color: var(--muted);
-      margin-top: 3px;
-    }
-
-    .social-arrow {
-      color: var(--muted);
-      font-size: 18px;
-      transition: transform 0.3s ease, color 0.3s ease;
-    }
-
-    .social-item:hover .social-arrow {
-      color: var(--accent);
-      transform: translate(4px, -4px);
-    }
-
-    /* ─── CONTACT ─── */
-    #contact {
-      text-align: center;
-      padding: 160px 24px 280px;
-    }
-
-    .contact-title {
-      font-size: clamp(2rem, 5vw, 3.2rem);
-      font-weight: 700;
-      color: #fff;
-      margin-bottom: 24px;
-      letter-spacing: -0.02em;
-    }
-
-    .contact-desc {
-      color: var(--muted);
-      font-size: 17px;
-      margin-bottom: 48px;
-      max-width: 450px;
-      margin-left: auto;
-      margin-right: auto;
-      line-height: 1.9;
-    }
-
-    /* ─── LICENSES ─── */
-    .licenses-list {
-      display: grid;
-      grid-template-columns: 1fr 1fr;
-      gap: 12px;
-    }
-
-    .license-item {
-      background: rgba(14, 14, 20, 0.5);
-      border: 1px solid rgba(255, 255, 255, 0.03);
-      padding: 18px 20px;
-      border-radius: 6px;
-      transition: border-color 0.3s ease;
-    }
-
-    .license-item:hover {
-      border-color: rgba(217, 140, 112, 0.1);
-    }
-
-    .license-name {
-      font-size: 15px;
-      font-weight: 700;
-      color: rgba(255,255,255,0.85);
-      margin-bottom: 4px;
-    }
-
-    .license-text {
-      font-size: 12px;
-      color: var(--muted);
-      letter-spacing: 0.02em;
-    }
-
-    /* ─── FOOTER ─── */
-    footer {
-      text-align: center;
-      padding: 36px 24px;
-      color: var(--muted);
-      font-size: 13px;
-      border-top: 1px solid rgba(255, 255, 255, 0.04);
-      background: rgba(0, 0, 0, 0.5);
-      letter-spacing: 0.05em;
-    }
-
-    /* ─── FADE IN ─── */
-    .fade-in {
-      opacity: 0;
-      transform: translateY(28px);
-      transition: opacity 0.9s cubic-bezier(0.25, 1, 0.5, 1), transform 0.9s cubic-bezier(0.25, 1, 0.5, 1);
-    }
-
-    .fade-in.visible {
-      opacity: 1;
-      transform: none;
-    }
-
-    /* Stagger children */
-    .projects-grid .fade-in:nth-child(2) { transition-delay: 0.1s; }
-    .projects-grid .fade-in:nth-child(3) { transition-delay: 0.2s; }
-    .social-list .fade-in:nth-child(2) { transition-delay: 0.08s; }
-    .social-list .fade-in:nth-child(3) { transition-delay: 0.16s; }
-    .social-list .fade-in:nth-child(4) { transition-delay: 0.24s; }
-
-    /* ─── CURSOR GLOW ─── */
-    #cursor-glow {
-      position: fixed;
-      width: 400px;
-      height: 400px;
+    .ripple {
+      position: absolute;
       border-radius: 50%;
+      transform: scale(0);
+      animation: ripple 600ms linear;
+      background-color: rgba(255, 255, 255, 0.15);
       pointer-events: none;
-      z-index: 0;
-      background: radial-gradient(circle, rgba(217, 140, 112, 0.055) 0%, transparent 65%);
-      transform: translate(-50%, -50%);
-      transition: opacity 0.4s ease;
-      will-change: left, top;
+    }
+    .ripple-primary .ripple { background-color: rgba(255, 255, 255, 0.3); }
+    .ripple-surface-variant .ripple { background-color: rgba(217, 119, 87, 0.12); }
+    @keyframes ripple {
+      to { transform: scale(4); opacity: 0; }
     }
 
-    /* ─── GRID DOTS CANVAS ─── */
-    #grid-dots {
-      position: fixed;
-      inset: 0;
-      pointer-events: none;
-      z-index: 0;
+    .m3-card {
+      transition: background-color 0.2s ease, box-shadow 0.2s ease;
     }
-
-    @keyframes winAppear {
-      from { opacity: 0; scale: 0.92; filter: blur(3px); }
-      to   { opacity: 1; scale: 1;    filter: blur(0px); }
+    .m3-card:hover {
+      background-color: #333332;
+      box-shadow: 0 4px 8px rgba(0,0,0,0.2);
     }
-
-    /* ─── WINDOWS 95 FILLER ELEMENTS ─── */
-    #win-profile {
-      top: 18%;
-      right: 15%;
-      animation: winAppear 1.2s cubic-bezier(0.16, 1, 0.3, 1) 0.6s both;
+    
+    #mobile-menu {
+      transition: clip-path 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+      clip-path: circle(0% at top right);
     }
-    #win-terminal {
-      top: 75%;
-      left: 12%;
-      animation: winAppear 1.2s cubic-bezier(0.16, 1, 0.3, 1) 1.1s both;
-    }
-    @media (max-aspect-ratio: 4/3) and (min-width: 769px), (max-width: 1200px) and (min-width: 769px) {
-      #win-profile {
-        top: 85%;
-        right: 5%;
-      }
-      #win-terminal {
-        top: 85%;
-        left: 5%;
-      }
-    }
-    .win-window {
-      cursor: grab;
-      background: #c0c0c0;
-      border-top: 1px solid #fff;
-      border-left: 1px solid #fff;
-      border-right: 1px solid #000;
-      border-bottom: 1px solid #000;
-      box-shadow: inset 1px 1px #dfdfdf, inset -1px -1px #808080;
-      position: absolute;
-      width: 320px;
-      z-index: 50;
-      font-family: 'Tahoma', system-ui, sans-serif;
-      color: #000;
-      transform-style: preserve-3d;
-      backface-visibility: hidden;
-      outline: 1px solid transparent;
-    }
-    .win-titlebar {
-      background: linear-gradient(90deg, #000080, #1084d0);
-      color: #fff;
-      font-weight: bold;
-      padding: 2px 4px;
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      font-size: 12px;
-      cursor: grab;
-      user-select: none;
-    }
-    .win-window button { cursor: default; }
-
-    .win-btn-close {
-      background: #c0c0c0;
-      border-top: 1px solid #fff;
-      border-left: 1px solid #fff;
-      border-right: 1px solid #000;
-      border-bottom: 1px solid #000;
-      box-shadow: inset 1px 1px #dfdfdf, inset -1px -1px #808080;
-      color: #000;
-      font-weight: bold;
-      width: 16px;
-      height: 14px;
-      line-height: 10px;
-      text-align: center;
-      font-size: 10px;
-      cursor: pointer;
-    }
-    .win-btn-close:active {
-      border-top: 1px solid #000;
-      border-left: 1px solid #000;
-      border-right: 1px solid #fff;
-      border-bottom: 1px solid #fff;
-      box-shadow: inset 1px 1px #808080, inset -1px -1px #dfdfdf;
-      padding-top: 1px;
-      padding-left: 1px;
-    }
-    .win-content {
-      padding: 10px;
-      font-size: 13px;
-      user-select: none;
-      -webkit-user-select: none;
-    }
-    .win-inset {
-      background: #fff;
-      border-top: 1px solid #808080;
-      border-left: 1px solid #808080;
-      border-right: 1px solid #fff;
-      border-bottom: 1px solid #fff;
-      box-shadow: inset 1px 1px #000;
-      padding: 8px;
-    }
-    .dos-cursor::after {
-      content: '_';
-      animation: dos-blink 1s step-end infinite;
-    }
-    @keyframes dos-blink { 0%, 100% { opacity: 1; } 50% { opacity: 0; } }
-
-    #terminal-deny-line {
-      color: #0f0;
-    }
-    .deny-flash {
-      animation: denyFlash 0.7s ease forwards;
-    }
-    @keyframes denyFlash {
-      0%   { color: #ff4444; text-shadow: 0 0 6px #ff4444; }
-      45%  { color: #ff4444; text-shadow: 0 0 6px #ff4444; }
-      100% { color: #0f0;    text-shadow: none; }
-    }
-
-    /* Cat pet heart */
-    .cat-heart {
-      position: absolute;
-      pointer-events: none;
-      font-size: 22px;
-      color: #ff6f9c;
-      text-shadow: 0 0 6px rgba(255, 111, 156, 0.6);
-      animation: catHeartFloat 1.4s cubic-bezier(0.16, 1, 0.3, 1) forwards;
-      z-index: 30;
-      user-select: none;
-    }
-
-    @keyframes catHeartFloat {
-      0%   { opacity: 0; transform: translateY(0) scale(0.4); }
-      20%  { opacity: 1; transform: translateY(-12px) scale(1.2); }
-      100% { opacity: 0; transform: translateY(-72px) scale(0.9); }
-    }
-
-    #cat-mascot {
-      transition: transform 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
-    }
-
-    #cat-mascot.pet {
-      transform: translateX(-50%) translateY(-4px) scale(1.04);
-    }
-
-    /* ─── PARTICLE SECTION ─── */
-    #particle-canvas {
-      display: block;
-      width: 100%;
-      cursor: crosshair;
-      border-radius: 6px;
-    }
-
-    /* ─── NAV HINT ─── */
-    #nav-hint {
-      position: fixed;
-      top: 102px;
-      left: 110px;
-      z-index: 9998;
-      pointer-events: none;
-      color: var(--accent);
-      display: flex;
-      flex-direction: column;
-      align-items: flex-start;
-      gap: 12px;
-      opacity: 0;
-      transition: opacity 1s ease;
-    }
-    #nav-hint.show { opacity: 0.8; }
-    .hint-arrow {
-      width: 44px;
-      height: 44px;
-      margin-left: 2px;
-    }
-    .hint-text {
-      font-size: 13px;
-      font-weight: 600;
-      line-height: 1.4;
-      background: rgba(217, 140, 112, 0.05);
-      padding: 10px 14px;
-      border-radius: 12px;
-      border: 1px solid rgba(217, 140, 112, 0.15);
-      backdrop-filter: blur(10px);
-      -webkit-backdrop-filter: blur(10px);
-      box-shadow: 0 4px 20px rgba(0, 0, 0, 0.2);
-    }
-
-    /* ─── RESPONSIVE ─── */
-    @media (max-width: 768px) {
-      nav { padding: 16px 24px; }
-      nav.scrolled { padding: 14px 24px; }
-      .nav-links li:not(:last-child) { display: none; }
-      section { padding: 80px 24px; }
-      .licenses-list { grid-template-columns: 1fr; }
-      #win-profile, #win-terminal { display: none !important; }
-      #cat-mascot { width: 8rem !important; left: 50% !important; }
-      #nav-hint { left: 36px; top: 82px; gap: 8px; }
-      .hint-arrow { width: 34px; height: 34px; }
-      .hint-text { font-size: 12px; padding: 8px 12px; }
+    #mobile-menu.open {
+      clip-path: circle(150% at top right);
     }
   </style>
 </head>
+<body class="antialiased min-h-screen">
 
-<body>
-
-  <div id="bg-layer"></div>
-  <div id="grain"></div>
-  <div id="scanline"></div>
-  <div id="cursor-glow"></div>
-  <canvas id="grid-dots"></canvas>
-
-  <nav id="navbar">
-    <div class="nav-left">
-      <div class="page-switcher" id="page-switcher">
-        <button class="brand-switcher" type="button" aria-haspopup="listbox" aria-expanded="false" onclick="togglePageSwitcher(event)">
-          <span class="brand-switcher-static">louie<span class="accent">.</span></span><span class="brand-switcher-current">home</span>
-          <svg class="brand-switcher-chevron" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"></polyline></svg>
+  <header class="fixed top-0 w-full z-[100] bg-m3-surface/95 backdrop-blur border-b border-m3-outlineVariant h-16 flex items-center justify-between px-4 md:px-6">
+    <div class="flex items-center gap-2">
+      <div class="relative" id="brand-dropdown-container">
+        <button id="brand-dropdown-btn" class="ripple-surface ripple-surface-variant px-3 py-2 rounded-m3-full font-bold text-lg flex items-center cursor-pointer">
+          <span class="text-m3-onSurface">louie</span>
+          <span class="text-m3-primary mx-1.5">.</span>
+          <span class="text-m3-onSurface/60 font-medium tracking-wide">home</span>
+          <svg id="brand-dropdown-icon" class="w-4 h-4 ml-1.5 text-m3-onSurface/60 transition-transform duration-200" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"></polyline></svg>
         </button>
-        <div class="page-switcher-menu" role="listbox">
-          <a href="index.html" class="page-switcher-item active" role="option" aria-current="page">
-            <span>louie<span class="accent">.</span>home</span>
-            <span class="page-switcher-item-dot"></span>
-          </a>
-          <a href="blog.html" class="page-switcher-item" role="option">
-            <span>louie<span class="accent">.</span>blog</span>
-            <span class="page-switcher-item-dot"></span>
-          </a>
-          <a href="learn.html" class="page-switcher-item" role="option">
-            <span>louie<span class="accent">.</span>learn</span>
-            <span class="page-switcher-item-dot"></span>
-          </a>
-          <a href="95.html" class="page-switcher-item" role="option">
-            <span>louie<span class="accent">.</span>95</span>
-            <span class="page-switcher-item-dot"></span>
-          </a>
+        <div id="brand-dropdown-menu" class="absolute top-full left-0 mt-2 w-48 bg-m3-surfaceContainer rounded-m3-sm shadow-lg shadow-black/40 border border-m3-outlineVariant opacity-0 pointer-events-none transition-opacity duration-200 z-[110] py-2 overflow-hidden">
+          <a href="index.html" class="ripple-surface ripple-surface-variant block px-4 py-3 text-sm font-medium text-m3-primary bg-m3-primaryContainer/30 hover:bg-m3-surfaceContainerHigh transition-colors">louie.home</a>
+          <a href="blog.html" class="ripple-surface ripple-surface-variant block px-4 py-3 text-sm font-medium text-m3-onSurfaceVariant hover:text-m3-onSurface hover:bg-m3-surfaceContainerHigh transition-colors">louie.blog</a>
+          <a href="learn.html" class="ripple-surface ripple-surface-variant block px-4 py-3 text-sm font-medium text-m3-onSurfaceVariant hover:text-m3-onSurface hover:bg-m3-surfaceContainerHigh transition-colors">louie.learn</a>
+          <a href="95.html" class="ripple-surface ripple-surface-variant block px-4 py-3 text-sm font-medium text-m3-onSurfaceVariant hover:text-m3-onSurface hover:bg-m3-surfaceContainerHigh transition-colors">louie.95</a>
         </div>
       </div>
-      <div id="nav-pointer-hint" class="nav-pointer-hint" aria-hidden="true">
-        <svg class="nav-pointer-arrow" viewBox="0 0 36 12" fill="none" stroke="currentColor" stroke-width="4" stroke-linecap="round" stroke-linejoin="round">
-          <line x1="34" y1="6" x2="7" y2="6"></line>
-          <polyline points="12 1 7 6 12 11"></polyline>
-        </svg>
-        <span data-i18n="nav-hint">点击这里能切换我的不同网页</span>
-      </div>
     </div>
-    <ul class="nav-links">
-      <li class="magnetic-wrap"><a href="#about" class="magnetic-inner" data-i18n="nav-about">About</a></li>
-      <li class="magnetic-wrap"><a href="#projects" class="magnetic-inner" data-i18n="nav-projects">Projects</a></li>
-      <li class="magnetic-wrap"><a href="#social" class="magnetic-inner" data-i18n="nav-social">Social</a></li>
-      <li class="magnetic-wrap"><a href="#links" class="magnetic-inner" data-i18n="nav-links">Links</a></li>
-      <li class="magnetic-wrap"><a href="#system95" class="magnetic-inner" data-i18n="nav-system95">Louie's 95</a></li>
-      <li class="magnetic-wrap"><a href="#licenses" class="magnetic-inner" data-i18n="nav-licenses">Licenses</a></li>
-      <li>
-        <button class="lang-toggle" id="lang-toggle" onclick="toggleLang()">EN</button>
-      </li>
-    </ul>
-  </nav>
 
-  <!-- WINDOWS 95 FILLER: PROFILE -->
-  <div id="win-profile" class="win-window" data-base-transform="rotate(2deg)" style="top: 18%; right: 15%; display: block; transform: rotate(2deg);" onmousedown="elasticStartDrag(event, 'win-profile')">
-    <div class="win-titlebar">
-      <span><img src="lib/po.webp" class="inline w-3 h-3 mr-1" alt="icon" style="image-rendering:pixelated; vertical-align:middle;">Person INFO.exe</span>
-      <button class="win-btn-close" onclick="denyClose('Person INFO')">X</button>
-    </div>
-    <div class="win-content">
-      <div style="display:flex; gap:16px;">
-        <div class="win-inset" style="width:80px; height:80px; flex-shrink:0; background:#008080; padding:2px;">
-          <img src="lib/po.webp" alt="Avatar" style="width:100%; height:100%; object-fit:cover; image-rendering: pixelated;">
-        </div>
-        <div style="font-size:13px; line-height:1.6;">
-          <div><strong>ID:</strong> Louie</div>
-          <div><strong>LOC:</strong> Melbourne, VIC, AU</div>
-        </div>
-      </div>
-      <div style="margin-top:16px;" class="win-inset bg-white">
-        <div style="font-weight:bold; border-bottom:1px solid #c0c0c0; margin-bottom:8px; padding-bottom:4px;" data-i18n="t_about">ABOUT_ME</div>
-        <p style="line-height:1.6; font-size:12px;" data-i18n="v_about">
-          来自江城武汉，现旅居颠倒世界墨尔本。
-        </p>
-      </div>
-    </div>
+    <nav class="hidden md:flex items-center gap-1">
+      <a href="#about" class="ripple-surface ripple-surface-variant px-4 py-2 rounded-m3-full text-sm font-medium text-m3-onSurfaceVariant hover:text-m3-onSurface transition-colors">About</a>
+      <a href="#projects" class="ripple-surface ripple-surface-variant px-4 py-2 rounded-m3-full text-sm font-medium text-m3-onSurfaceVariant hover:text-m3-onSurface transition-colors">Projects</a>
+      <a href="#social" class="ripple-surface ripple-surface-variant px-4 py-2 rounded-m3-full text-sm font-medium text-m3-onSurfaceVariant hover:text-m3-onSurface transition-colors">Social</a>
+      <a href="#links" class="ripple-surface ripple-surface-variant px-4 py-2 rounded-m3-full text-sm font-medium text-m3-onSurfaceVariant hover:text-m3-onSurface transition-colors">Links</a>
+      <a href="#licenses" class="ripple-surface ripple-surface-variant px-4 py-2 rounded-m3-full text-sm font-medium text-m3-onSurfaceVariant hover:text-m3-onSurface transition-colors">Licenses</a>
+      <div class="w-[1px] h-6 bg-m3-outlineVariant mx-2"></div>
+      <button onclick="toggleLang()" id="lang-toggle" class="ripple-surface ripple-surface-variant border border-m3-outline px-4 py-1.5 rounded-m3-full text-sm font-medium text-m3-primary hover:bg-m3-primaryContainer transition-colors">EN</button>
+    </nav>
+
+    <button id="menu-btn" class="md:hidden ripple-surface px-3 py-3 rounded-m3-full text-m3-onSurface">
+      <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="3" y1="12" x2="21" y2="12"></line><line x1="3" y1="6" x2="21" y2="6"></line><line x1="3" y1="18" x2="21" y2="18"></line></svg>
+    </button>
+  </header>
+
+  <div id="mobile-menu" class="fixed top-16 left-0 w-full bg-m3-surfaceContainer border-b border-m3-outlineVariant z-[90] flex flex-col p-4 shadow-xl md:hidden">
+    <a href="#about" class="px-4 py-3 text-m3-onSurface rounded-m3-md hover:bg-m3-surfaceContainerHigh">About</a>
+    <a href="#projects" class="px-4 py-3 text-m3-onSurface rounded-m3-md hover:bg-m3-surfaceContainerHigh">Projects</a>
+    <a href="#social" class="px-4 py-3 text-m3-onSurface rounded-m3-md hover:bg-m3-surfaceContainerHigh">Social</a>
+    <a href="#links" class="px-4 py-3 text-m3-onSurface rounded-m3-md hover:bg-m3-surfaceContainerHigh">Links</a>
+    <a href="#licenses" class="px-4 py-3 text-m3-onSurface rounded-m3-md hover:bg-m3-surfaceContainerHigh">Licenses</a>
+    <button onclick="toggleLang()" class="mt-2 text-left px-4 py-3 text-m3-primary rounded-m3-md hover:bg-m3-primaryContainer">Switch Lang</button>
   </div>
 
-  <section id="hero">
-    <div class="fade-in">
-      <div style="display: block;">
-        <div class="hero-content-wrapper" style="width: 100%;">
-          <p class="hero-greeting" data-i18n="hero-greeting">hello, world!</p>
-          <div class="hero-name-wrap">
-            <div class="hero-name">Hi, I'm</div>
-            <div class="hero-name hero-roll-line">
-              <span id="hero-roll-text" class="hero-dynamic-text">Louie</span>
-            </div>
-          </div>
-        </div>
-      </div>
-      <div class="mt-4" style="display:flex;gap:14px;flex-wrap:wrap;align-items:center;">
-        <a href="blog.html" class="hero-email">
-          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
-            <path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"></path>
-            <polyline points="15 3 21 3 21 9"></polyline>
-            <line x1="10" y1="14" x2="21" y2="3"></line>
-          </svg>
-          <span data-i18n="hero-blog-btn">View my Blog</span>
-        </a>
-        <a href="mailto:louieluyaotang@gmail.com" class="hero-blog-btn">
-          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
-            <path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"></path>
-            <polyline points="22,6 12,13 2,6"></polyline>
-          </svg>
-          <span data-i18n="hero-email-btn">Email Me</span>
-        </a>
-      </div>
+  <main class="pt-32 pb-20 px-6 max-w-4xl mx-auto flex flex-col items-start min-h-[80vh] justify-center">
+    <p class="text-m3-primary font-bold tracking-widest uppercase mb-6 text-sm flex items-center gap-4 before:w-8 before:h-[2px] before:bg-m3-primary" data-i18n="hero-greeting">hello, world!</p>
+    <h1 class="text-5xl md:text-7xl font-extrabold leading-tight text-m3-onSurface">
+      Hi, I'm <br/><span style="display:inline-block; overflow:hidden; line-height:1.2;"><span id="hero-roll-text" style="display:inline-block; background:linear-gradient(90deg,#d97757,#ffb49d); -webkit-background-clip:text; background-clip:text; color:transparent;">Louie</span></span>
+    </h1>
+    <div class="flex flex-wrap gap-4 mt-12">
+      <a href="blog.html" class="ripple-surface ripple-primary bg-m3-primary text-m3-onPrimary rounded-m3-full px-8 py-3.5 font-bold tracking-wide shadow-sm hover:shadow-md transition-shadow">
+        <span data-i18n="hero-blog-btn">View my Blog</span>
+      </a>
+      <a href="mailto:louieluyaotang@gmail.com" class="ripple-surface ripple-surface-variant border border-m3-outline text-m3-onSurface hover:bg-m3-surfaceContainerHigh rounded-m3-full px-8 py-3.5 font-bold tracking-wide transition-colors">
+        <span data-i18n="hero-email-btn">Email Me</span>
+      </a>
     </div>
-    <div class="scroll-indicator fade-in" style="transition-delay:0.4s">
-      <a href="#about" aria-label="Scroll down">
-        <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
-          <line x1="12" y1="5" x2="12" y2="19"></line>
-          <polyline points="19 12 12 19 5 12"></polyline>
-        </svg>
+  </main>
+
+  <section id="about" class="py-20 px-6 max-w-4xl mx-auto border-t border-m3-outlineVariant">
+    <h2 class="text-2xl font-bold mb-8 text-m3-onSurface flex items-center gap-4">
+      <span class="text-m3-primary font-mono opacity-80">01.</span> <span data-i18n="section-about">About</span>
+    </h2>
+    <div class="bg-m3-surfaceContainer rounded-m3-xl p-8 m3-card">
+      <p class="text-[17px] leading-loose text-m3-onSurfaceVariant" data-i18n-html="about-text">
+        来自江城武汉，现旅居颠倒世界墨尔本。
+      </p>
+    </div>
+  </section>
+
+  <section id="projects" class="py-20 px-6 max-w-4xl mx-auto border-t border-m3-outlineVariant">
+    <h2 class="text-2xl font-bold mb-8 text-m3-onSurface flex items-center gap-4">
+      <span class="text-m3-primary font-mono opacity-80">02.</span> <span data-i18n="section-projects">Projects</span>
+    </h2>
+    
+    <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+      <a href="learn.html" class="ripple-surface m3-card bg-m3-surfaceContainer rounded-m3-xl p-6 border border-m3-outlineVariant block">
+        <h3 class="text-xl text-m3-onSurface font-bold mb-2">louie.learn</h3>
+        <p class="text-m3-onSurfaceVariant text-[15px] leading-relaxed mb-6" data-i18n="project-learn-desc">一个在线学习编程平台</p>
+        <div class="flex flex-wrap gap-2">
+          <span class="px-3 py-1 rounded-m3-sm text-xs font-mono text-m3-onPrimaryContainer bg-m3-primaryContainer">Web</span>
+          <span class="px-3 py-1 rounded-m3-sm text-xs font-mono text-m3-onPrimaryContainer bg-m3-primaryContainer">Code</span>
+        </div>
+      </a>
+
+      <a href="https://jetlag.louie1.com" target="_blank" class="ripple-surface m3-card bg-m3-surfaceContainer rounded-m3-xl p-6 border border-m3-outlineVariant block">
+        <h3 class="text-xl text-m3-onSurface font-bold mb-2">Jetlag Commander</h3>
+        <p class="text-m3-onSurfaceVariant text-[15px] leading-relaxed mb-6" data-i18n="project-jetlag-desc">科学时差调节系统</p>
+        <div class="flex flex-wrap gap-2">
+          <span class="px-3 py-1 rounded-m3-sm text-xs font-mono text-m3-onPrimaryContainer bg-m3-primaryContainer">Web</span>
+          <span class="px-3 py-1 rounded-m3-sm text-xs font-mono text-m3-onPrimaryContainer bg-m3-primaryContainer">App</span>
+        </div>
+      </a>
+
+      <a href="https://github.com/Cohenjikan/sync-station" target="_blank" class="ripple-surface m3-card bg-m3-surfaceContainer rounded-m3-xl p-6 border border-m3-outlineVariant block">
+        <h3 class="text-xl text-m3-onSurface font-bold mb-2">Sync Station</h3>
+        <p class="text-m3-onSurfaceVariant text-[15px] leading-relaxed mb-6" data-i18n="project-sync-desc">私有跨设备同步工具，支持文本与文件的实时共享，基于 WebSocket 实现即时更新，提供双视图布局与 PIN 锁保护。</p>
+        <div class="flex flex-wrap gap-2">
+          <span class="px-3 py-1 rounded-m3-sm text-xs font-mono text-m3-onPrimaryContainer bg-m3-primaryContainer">JavaScript</span>
+          <span class="px-3 py-1 rounded-m3-sm text-xs font-mono text-m3-onPrimaryContainer bg-m3-primaryContainer">WebSocket</span>
+          <span class="px-3 py-1 rounded-m3-sm text-xs font-mono text-m3-onPrimaryContainer bg-m3-primaryContainer">HTML</span>
+        </div>
+      </a>
+
+      <a href="https://github.com/TH-Chen-CN/PrimerScore" target="_blank" class="ripple-surface m3-card bg-m3-surfaceContainer rounded-m3-xl p-6 border border-m3-outlineVariant block">
+        <h3 class="text-xl text-m3-onSurface font-bold mb-2">PrimerScore Web</h3>
+        <p class="text-m3-onSurfaceVariant text-[15px] leading-relaxed mb-6" data-i18n="project-primer-desc">PCR 引物设计工具的网页化实现，支持 BLAST 校验与表达感知评分，提升了生信工具的交互体验与可访问性。</p>
+        <div class="flex flex-wrap gap-2">
+          <span class="px-3 py-1 rounded-m3-sm text-xs font-mono text-m3-onPrimaryContainer bg-m3-primaryContainer">Python</span>
+          <span class="px-3 py-1 rounded-m3-sm text-xs font-mono text-m3-onPrimaryContainer bg-m3-primaryContainer">Bioinformatics</span>
+          <span class="px-3 py-1 rounded-m3-sm text-xs font-mono text-m3-onPrimaryContainer bg-m3-primaryContainer">BLAST</span>
+          <span class="px-3 py-1 rounded-m3-sm text-xs font-mono text-m3-onPrimaryContainer bg-m3-primaryContainer">Web</span>
+        </div>
       </a>
     </div>
   </section>
 
-  <!-- WINDOWS 95 FILLER: TERMINAL -->
-  <div id="win-terminal" class="win-window" data-base-transform="rotate(-3deg)" style="display: block; transform: rotate(-3deg);" onmousedown="elasticStartDrag(event, 'win-terminal')">
-    <div class="win-titlebar">
-      <span>Terminal.exe - SYSTEM OVERRIDE</span>
-      <button class="win-btn-close" onclick="denyClose('Terminal')">X</button>
-    </div>
-    <div class="win-content" style="padding:0;">
-      <div class="win-inset" id="terminal-output" style="background:#000; color:#0f0; font-family:'JetBrains Mono', monospace; padding:10px; height:180px; overflow-y:auto; border-top:1px solid #808080; border-left:1px solid #808080; border-right:1px solid #fff; border-bottom:1px solid #fff;">
-        <div>C:\> LOC: MELBOURNE_VIC_AU</div>
-        <div>C:\> Login as root</div>
-        <div>Authorizing... Approved.</div>
-        <div>Loading Louie's 95 filler modules...</div>
-        <br>
-        <span class="dos-cursor"></span>
-      </div>
-    </div>
-  </div>
+  <section id="social" class="py-20 px-6 max-w-4xl mx-auto border-t border-m3-outlineVariant">
+    <h2 class="text-2xl font-bold mb-8 text-m3-onSurface flex items-center gap-4">
+      <span class="text-m3-primary font-mono opacity-80">03.</span> <span data-i18n="section-social">Social</span>
+    </h2>
+    
+    <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+      <a href="https://github.com/mrtangluyao/" target="_blank" class="ripple-surface m3-card flex items-center gap-4 p-4 bg-m3-surfaceContainer rounded-m3-xl border border-m3-outlineVariant">
+        <div class="w-12 h-12 flex items-center justify-center rounded-m3-full bg-m3-primaryContainer text-m3-onPrimaryContainer">
+          <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 19c-5 1.5-5-2.5-7-3m14 6v-3.87a3.37 3.37 0 0 0-.94-2.61c3.14-.35 6.44-1.54 6.44-7A5.44 5.44 0 0 0 20 4.77 5.07 5.07 0 0 0 19.91 1S18.73.65 16 2.48a13.38 13.38 0 0 0-7 0C6.27.65 5.09 1 5.09 1A5.07 5.07 0 0 0 5 4.77a5.44 5.44 0 0 0-1.5 3.78c0 5.42 3.3 6.61 6.44 7A3.37 3.37 0 0 0 9 18.13V22"></path></svg>
+        </div>
+        <div class="flex flex-col">
+          <span class="text-m3-onSurface font-bold">GitHub</span>
+          <span class="text-sm text-m3-onSurfaceVariant">@mrtangluyao</span>
+        </div>
+      </a>
 
-  <section id="about">
-    <div class="section-label"><span>01.</span> <span data-i18n="section-about">About</span></div>
-    <p class="about-text fade-in" data-i18n-html="about-text">
-      来自江城武汉，现旅居颠倒世界墨尔本。<br><br>
-    </p>
-  </section>
+      <a href="https://www.linkedin.com/in/luyao-tang-b8b6353b5" target="_blank" class="ripple-surface m3-card flex items-center gap-4 p-4 bg-m3-surfaceContainer rounded-m3-xl border border-m3-outlineVariant">
+        <div class="w-12 h-12 flex items-center justify-center rounded-m3-full bg-m3-primaryContainer text-m3-onPrimaryContainer">
+          <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M16 8a6 6 0 0 1 6 6v7h-4v-7a2 2 0 0 0-2-2 2 2 0 0 0-2 2v7h-4v-7a6 6 0 0 1 6-6z"></path><rect x="2" y="9" width="4" height="12"></rect><circle cx="4" cy="4" r="2"></circle></svg>
+        </div>
+        <div class="flex flex-col">
+          <span class="text-m3-onSurface font-bold">LinkedIn</span>
+          <span class="text-sm text-m3-onSurfaceVariant">Luyao Tang</span>
+        </div>
+      </a>
 
-  <section id="projects">
-    <div class="section-label"><span>02.</span> <span data-i18n="section-projects">Projects</span></div>
-    <div class="projects-grid">
-      <div class="magnetic-wrap" style="display: block;">
-        <a href="learn.html" class="project-card magnetic-inner fade-in" style="width: 100%;">
-          <div class="project-card-header">
-            <span class="project-name">louie.learn</span>
-            <span class="project-arrow"><svg width="1em" height="1em" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="7" y1="17" x2="17" y2="7"></line><polyline points="7 7 17 7 17 17"></polyline></svg></span>
-          </div>
-          <p class="project-desc" data-i18n="project-learn-desc">一个在线学习编程平台</p>
-          <div class="project-tags">
-            <span class="tag">Web</span>
-            <span class="tag">Code</span>
-          </div>
-        </a>
-      </div>
+      <a href="https://space.bilibili.com/501015028" target="_blank" class="ripple-surface m3-card flex items-center gap-4 p-4 bg-m3-surfaceContainer rounded-m3-xl border border-m3-outlineVariant">
+        <div class="w-12 h-12 flex items-center justify-center rounded-m3-full bg-m3-primaryContainer text-m3-onPrimaryContainer">
+          <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="7" width="20" height="15" rx="2" ry="2"></rect><polyline points="17 2 12 7 7 2"></polyline></svg>
+        </div>
+        <div class="flex flex-col">
+          <span class="text-m3-onSurface font-bold">Bilibili</span>
+          <span class="text-sm text-m3-onSurfaceVariant">@古怪的路易</span>
+        </div>
+      </a>
 
-      <div class="magnetic-wrap" style="display: block;">
-        <a href="https://jetlag.louie1.com" target="_blank" class="project-card magnetic-inner fade-in" style="width: 100%;">
-          <div class="project-card-header">
-            <span class="project-name">Jetlag Commander</span>
-            <span class="project-arrow"><svg width="1em" height="1em" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="7" y1="17" x2="17" y2="7"></line><polyline points="7 7 17 7 17 17"></polyline></svg></span>
-          </div>
-          <p class="project-desc" data-i18n="project-jetlag-desc">科学时差调节系统</p>
-          <div class="project-tags">
-            <span class="tag">Web</span>
-            <span class="tag">App</span>
-          </div>
-        </a>
-      </div>
-
-      <div class="magnetic-wrap" style="display: block;">
-        <a href="https://github.com/Cohenjikan/sync-station" target="_blank" class="project-card magnetic-inner fade-in" style="width: 100%;">
-          <div class="project-card-header">
-            <span class="project-name">Sync Station</span>
-            <span class="project-arrow"><svg width="1em" height="1em" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="7" y1="17" x2="17" y2="7"></line><polyline points="7 7 17 7 17 17"></polyline></svg></span>
-          </div>
-          <p class="project-desc" data-i18n="project-sync-desc">私有跨设备同步工具，支持文本与文件的实时共享，基于 WebSocket 实现即时更新，提供双视图布局与 PIN 锁保护。</p>
-          <div class="project-tags">
-            <span class="tag">JavaScript</span>
-            <span class="tag">WebSocket</span>
-            <span class="tag">HTML</span>
-          </div>
-        </a>
-      </div>
-
-      <div class="magnetic-wrap" style="display: block;">
-        <a href="https://github.com/TH-Chen-CN/PrimerScore" target="_blank" class="project-card magnetic-inner fade-in" style="width: 100%;">
-          <div class="project-card-header">
-            <span class="project-name">PrimerScore Web</span>
-            <span class="project-arrow"><svg width="1em" height="1em" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="7" y1="17" x2="17" y2="7"></line><polyline points="7 7 17 7 17 17"></polyline></svg></span>
-          </div>
-          <p class="project-desc" data-i18n="project-primer-desc">PCR 引物设计工具的网页化实现，支持 BLAST 校验与表达感知评分，提升了生信工具的交互体验与可访问性。</p>
-          <div class="project-tags">
-            <span class="tag">Python</span>
-            <span class="tag">Bioinformatics</span>
-            <span class="tag">BLAST</span>
-            <span class="tag">Web</span>
-          </div>
-        </a>
-      </div>
+      <a href="https://xhslink.com/m/7yaJ9ssWxsW" target="_blank" class="ripple-surface m3-card flex items-center gap-4 p-4 bg-m3-surfaceContainer rounded-m3-xl border border-m3-outlineVariant">
+        <div class="w-12 h-12 flex items-center justify-center rounded-m3-full bg-m3-primaryContainer text-m3-onPrimaryContainer">
+          <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"></path><path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"></path></svg>
+        </div>
+        <div class="flex flex-col">
+          <span class="text-m3-onSurface font-bold">小红书</span>
+          <span class="text-sm text-m3-onSurfaceVariant">@古怪的路易</span>
+        </div>
+      </a>
     </div>
   </section>
 
-  <section id="social">
-    <div class="section-label"><span>03.</span> <span data-i18n="section-social">Social</span></div>
-    <div class="social-list">
+  <section id="links" class="py-20 px-6 max-w-4xl mx-auto border-t border-m3-outlineVariant">
+    <h2 class="text-2xl font-bold mb-8 text-m3-onSurface flex items-center gap-4">
+      <span class="text-m3-primary font-mono opacity-80">04.</span> <span data-i18n="section-links">Friend Links</span>
+    </h2>
+    
+    <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+      <a href="https://cohenjikan.com" target="_blank" class="ripple-surface m3-card flex items-center gap-4 p-4 bg-m3-surfaceContainer rounded-m3-xl border border-m3-outlineVariant">
+        <div class="w-12 h-12 flex items-center justify-center rounded-m3-full bg-m3-primaryContainer text-m3-onPrimaryContainer">
+          <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"></path><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"></path></svg>
+        </div>
+        <div class="flex flex-col">
+          <span class="text-m3-onSurface font-bold" data-i18n="links-cohen-name">Cohenjikan 的主页</span>
+          <span class="text-sm text-m3-onSurfaceVariant">cohenjikan.com</span>
+        </div>
+      </a>
+    </div>
+  </section>
+
+  <section id="licenses" class="py-20 px-6 max-w-4xl mx-auto border-t border-m3-outlineVariant">
+    <h2 class="text-2xl font-bold mb-8 text-m3-onSurface flex items-center gap-4">
+      <span class="text-m3-primary font-mono opacity-80">05.</span> <span data-i18n="section-licenses">OPEN SOURCE LICENSES</span>
+    </h2>
+    
+    <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+      <div class="p-6 bg-m3-surfaceContainer rounded-m3-xl border border-m3-outlineVariant">
+        <div class="font-bold text-m3-onSurface text-lg mb-2">Tailwind CSS</div>
+        <div class="text-sm text-m3-onSurfaceVariant tracking-wide">MIT License | Copyright (c) Tailwind Labs, Inc.</div>
+      </div>
+      <div class="p-6 bg-m3-surfaceContainer rounded-m3-xl border border-m3-outlineVariant">
+        <div class="font-bold text-m3-onSurface text-lg mb-2">Luxon.js</div>
+        <div class="text-sm text-m3-onSurfaceVariant tracking-wide">MIT License | Copyright (c) 2017 Isaac Cambron</div>
+      </div>
+      <div class="p-6 bg-m3-surfaceContainer rounded-m3-xl border border-m3-outlineVariant">
+        <div class="font-bold text-m3-onSurface text-lg mb-2">JetBrains Mono</div>
+        <div class="text-sm text-m3-onSurfaceVariant tracking-wide">SIL Open Font License 1.1 | Copyright (c) 2020 JetBrains s.r.o.</div>
+      </div>
+      <div class="p-6 bg-m3-surfaceContainer rounded-m3-xl border border-m3-outlineVariant">
+        <div class="font-bold text-m3-onSurface text-lg mb-2">HarmonyOS Sans</div>
+        <div class="text-sm text-m3-onSurfaceVariant tracking-wide">Copyright (c) Huawei Device Co., Ltd.</div>
+      </div>
+    </div>
+    <p class="mt-6 text-sm text-m3-onSurfaceVariant/60">本站视觉设计参考了 <a href="https://m3.material.io" target="_blank" rel="noopener" class="ripple-surface ripple-surface-variant inline-flex items-center text-m3-primary px-2 py-0.5 rounded-m3-sm hover:bg-m3-primaryContainer transition-colors">Material Design 3</a> 规范，并非使用其官方组件库。</p>
+  </section>
+
+  <footer class="text-center py-20 border-t border-m3-outlineVariant bg-m3-surfaceContainer/50">
+    <div class="container mx-auto px-6 max-w-4xl">
+      <h2 class="text-3xl font-bold mb-6 text-m3-onSurface">What's Next?</h2>
+      <p class="max-w-md mx-auto mb-10 text-[17px] leading-loose text-m3-onSurfaceVariant" data-i18n="contact-desc">我的收件箱始终敞开。无论是有项目合作、技术交流，还是简单地打个招呼，我都会尽量回复。</p>
       
-      <div class="magnetic-wrap">
-        <a href="https://github.com/mrtangluyao/" target="_blank" class="social-item magnetic-inner fade-in" style="width: 100%;">
-          <div class="social-item-left">
-            <div class="social-icon">
-              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                <path d="M9 19c-5 1.5-5-2.5-7-3m14 6v-3.87a3.37 3.37 0 0 0-.94-2.61c3.14-.35 6.44-1.54 6.44-7A5.44 5.44 0 0 0 20 4.77 5.07 5.07 0 0 0 19.91 1S18.73.65 16 2.48a13.38 13.38 0 0 0-7 0C6.27.65 5.09 1 5.09 1A5.07 5.07 0 0 0 5 4.77a5.44 5.44 0 0 0-1.5 3.78c0 5.42 3.3 6.61 6.44 7A3.37 3.37 0 0 0 9 18.13V22"></path>
-              </svg>
-            </div>
-            <div>
-              <div class="social-name">GitHub</div>
-              <div class="social-handle">@mrtangluyao</div>
-            </div>
-          </div>
-          <span class="social-arrow"><svg width="1em" height="1em" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="7" y1="17" x2="17" y2="7"></line><polyline points="7 7 17 7 17 17"></polyline></svg></span>
-        </a>
-      </div>
-
-      <div class="magnetic-wrap">
-        <a href="https://www.linkedin.com/in/luyao-tang-b8b6353b5" target="_blank" class="social-item magnetic-inner fade-in" style="width: 100%;">
-          <div class="social-item-left">
-            <div class="social-icon">
-              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                <path d="M16 8a6 6 0 0 1 6 6v7h-4v-7a2 2 0 0 0-2-2 2 2 0 0 0-2 2v7h-4v-7a6 6 0 0 1 6-6z"></path><rect x="2" y="9" width="4" height="12"></rect><circle cx="4" cy="4" r="2"></circle>
-              </svg>
-            </div>
-            <div>
-              <div class="social-name">LinkedIn</div>
-              <div class="social-handle">Luyao Tang</div>
-            </div>
-          </div>
-          <span class="social-arrow"><svg width="1em" height="1em" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="7" y1="17" x2="17" y2="7"></line><polyline points="7 7 17 7 17 17"></polyline></svg></span>
-        </a>
-      </div>
-
-      <div class="magnetic-wrap">
-        <a href="https://space.bilibili.com/501015028" target="_blank" class="social-item magnetic-inner fade-in" style="width: 100%;">
-          <div class="social-item-left">
-            <div class="social-icon">
-              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                <rect x="2" y="7" width="20" height="15" rx="2" ry="2"></rect><polyline points="17 2 12 7 7 2"></polyline>
-              </svg>
-            </div>
-            <div>
-              <div class="social-name">Bilibili</div>
-              <div class="social-handle">@古怪的路易</div>
-            </div>
-          </div>
-          <span class="social-arrow"><svg width="1em" height="1em" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="7" y1="17" x2="17" y2="7"></line><polyline points="7 7 17 7 17 17"></polyline></svg></span>
-        </a>
-      </div>
+      <a href="mailto:louieluyaotang@gmail.com" class="ripple-surface ripple-surface-variant inline-flex items-center justify-center bg-m3-primaryContainer text-m3-onPrimaryContainer font-bold rounded-m3-full px-10 py-4 transition-colors">
+        Email
+      </a>
       
-      <div class="magnetic-wrap">
-        <a href="https://xhslink.com/m/7yaJ9ssWxsW" target="_blank" class="social-item magnetic-inner fade-in" style="width: 100%;">
-          <div class="social-item-left">
-            <div class="social-icon">
-              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                <path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"></path><path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"></path>
-              </svg>
-            </div>
-            <div>
-              <div class="social-name">小红书</div>
-              <div class="social-handle">@古怪的路易</div>
-            </div>
-          </div>
-          <span class="social-arrow"><svg width="1em" height="1em" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="7" y1="17" x2="17" y2="7"></line><polyline points="7 7 17 7 17 17"></polyline></svg></span>
-        </a>
-      </div>
-
-    </div>
-  </section>
-
-  <section id="links">
-    <div class="section-label"><span>04.</span> <span data-i18n="section-links">Friend Links</span></div>
-    <div class="social-list">
-      
-      <div class="magnetic-wrap">
-        <a href="https://cohenjikan.com" target="_blank" class="social-item magnetic-inner fade-in" style="width: 100%;">
-          <div class="social-item-left">
-            <div class="social-icon">
-              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                <path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"></path>
-                <path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"></path>
-              </svg>
-            </div>
-            <div>
-              <div class="social-name" data-i18n="links-cohen-name">Cohenjikan 的主页</div>
-              <div class="social-handle">cohenjikan.com</div>
-            </div>
-          </div>
-          <span class="social-arrow"><svg width="1em" height="1em" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="7" y1="17" x2="17" y2="7"></line><polyline points="7 7 17 7 17 17"></polyline></svg></span>
-        </a>
-      </div>
-
-    </div>
-  </section>
-
-  <section id="system95">
-    <div class="section-label"><span>05.</span> <span data-i18n="section-system95">Louie's 95</span></div>
-    <div class="projects-grid">
-      <div class="magnetic-wrap" style="display: block; width: 100%;">
-        <a href="https://louie1.com/95.html" target="_blank" class="magnetic-inner fade-in" style="width: 100%; text-decoration: none; display: block; transform: translateZ(0);">
-          <div class="win-window" style="position: relative; width: 100%; display: block; transition: transform 0.2s; cursor: pointer; user-select: none; -webkit-user-select: none;">
-            <div class="win-titlebar">
-              <span style="display:flex; align-items:center; gap:8px;">
-                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                  <polyline points="4 17 10 11 4 5"></polyline>
-                  <line x1="12" y1="19" x2="20" y2="19"></line>
-                </svg>
-                Louie's 95.exe
-              </span>
-              <div class="win-btn-close" style="pointer-events: none;">?</div>
-            </div>
-            <div class="win-content" style="display: flex; align-items: center; justify-content: space-between; padding: 24px 20px;">
-              <div>
-                <div style="font-size: 18px; font-weight: bold; margin-bottom: 8px; color: #000;" data-i18n="system95-title">进入 Louie's 95</div>
-                <div style="font-size: 13px; color: #333;" data-i18n="system95-desc">What is that?</div>
-              </div>
-              <div style="background: #c0c0c0; border-top: 1px solid #fff; border-left: 1px solid #fff; border-right: 1px solid #000; border-bottom: 1px solid #000; box-shadow: inset 1px 1px #dfdfdf, inset -1px -1px #808080; padding: 6px 16px; font-size: 13px; font-weight: bold; cursor: pointer; color: #000;">
-                Run
-              </div>
-            </div>
-          </div>
-        </a>
+      <div class="mt-20 text-sm text-m3-onSurfaceVariant tracking-widest uppercase font-mono">
+        <span id="footer-year"></span> Louie
       </div>
     </div>
-  </section>
-
-  <section id="licenses">
-    <div class="section-label"><span>06.</span> <span data-i18n="section-licenses">OPEN SOURCE LICENSES</span></div>
-    <div class="licenses-list fade-in">
-      <div class="license-item">
-        <div class="license-name">Tailwind CSS</div>
-        <div class="license-text">MIT License | Copyright (c) Tailwind Labs, Inc.</div>
-      </div>
-      <div class="license-item">
-        <div class="license-name">Luxon.js</div>
-        <div class="license-text">MIT License | Copyright (c) 2017 Isaac Cambron</div>
-      </div>
-      <div class="license-item">
-        <div class="license-name">JetBrains Mono</div>
-        <div class="license-text">SIL Open Font License 1.1 | Copyright (c) 2020 JetBrains s.r.o.</div>
-      </div>
-      <div class="license-item">
-        <div class="license-name">HarmonyOS Sans</div>
-        <div class="license-text">Copyright (c) Huawei Device Co., Ltd.</div>
-      </div>
-    </div>
-  </section>
-
-  <section id="contact">
-    <h2 class="contact-title fade-in">What's Next?</h2>
-    <p class="contact-desc fade-in" data-i18n="contact-desc">我的收件箱始终敞开。无论是有项目合作、技术交流，还是简单地打个招呼，我都会尽量回复。</p>
-    <canvas id="particle-canvas" class="fade-in" style="margin-top:32px;"></canvas>
-  </section>
-
-  <div class="relative h-0 -mb-px z-20" style="pointer-events: none;">
-    <img id="cat-mascot" src="lib/cat_t.webp"
-         alt="sleeping cat"
-         style="position: absolute; bottom: 0; left: 33.333%; transform: translateX(-50%); width: 11rem; height: auto; image-rendering: pixelated; pointer-events: auto; cursor: pointer; filter: drop-shadow(0 6px 16px rgba(0,0,0,0.45));"
-         onclick="petCat()" title="zzz... (click to pet)">
-  </div>
-
-  <footer>
-    <span id="footer-year"></span> Louie &mdash; <span data-i18n="footer-built">homepage ♥ 构建</span>
   </footer>
 
-  <script src="lib/luxon.min.js"></script>
   <script>
-    /* ─── i18n ─── */
+    function createRipple(event) {
+      const button = event.currentTarget;
+      const circle = document.createElement("span");
+      const diameter = Math.max(button.clientWidth, button.clientHeight);
+      const radius = diameter / 2;
+
+      const rect = button.getBoundingClientRect();
+      circle.style.width = circle.style.height = `${diameter}px`;
+      circle.style.left = `${event.clientX - rect.left - radius}px`;
+      circle.style.top = `${event.clientY - rect.top - radius}px`;
+      circle.classList.add("ripple");
+
+      const existingRipple = button.querySelector('.ripple');
+      if (existingRipple) { existingRipple.remove(); }
+      button.appendChild(circle);
+    }
+    const buttons = document.querySelectorAll('.ripple-surface');
+    for (const button of buttons) { button.addEventListener('mousedown', createRipple); }
+
+    const brandBtn = document.getElementById('brand-dropdown-btn');
+    const brandMenu = document.getElementById('brand-dropdown-menu');
+    const brandIcon = document.getElementById('brand-dropdown-icon');
+
+    brandBtn.addEventListener('click', (e) => {
+      e.stopPropagation();
+      const isOpen = brandMenu.classList.contains('opacity-100');
+      if (isOpen) {
+        brandMenu.classList.remove('opacity-100', 'pointer-events-auto');
+        brandMenu.classList.add('opacity-0', 'pointer-events-none');
+        brandIcon.style.transform = 'rotate(0deg)';
+      } else {
+        brandMenu.classList.remove('opacity-0', 'pointer-events-none');
+        brandMenu.classList.add('opacity-100', 'pointer-events-auto');
+        brandIcon.style.transform = 'rotate(180deg)';
+      }
+    });
+
+    document.addEventListener('click', (e) => {
+      if (!brandBtn.contains(e.target) && !brandMenu.contains(e.target)) {
+        brandMenu.classList.remove('opacity-100', 'pointer-events-auto');
+        brandMenu.classList.add('opacity-0', 'pointer-events-none');
+        brandIcon.style.transform = 'rotate(0deg)';
+      }
+    });
+
+    const menuBtn = document.getElementById('menu-btn');
+    const mobileMenu = document.getElementById('mobile-menu');
+    menuBtn.addEventListener('click', () => mobileMenu.classList.toggle('open'));
+    mobileMenu.addEventListener('click', () => mobileMenu.classList.remove('open'));
+
     const translations = {
       zh: {
-        'nav-about': 'About','nav-projects': 'Projects','nav-social': 'Social','nav-links': 'Links',
-        'nav-system95': "Louie's 95",'nav-licenses': 'Licenses','nav-contact': 'Contact',
-        'hero-greeting': '你好, 陌生人!','hero-email-btn': '邮件联系', 'hero-blog-btn': '我的博客',
-        'section-about': 'About','section-projects': 'Projects','section-social': 'Social',
-        'section-links': 'Friend Links','section-system95': "Louie's 95",'section-licenses': 'OPEN SOURCE LICENSES',
-        'about-text': '来自江城武汉，现旅居颠倒世界墨尔本。<br><br>',
+        'hero-greeting': '你好, 陌生人!',
+        'hero-email-btn': '邮件联系',
+        'hero-blog-btn': '我的博客',
+        'section-about': 'About',
+        'section-projects': 'Projects',
+        'section-social': 'Social',
+        'section-links': 'Friend Links',
+        'section-licenses': 'OPEN SOURCE LICENSES',
+        'about-text': '来自江城武汉，现旅居颠倒世界墨尔本。',
         'project-learn-desc': '一个在线学习编程平台',
         'project-jetlag-desc': '科学时差调节系统',
         'project-sync-desc': '私有跨设备同步工具，支持文本与文件的实时共享，基于 WebSocket 实现即时更新，提供双视图布局与 PIN 锁保护。',
         'project-primer-desc': 'PCR 引物设计工具的网页化实现，支持 BLAST 校验与表达感知评分，提升了生信工具的交互体验与可访问性。',
-        'links-blog-name': '古怪的路易博客','links-cohen-name': 'Cohenjikan 的主页',
-        'system95-title': "进入 Louie's 95",'system95-desc': 'What is that?',
-        'contact-desc': '我的收件箱始终敞开。无论是有项目合作、技术交流，还是简单地打个招呼，我都会尽量回复。',
-        'footer-built': 'homepage ♥ 构建',
-        'l_trait': '爱好:', 'v_trait': '游戏，摆弄电子产品', 't_about': 'ABOUT_ME',
-        'v_about': '来自江城武汉，现旅居颠倒世界墨尔本。',
-        'nav-hint': '点击这里能切换我的不同网页'
+        'links-cohen-name': 'Cohenjikan 的主页',
+        'contact-desc': '我的收件箱始终敞开。无论是有项目合作、技术交流，还是简单地打个招呼，我都会尽量回复。'
       },
       en: {
-        'nav-about': 'About','nav-projects': 'Projects','nav-social': 'Social','nav-links': 'Links',
-        'nav-system95': "Louie's 95",'nav-licenses': 'Licenses','nav-contact': 'Contact',
         'hero-greeting': 'hello, world!',
-        'hero-email-btn': 'Email Me', 'hero-blog-btn': 'View my Blog',
-        'section-about': 'About','section-projects': 'Projects','section-social': 'Social',
-        'section-links': 'Friend Links','section-system95': "Louie's 95",'section-licenses': 'OPEN SOURCE LICENSES',
-        'about-text': 'Born in Wuhan, currently residing in Melbourne — the Upside Down.<br><br>',
+        'hero-email-btn': 'Email Me',
+        'hero-blog-btn': 'View my Blog',
+        'section-about': 'About',
+        'section-projects': 'Projects',
+        'section-social': 'Social',
+        'section-links': 'Friend Links',
+        'section-licenses': 'OPEN SOURCE LICENSES',
+        'about-text': 'Born in Wuhan, currently residing in Melbourne — the Upside Down.',
         'project-learn-desc': 'An online programming learning platform.',
         'project-jetlag-desc': 'Circadian Rhythm Override Protocol / Scientific Jetlag Adjustment.',
         'project-sync-desc': 'Private cross-device synchronization tool. Real-time text/file sharing via WebSocket. Features dual-view layout and PIN lock.',
         'project-primer-desc': 'A web-based implementation of a PCR primer design tool with BLAST validation and expression-aware scoring.',
-        'links-blog-name': "Strange Louie's blog",'links-cohen-name': "Cohen's Homepage",
-        'system95-title': "Enter Louie's 95",'system95-desc': 'What is that?',
-        'contact-desc': "My inbox is always open. Whether it's a collaboration proposal, a tech chat, or just a hello — I'll do my best to reply.",
-        'footer-built': 'homepage ♥ built',
-        'l_trait': 'CLASS:', 'v_trait': 'Gaming, Electronics Enthusiast', 't_about': 'ABOUT_ME',
-        'v_about': 'Born in Wuhan, currently residing in Melbourne — the Upside Down.',
-        'nav-hint': 'Click here to switch between my different pages'
+        'links-cohen-name': "Cohen's Homepage",
+        'contact-desc': "My inbox is always open. Whether it's a collaboration proposal, a tech chat, or just a hello — I'll do my best to reply."
       }
     };
 
-    let currentLang = 'en';
+    let currentLang = navigator.language.toLowerCase().includes('zh') ? 'zh' : 'en';
 
     function applyLang(lang) {
       const t = translations[lang];
       document.querySelectorAll('[data-i18n]').forEach(el => {
         const key = el.getAttribute('data-i18n');
-        if (t[key] !== undefined) el.innerHTML = t[key];
+        if (t[key]) el.textContent = t[key];
       });
       document.querySelectorAll('[data-i18n-html]').forEach(el => {
         const key = el.getAttribute('data-i18n-html');
-        if (t[key] !== undefined) el.innerHTML = t[key];
+        if (t[key]) el.innerHTML = t[key];
       });
-      document.getElementById('lang-toggle').textContent = lang === 'zh' ? 'EN' : '中';
+      const toggleBtn = document.getElementById('lang-toggle');
+      if(toggleBtn) toggleBtn.textContent = lang === 'zh' ? 'EN' : '中';
       document.documentElement.lang = lang === 'zh' ? 'zh-CN' : 'en';
     }
 
@@ -1509,475 +419,32 @@
       applyLang(currentLang);
     }
 
-    /* ─── Inline nav-pointer hint ─── */
-    (function() {
-      const hint = document.getElementById('nav-pointer-hint');
-      if (!hint) return;
-      // Fade in shortly after load so it's not part of the initial chrome.
-      setTimeout(() => hint.classList.add('show'), 600);
-      // Fade out after 12s so the user notices it but it doesn't linger.
-      setTimeout(() => hint.classList.remove('show'), 12000);
-    })();
-
-    const userBrowserLang = navigator.language.toLowerCase();
-    if (userBrowserLang === 'zh-cn' || userBrowserLang === 'zh') currentLang = 'zh';
     applyLang(currentLang);
+    document.getElementById('footer-year').textContent = '© ' + new Date().getFullYear();
 
-    try {
-      document.getElementById('footer-year').textContent = '© ' + luxon.DateTime.now().year;
-    } catch(e) {
-      document.getElementById('footer-year').textContent = '© ' + new Date().getFullYear();
+    const words = ['Louie', 'Developer', 'Creator', 'AI Enjoyer', 'CS Student'];
+    const rollEl = document.getElementById('hero-roll-text');
+    let idx = 0;
+
+    function rollNext() {
+      rollEl.style.transition = 'transform 0.35s cubic-bezier(0.4,0,1,1), opacity 0.28s ease';
+      rollEl.style.transform = 'translateY(-115%)';
+      rollEl.style.opacity = '0';
+      setTimeout(() => {
+        idx = (idx + 1) % words.length;
+        rollEl.textContent = words[idx];
+        rollEl.style.transition = 'none';
+        rollEl.style.transform = 'translateY(115%)';
+        rollEl.style.opacity = '0';
+        requestAnimationFrame(() => requestAnimationFrame(() => {
+          rollEl.style.transition = 'transform 0.42s cubic-bezier(0,0,0.2,1), opacity 0.35s ease';
+          rollEl.style.transform = 'translateY(0)';
+          rollEl.style.opacity = '1';
+        }));
+      }, 370);
     }
 
-    /* ─── Nav scroll ─── */
-    window.addEventListener('scroll', () => {
-      document.getElementById('navbar').classList.toggle('scrolled', window.scrollY > 50);
-    });
-
-    /* ─── Intersection observer ─── */
-    const observer = new IntersectionObserver((entries) => {
-      entries.forEach(entry => {
-        if (entry.isIntersecting) entry.target.classList.add('visible');
-      });
-    }, { threshold: 0.08 });
-    document.querySelectorAll('.fade-in').forEach(el => observer.observe(el));
-
-    /* ─── Cursor glow ─── */
-    const cursorGlow = document.getElementById('cursor-glow');
-    let cx = -1000, cy = -1000;
-    let gcx = -1000, gcy = -1000;
-
-    window.addEventListener('mousemove', (e) => {
-      cx = e.clientX; cy = e.clientY;
-    });
-
-    function animateGlow() {
-      gcx += (cx - gcx) * 0.07;
-      gcy += (cy - gcy) * 0.07;
-      cursorGlow.style.left = gcx + 'px';
-      cursorGlow.style.top  = gcy + 'px';
-      requestAnimationFrame(animateGlow);
-    }
-    animateGlow();
-
-    /* ─── Mobile & Resize detect ─── */
-    let isMobile = window.innerWidth <= 768 || window.matchMedia("(any-pointer: coarse)").matches;
-    let isNarrow = window.innerWidth < 1200 || (window.innerWidth / window.innerHeight) < 1.33;
-    
-    window.addEventListener('resize', () => {
-      const currentlyNarrow = window.innerWidth < 1200 || (window.innerWidth / window.innerHeight) < 1.33;
-      if (currentlyNarrow !== isNarrow) {
-        isNarrow = currentlyNarrow;
-        const wp = document.getElementById('win-profile');
-        const wt = document.getElementById('win-terminal');
-        if (wp) { wp.style.left = ''; wp.style.top = ''; wp.style.right = ''; }
-        if (wt) { wt.style.left = ''; wt.style.top = ''; wt.style.right = ''; }
-      }
-
-      isMobile = window.innerWidth <= 768 || window.matchMedia("(any-pointer: coarse)").matches;
-      if (isMobile) {
-        cursorGlow.style.display = 'none';
-      } else {
-        cursorGlow.style.display = 'block';
-      }
-    });
-
-    if (isMobile) cursorGlow.style.display = 'none';
-
-    /* ─── Grid dots ─── */
-    (function () {
-      const canvas = document.getElementById('grid-dots');
-      if (!canvas) return;
-      const ctx = canvas.getContext('2d');
-      const GRID = 60;
-      const REACH = 140;
-
-      function resize() {
-        canvas.width  = window.innerWidth;
-        canvas.height = window.innerHeight;
-      }
-      resize();
-      window.addEventListener('resize', resize);
-
-      function draw() {
-        ctx.clearRect(0, 0, canvas.width, canvas.height);
-        if (isMobile || cx < -500) { requestAnimationFrame(draw); return; }
-
-        const c0 = Math.floor((cx - REACH) / GRID);
-        const c1 = Math.ceil ((cx + REACH) / GRID);
-        const r0 = Math.floor((cy - REACH) / GRID);
-        const r1 = Math.ceil ((cy + REACH) / GRID);
-
-        for (let i = c0; i <= c1; i++) {
-          for (let j = r0; j <= r1; j++) {
-            const x = i * GRID, y = j * GRID;
-            const dist = Math.hypot(cx - x, cy - y);
-            if (dist >= REACH) continue;
-            const t = 1 - dist / REACH;
-            const alpha = t * t * 0.55;
-            ctx.beginPath();
-            ctx.arc(x, y, 1.5, 0, Math.PI * 2);
-            ctx.fillStyle = `rgba(217,140,112,${alpha.toFixed(3)})`;
-            ctx.fill();
-          }
-        }
-        requestAnimationFrame(draw);
-      }
-      draw();
-    })();
-
-    /* ─── Rolling Hero ─── */
-    (function () {
-      const words = ['Louie', 'Developer', 'Creator', 'AI Enjoyer', 'CS Student'];
-      const el = document.getElementById('hero-roll-text');
-      if (!el) return;
-      let idx = 0;
-
-      function rollNext() {
-        el.style.transition = 'transform 0.35s cubic-bezier(0.4,0,1,1), opacity 0.28s ease';
-        el.style.transform = 'translateY(-115%)';
-        el.style.opacity = '0';
-        setTimeout(() => {
-          idx = (idx + 1) % words.length;
-          el.textContent = words[idx];
-          el.style.transition = 'none';
-          el.style.transform = 'translateY(115%)';
-          el.style.opacity = '0';
-          requestAnimationFrame(() => requestAnimationFrame(() => {
-            el.style.transition = 'transform 0.42s cubic-bezier(0,0,0.2,1), opacity 0.35s ease';
-            el.style.transform = 'translateY(0)';
-            el.style.opacity = '1';
-          }));
-        }, 370);
-      }
-
-      setInterval(rollNext, 2800);
-    })();
-
-    /* ─── Page switcher dropdown ─── */
-    function togglePageSwitcher(e) {
-      if (e) e.stopPropagation();
-      const sw = document.getElementById('page-switcher');
-      if (!sw) return;
-      sw.classList.toggle('open');
-    }
-    document.addEventListener('click', (e) => {
-      const sw = document.getElementById('page-switcher');
-      if (sw && !sw.contains(e.target)) sw.classList.remove('open');
-    });
-    document.addEventListener('keydown', (e) => {
-      if (e.key === 'Escape') {
-        const sw = document.getElementById('page-switcher');
-        if (sw) sw.classList.remove('open');
-      }
-    });
-
-    /* ─── Magnetic ─── */
-    document.querySelectorAll('.magnetic-wrap').forEach((el) => {
-      const inner = el.querySelector('.magnetic-inner');
-      if (!inner) return;
-      el.addEventListener('mousemove', (e) => {
-        if (isMobile) return;
-        const rect = el.getBoundingClientRect();
-        const distX = e.clientX - (rect.left + rect.width / 2);
-        const distY = e.clientY - (rect.top + rect.height / 2);
-        inner.style.transform = `translate(${distX * 0.28}px, ${distY * 0.28}px)`;
-      });
-      el.addEventListener('mouseleave', () => {
-        if (isMobile) return;
-        inner.style.transform = 'translate(0px, 0px)';
-      });
-    });
-
-    /* ─── Particle About ─── */
-    (function () {
-      const canvas = document.getElementById('particle-canvas');
-      if (!canvas) return;
-      const ctx = canvas.getContext('2d');
-
-      const WORDS = ['Developer', 'Creator', 'Builder', 'Curious'];
-      const N = 320;
-      const REPEL_R = 90;
-      const H = 200;
-
-      let W = 0;
-      let particles = [];
-      let mx = -9999, my = -9999;
-      let wordIdx = 0;
-      let allTargets = [];
-      // phases: 0=wait  1=forming  2=holding  3=dissolving
-      let phase = 0, phaseTime = 0;
-      const PHASE_DUR = [600, 2000, 900, 700];
-
-      function initCanvas() {
-        W = canvas.parentElement.clientWidth || 700;
-        canvas.width = W;
-        canvas.height = H;
-      }
-
-      function initParticles() {
-        particles = Array.from({length: N}, () => {
-          const ba = 0.12 + Math.random() * 0.18;
-          return {
-            x: Math.random() * W, y: Math.random() * H,
-            vx: (Math.random() - 0.5) * 0.6,
-            vy: (Math.random() - 0.5) * 0.6,
-            tx: null, ty: null,
-            r: 1.5 + Math.random() * 1.2,
-            baseAlpha: ba, displayAlpha: ba, colorT: 0,
-          };
-        });
-      }
-
-      function getWordTargets(word) {
-        const off = document.createElement('canvas');
-        off.width = W; off.height = H;
-        const oCtx = off.getContext('2d');
-        let fs = Math.min(90, H * 0.72);
-        oCtx.font = `800 ${fs}px "JetBrains Mono", monospace`;
-        while (oCtx.measureText(word).width > W * 0.84 && fs > 22) {
-          fs -= 3;
-          oCtx.font = `800 ${fs}px "JetBrains Mono", monospace`;
-        }
-        oCtx.fillStyle = '#fff';
-        oCtx.textAlign = 'center';
-        oCtx.textBaseline = 'middle';
-        oCtx.fillText(word, W / 2, H / 2);
-        const data = oCtx.getImageData(0, 0, W, H).data;
-        const pts = [];
-        const gap = 5;
-        for (let y = 0; y < H; y += gap)
-          for (let x = 0; x < W; x += gap)
-            if (data[(y * W + x) * 4 + 3] > 80)
-              pts.push({ x: x + (Math.random()-0.5)*2, y: y + (Math.random()-0.5)*2 });
-        for (let i = pts.length - 1; i > 0; i--) {
-          const j = Math.floor(Math.random() * (i + 1));
-          [pts[i], pts[j]] = [pts[j], pts[i]];
-        }
-        return pts;
-      }
-
-      function assignTargets(pts) {
-        particles.forEach((p, i) => {
-          const t = pts[i % pts.length];
-          p.tx = t.x; p.ty = t.y;
-        });
-      }
-
-      function clearTargets() {
-        particles.forEach(p => { p.tx = null; p.ty = null; });
-      }
-
-      function precompute() {
-        allTargets = WORDS.map(w => getWordTargets(w));
-      }
-
-      let last = 0;
-      function tick(t) {
-        requestAnimationFrame(tick);
-        const dt = Math.min(t - last, 50);
-        last = t;
-
-        phaseTime += dt;
-        while (phaseTime >= PHASE_DUR[phase]) {
-          phaseTime -= PHASE_DUR[phase];
-          phase = (phase + 1) % 4;
-          if (phase === 1) assignTargets(allTargets[wordIdx]);
-          if (phase === 3) {
-            clearTargets();
-            particles.forEach(p => {
-              p.vx += (Math.random() - 0.5) * 0.8;
-              p.vy += (Math.random() - 0.5) * 0.8;
-            });
-            wordIdx = (wordIdx + 1) % WORDS.length;
-          }
-        }
-
-        ctx.clearRect(0, 0, W, H);
-
-        for (const p of particles) {
-          // Repulsion
-          const dx = p.x - mx, dy = p.y - my;
-          const dist = Math.hypot(dx, dy);
-          if (dist < REPEL_R && dist > 0.1) {
-            const t = 1 - dist / REPEL_R;
-            const push = t * t * 7;
-            p.vx += (dx / dist) * push;
-            p.vy += (dy / dist) * push;
-          }
-
-          if (p.tx !== null) {
-            p.vx *= 0.5; p.vy *= 0.5;
-            p.x += (p.tx - p.x) * 0.04;
-            p.y += (p.ty - p.y) * 0.04;
-          } else {
-            if (Math.random() < 0.015) {
-              p.vx += (Math.random() - 0.5) * 0.5;
-              p.vy += (Math.random() - 0.5) * 0.5;
-            }
-            p.vx += (W * 0.5 - p.x) * 0.00006;
-            p.vy += (H * 0.5 - p.y) * 0.00006;
-            p.vx *= 0.99; p.vy *= 0.99;
-          }
-
-          p.x += p.vx; p.y += p.vy;
-          if (p.x < 0)  { p.x = 0;  p.vx =  Math.abs(p.vx) * 0.4; }
-          if (p.x > W)  { p.x = W;  p.vx = -Math.abs(p.vx) * 0.4; }
-          if (p.y < 0)  { p.y = 0;  p.vy =  Math.abs(p.vy) * 0.4; }
-          if (p.y > H)  { p.y = H;  p.vy = -Math.abs(p.vy) * 0.4; }
-
-          const settled = p.tx !== null && Math.hypot(p.x - p.tx, p.y - p.ty) < 5;
-          const targetAlpha = settled ? 0.88 : (p.tx !== null ? 0.42 : p.baseAlpha);
-          const targetColorT = settled ? 1 : 0;
-          p.displayAlpha += (targetAlpha  - p.displayAlpha) * 0.05;
-          p.colorT       += (targetColorT - p.colorT)       * 0.05;
-          const rr = Math.round(217 + 28 * p.colorT);
-          const gg = Math.round(140 + 56 * p.colorT);
-          const bb = Math.round(112 + 48 * p.colorT);
-          ctx.beginPath();
-          ctx.arc(p.x, p.y, p.r, 0, Math.PI * 2);
-          ctx.fillStyle = `rgba(${rr},${gg},${bb},${p.displayAlpha.toFixed(3)})`;
-          ctx.fill();
-        }
-      }
-
-      canvas.addEventListener('mousemove', e => {
-        const r = canvas.getBoundingClientRect();
-        mx = e.clientX - r.left;
-        my = e.clientY - r.top;
-      });
-      canvas.addEventListener('mouseleave', () => { mx = -9999; my = -9999; });
-      canvas.addEventListener('touchmove', e => {
-        e.preventDefault();
-        const r = canvas.getBoundingClientRect();
-        mx = e.touches[0].clientX - r.left;
-        my = e.touches[0].clientY - r.top;
-      }, { passive: false });
-      canvas.addEventListener('touchend', () => { mx = -9999; my = -9999; });
-
-      let resizeTimer;
-      window.addEventListener('resize', () => {
-        clearTimeout(resizeTimer);
-        resizeTimer = setTimeout(() => {
-          initCanvas(); precompute(); initParticles();
-          phase = 0; phaseTime = 0;
-        }, 200);
-      });
-
-      initCanvas();
-      precompute();
-      initParticles();
-      requestAnimationFrame(tick);
-    })();
-
-    /* ─── Deny Close ─── */
-    function denyClose(name) {
-      const terminal = document.getElementById('win-terminal');
-      if (terminal) terminal.style.display = 'block';
-      const output = document.getElementById('terminal-output');
-      if (!output) return;
-      let line = document.getElementById('terminal-deny-line');
-      if (!line) {
-        line = document.createElement('div');
-        line.id = 'terminal-deny-line';
-        const cursor = output.querySelector('.dos-cursor');
-        cursor ? output.insertBefore(line, cursor) : output.appendChild(line);
-      }
-      line.textContent = 'C:\\> ' + name + '.exe Failed to close. Access Denied.';
-      line.classList.remove('deny-flash');
-      void line.offsetWidth;
-      line.classList.add('deny-flash');
-      output.scrollTop = output.scrollHeight;
-    }
-
-    /* ─── Elastic Drag System ─── */
-    let zIndexCounter = 100;
-    let elasticTarget = null, elasticStartX = 0, elasticStartY = 0;
-
-    function bringToFront(id) {
-      const el = document.getElementById(id);
-      if (el) el.style.zIndex = ++zIndexCounter;
-    }
-
-    function elasticStartDrag(e, id) {
-      if (isMobile || e.target.tagName.toLowerCase() === 'button') return;
-      const el = document.getElementById(id);
-      if (!el) return;
-      elasticTarget = id;
-      const pt = e.type.includes('mouse') ? e : e.touches[0];
-      elasticStartX = pt.clientX;
-      elasticStartY = pt.clientY;
-      el.style.transition = 'none';
-      el.style.cursor = 'grabbing';
-      document.body.style.cursor = 'grabbing';
-      bringToFront(id);
-      e.preventDefault();
-    }
-
-    function elasticDoDrag(e) {
-      if (!elasticTarget) return;
-      const el = document.getElementById(elasticTarget);
-      if (!el) return;
-      const pt = e.type.includes('mouse') ? e : e.touches[0];
-      const dx = pt.clientX - elasticStartX;
-      const dy = pt.clientY - elasticStartY;
-      const S = 160;
-      const ex = dx / (1 + Math.abs(dx) / S);
-      const ey = dy / (1 + Math.abs(dy) / S);
-      const base = el.dataset.baseTransform || '';
-      el.style.transform = `${base} translate(${ex}px, ${ey}px)`;
-    }
-
-    function elasticStopDrag() {
-      if (!elasticTarget) return;
-      const el = document.getElementById(elasticTarget);
-      if (el) {
-        const base = el.dataset.baseTransform || '';
-        el.style.transition = 'transform 0.45s cubic-bezier(0.34, 1.56, 0.64, 1)';
-        el.style.transform = base;
-        el.style.cursor = 'grab';
-      }
-      document.body.style.cursor = '';
-      elasticTarget = null;
-    }
-
-    document.addEventListener('mousemove', elasticDoDrag);
-    document.addEventListener('mouseup', elasticStopDrag);
-    document.addEventListener('touchmove', elasticDoDrag, { passive: false });
-    document.addEventListener('touchend', elasticStopDrag);
-
-    /* ─── Cat petting ─── */
-    const CAT_HEARTS = ['❤', '♥', '✦', '♡'];
-    const CAT_PURRS = ['purr~', 'mew~', 'zzz...', 'nya~', 'meow~'];
-    let catPetCount = 0;
-    function petCat() {
-      const cat = document.getElementById('cat-mascot');
-      if (!cat) return;
-      catPetCount++;
-      cat.classList.remove('pet');
-      void cat.offsetWidth;
-      cat.classList.add('pet');
-      setTimeout(() => cat.classList.remove('pet'), 320);
-
-      const rect = cat.getBoundingClientRect();
-      const heart = document.createElement('span');
-      heart.className = 'cat-heart';
-      const symbol = catPetCount % 7 === 0
-        ? CAT_PURRS[Math.floor(Math.random() * CAT_PURRS.length)]
-        : CAT_HEARTS[Math.floor(Math.random() * CAT_HEARTS.length)];
-      heart.textContent = symbol;
-      heart.style.left = (rect.left + rect.width / 2 + (Math.random() * 40 - 20) + window.scrollX) + 'px';
-      heart.style.top = (rect.top + rect.height * 0.18 + window.scrollY) + 'px';
-      heart.style.position = 'absolute';
-      if (catPetCount % 7 === 0) {
-        heart.style.fontSize = '14px';
-        heart.style.color = '#f0d4b8';
-        heart.style.fontStyle = 'italic';
-      }
-      document.body.appendChild(heart);
-      setTimeout(() => heart.remove(), 1500);
-    }
-
+    setInterval(rollNext, 2800);
   </script>
 </body>
 </html>
