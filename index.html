@@ -41,6 +41,13 @@
     }
   </script>
   <style>
+    :root {
+      --bg: #1f1f1e; --surface: #2a2a29; --surface-high: #333332;
+      --border: #3a3a39; --outline: #4a4a49;
+      --text: #e8e8e8; --muted: #a1a1a0;
+      --accent: #d97757; --accent-dim: rgba(217,119,87,0.15); --accent-on: #ffb49d;
+    }
+
     body {
       font-family: 'JetBrains Mono', 'HarmonyOS Sans', 'PingFang SC', 'Microsoft YaHei', sans-serif !important;
       background-color: #1f1f1e;
@@ -50,86 +57,145 @@
       user-select: none;
     }
 
-    .ripple-surface {
-      position: relative;
-      overflow: hidden;
-    }
+    .ripple-surface { position: relative; overflow: hidden; }
     .ripple {
-      position: absolute;
-      border-radius: 50%;
-      transform: scale(0);
-      animation: ripple 600ms linear;
+      position: absolute; border-radius: 50%; transform: scale(0);
+      animation: ripple 600ms linear; pointer-events: none;
       background-color: rgba(255, 255, 255, 0.15);
-      pointer-events: none;
     }
     .ripple-primary .ripple { background-color: rgba(255, 255, 255, 0.3); }
-    .ripple-surface-variant .ripple { background-color: rgba(217, 119, 87, 0.12); }
-    @keyframes ripple {
-      to { transform: scale(4); opacity: 0; }
-    }
+    .ripple-surface-variant .ripple { background-color: rgba(255, 255, 255, 0.08); }
+    @keyframes ripple { to { transform: scale(4); opacity: 0; } }
 
-    .m3-card {
-      transition: background-color 0.2s ease, box-shadow 0.2s ease;
-    }
+    .m3-card { transition: background-color 0.2s ease, box-shadow 0.2s ease, transform 0.2s ease; }
     .m3-card:hover {
       background-color: #333332;
-      box-shadow: 0 4px 8px rgba(0,0,0,0.2);
+      box-shadow: 0 8px 20px rgba(0,0,0,0.28);
+      transform: translateY(-3px);
     }
-    
+
+    /* ─── NAV ─── */
+    #navbar {
+      position: fixed; top: 0; left: 0; right: 0; z-index: 9999;
+      display: flex; align-items: center; justify-content: space-between;
+      height: 64px; padding: 0 24px;
+      background: rgba(31,31,30,0.95);
+      backdrop-filter: blur(8px); -webkit-backdrop-filter: blur(8px);
+      border-bottom: 1px solid var(--border);
+    }
+    .nav-brand-wrap { position: relative; }
+    #brand-dropdown-btn {
+      position: relative; overflow: hidden;
+      display: inline-flex; align-items: center;
+      padding: 8px 12px; border-radius: 9999px;
+      border: none; background: transparent;
+      font-family: inherit; font-size: 18px; font-weight: 700;
+      cursor: pointer; letter-spacing: 0.05em;
+      transition: background 0.2s ease;
+    }
+    #brand-dropdown-btn:hover { background: var(--accent-dim); }
+    #brand-dropdown-btn .b-static { color: var(--text); }
+    #brand-dropdown-btn .b-dot { color: var(--accent); }
+    #brand-dropdown-btn .b-page { color: rgba(232,232,232,0.6); font-weight: 500; }
+    #brand-dropdown-icon {
+      width: 16px; height: 16px; margin-left: 6px;
+      color: rgba(232,232,232,0.6); transition: transform 0.2s ease;
+    }
+    #brand-dropdown-menu {
+      position: absolute; top: 100%; left: 0; margin-top: 8px;
+      width: 192px; background: var(--surface); border-radius: 8px;
+      box-shadow: 0 8px 24px rgba(0,0,0,0.4); border: 1px solid var(--border);
+      padding: 8px 0; overflow: hidden;
+      opacity: 0; pointer-events: none; transition: opacity 0.2s ease; z-index: 110;
+    }
+    #brand-dropdown-menu.is-open { opacity: 1; pointer-events: auto; }
+    .nav-dd-item {
+      position: relative; overflow: hidden;
+      display: block; padding: 12px 16px;
+      font-size: 14px; font-weight: 500; text-decoration: none; color: var(--muted);
+      transition: color 0.2s ease, background 0.2s ease;
+    }
+    .nav-dd-item:hover { color: var(--text); background: var(--surface-high); }
+    .nav-dd-item.nav-active { color: var(--accent); background: var(--accent-dim); }
+    .nav-right { display: flex; align-items: center; gap: 8px; }
+    .nav-link {
+      position: relative; overflow: hidden;
+      display: inline-flex; align-items: center;
+      padding: 8px 12px; border-radius: 9999px;
+      font-size: 14px; font-weight: 500; color: var(--muted);
+      text-decoration: none;
+      transition: color 0.2s ease, background 0.2s ease;
+    }
+    .nav-link:hover { color: var(--text); background: var(--surface-high); }
+    .nav-divider { width: 1px; height: 24px; background: var(--border); margin: 0 4px; }
+    #lang-toggle {
+      background: none; border: 1px solid var(--outline);
+      color: var(--accent); font-family: inherit; font-size: 13px; font-weight: 500;
+      padding: 6px 16px; border-radius: 9999px; cursor: pointer; letter-spacing: 0.1em;
+      position: relative; overflow: hidden;
+      display: inline-flex; align-items: center; gap: 6px;
+      transition: background 0.2s ease, border-color 0.2s ease;
+    }
+    #lang-toggle:hover { background: var(--accent-dim); border-color: rgba(217,119,87,0.5); }
+    #menu-btn {
+      display: none; align-items: center; justify-content: center;
+      background: none; border: none; color: var(--text);
+      cursor: pointer; padding: 8px; border-radius: 9999px;
+      position: relative; overflow: hidden;
+      transition: background 0.2s ease;
+    }
+    #menu-btn:hover { background: var(--surface-high); }
+    @media (max-width: 767px) {
+      #nav-links { display: none !important; }
+      #menu-btn { display: inline-flex !important; }
+    }
     #mobile-menu {
       transition: clip-path 0.3s cubic-bezier(0.4, 0, 0.2, 1);
       clip-path: circle(0% at top right);
     }
-    #mobile-menu.open {
-      clip-path: circle(150% at top right);
-    }
+    #mobile-menu.open { clip-path: circle(150% at top right); }
   </style>
 </head>
 <body class="antialiased min-h-screen">
 
-  <header class="fixed top-0 w-full z-[100] bg-m3-surface/95 backdrop-blur border-b border-m3-outlineVariant h-16 flex items-center justify-between px-4 md:px-6">
-    <div class="flex items-center gap-2">
-      <div class="relative" id="brand-dropdown-container">
-        <button id="brand-dropdown-btn" class="ripple-surface ripple-surface-variant px-3 py-2 rounded-m3-full font-bold text-lg flex items-center cursor-pointer">
-          <span class="text-m3-onSurface">louie</span>
-          <span class="text-m3-primary">.</span>
-          <span class="text-m3-onSurface/60 font-medium tracking-wide">home</span>
-          <svg id="brand-dropdown-icon" class="w-4 h-4 ml-1.5 text-m3-onSurface/60 transition-transform duration-200" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"></polyline></svg>
-        </button>
-        <div id="brand-dropdown-menu" class="absolute top-full left-0 mt-2 w-48 bg-m3-surfaceContainer rounded-m3-sm shadow-lg shadow-black/40 border border-m3-outlineVariant opacity-0 pointer-events-none transition-opacity duration-200 z-[110] py-2 overflow-hidden">
-          <a href="index.html" class="ripple-surface ripple-surface-variant block px-4 py-3 text-sm font-medium bg-m3-primaryContainer/30 hover:bg-m3-surfaceContainerHigh transition-colors"><span class="text-m3-onSurface">louie</span><span class="text-m3-primary">.</span><span class="text-m3-primary font-semibold">home</span></a>
-          <a href="blog.html" class="ripple-surface ripple-surface-variant block px-4 py-3 text-sm font-medium hover:bg-m3-surfaceContainerHigh transition-colors"><span class="text-m3-onSurface">louie</span><span class="text-m3-primary">.</span><span class="text-m3-onSurface/60">blog</span></a>
-          <a href="learn.html" class="ripple-surface ripple-surface-variant block px-4 py-3 text-sm font-medium hover:bg-m3-surfaceContainerHigh transition-colors"><span class="text-m3-onSurface">louie</span><span class="text-m3-primary">.</span><span class="text-m3-onSurface/60">learn</span></a>
-          <a href="95.html" class="ripple-surface ripple-surface-variant block px-4 py-3 text-sm font-medium hover:bg-m3-surfaceContainerHigh transition-colors"><span class="text-m3-onSurface">louie</span><span class="text-m3-primary">.</span><span class="text-m3-onSurface/60">95</span></a>
-        </div>
+  <nav id="navbar">
+    <div class="nav-brand-wrap" id="brand-dropdown-container">
+      <button id="brand-dropdown-btn" class="ripple-surface" type="button">
+        <span class="b-static">louie</span><span class="b-dot">.</span><span class="b-page">home</span>
+        <svg id="brand-dropdown-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"></polyline></svg>
+      </button>
+      <div id="brand-dropdown-menu">
+        <a href="index.html" class="nav-dd-item nav-active ripple-surface"><span style="color:var(--text)">louie</span><span style="color:var(--accent)">.</span><span style="color:var(--accent);font-weight:600">home</span></a>
+        <a href="blog.html" class="nav-dd-item ripple-surface"><span style="color:var(--text)">louie</span><span style="color:var(--accent)">.</span><span style="color:var(--muted)">blog</span></a>
+        <a href="learn.html" class="nav-dd-item ripple-surface"><span style="color:var(--text)">louie</span><span style="color:var(--accent)">.</span><span style="color:var(--muted)">learn</span></a>
+        <a href="95.html" class="nav-dd-item ripple-surface"><span style="color:var(--text)">louie</span><span style="color:var(--accent)">.</span><span style="color:var(--muted)">95</span></a>
       </div>
     </div>
-
-    <div class="flex items-center gap-1">
-      <nav class="hidden md:flex items-center gap-1 mr-1">
-        <a href="#about" class="ripple-surface ripple-surface-variant px-4 py-2 rounded-m3-full text-sm font-medium text-m3-onSurfaceVariant hover:text-m3-onSurface transition-colors">About</a>
-        <a href="#projects" class="ripple-surface ripple-surface-variant px-4 py-2 rounded-m3-full text-sm font-medium text-m3-onSurfaceVariant hover:text-m3-onSurface transition-colors">Projects</a>
-        <a href="#social" class="ripple-surface ripple-surface-variant px-4 py-2 rounded-m3-full text-sm font-medium text-m3-onSurfaceVariant hover:text-m3-onSurface transition-colors">Social</a>
-        <a href="#links" class="ripple-surface ripple-surface-variant px-4 py-2 rounded-m3-full text-sm font-medium text-m3-onSurfaceVariant hover:text-m3-onSurface transition-colors">Links</a>
-        <a href="#licenses" class="ripple-surface ripple-surface-variant px-4 py-2 rounded-m3-full text-sm font-medium text-m3-onSurfaceVariant hover:text-m3-onSurface transition-colors">Licenses</a>
-        <div class="w-[1px] h-6 bg-m3-outlineVariant mx-1"></div>
+    <div class="nav-right">
+      <nav id="nav-links" style="display:flex; align-items:center; gap:4px; margin-right:4px;">
+        <a href="#about" class="nav-link ripple-surface">About</a>
+        <a href="#projects" class="nav-link ripple-surface">Projects</a>
+        <a href="#social" class="nav-link ripple-surface">Social</a>
+        <a href="#links" class="nav-link ripple-surface">Links</a>
+        <a href="#licenses" class="nav-link ripple-surface">Licenses</a>
+        <div class="nav-divider"></div>
       </nav>
-      <button onclick="toggleLang()" id="lang-toggle" class="ripple-surface ripple-surface-variant border border-m3-outline px-3 py-1.5 rounded-m3-full text-sm font-medium text-m3-primary hover:bg-m3-primaryContainer transition-colors flex items-center gap-1.5">
-        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="shrink-0"><path d="m5 8 6 6"/><path d="m4 14 6-6 2-3"/><path d="M2 5h12"/><path d="M7 2h1"/><path d="m22 22-5-10-5 10"/><path d="M14 18h6"/></svg>
+      <button id="lang-toggle" class="ripple-surface" onclick="toggleLang()">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="flex-shrink:0;"><path d="m5 8 6 6"/><path d="m4 14 6-6 2-3"/><path d="M2 5h12"/><path d="M7 2h1"/><path d="m22 22-5-10-5 10"/><path d="M14 18h6"/></svg>
         <span id="lang-label">EN ⇄ 文</span>
       </button>
-      <button id="menu-btn" class="md:hidden ripple-surface px-3 py-3 rounded-m3-full text-m3-onSurface">
+      <button id="menu-btn" class="ripple-surface">
         <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="3" y1="12" x2="21" y2="12"></line><line x1="3" y1="6" x2="21" y2="6"></line><line x1="3" y1="18" x2="21" y2="18"></line></svg>
       </button>
     </div>
-  </header>
+  </nav>
 
-  <div id="mobile-menu" class="fixed top-16 left-0 w-full bg-m3-surfaceContainer border-b border-m3-outlineVariant z-[90] flex flex-col p-3 shadow-xl md:hidden">
-    <a href="#about" class="ripple-surface ripple-surface-variant px-4 py-3 text-m3-onSurface rounded-m3-md hover:bg-m3-surfaceContainerHigh transition-colors">About</a>
-    <a href="#projects" class="ripple-surface ripple-surface-variant px-4 py-3 text-m3-onSurface rounded-m3-md hover:bg-m3-surfaceContainerHigh transition-colors">Projects</a>
-    <a href="#social" class="ripple-surface ripple-surface-variant px-4 py-3 text-m3-onSurface rounded-m3-md hover:bg-m3-surfaceContainerHigh transition-colors">Social</a>
-    <a href="#links" class="ripple-surface ripple-surface-variant px-4 py-3 text-m3-onSurface rounded-m3-md hover:bg-m3-surfaceContainerHigh transition-colors">Links</a>
-    <a href="#licenses" class="ripple-surface ripple-surface-variant px-4 py-3 text-m3-onSurface rounded-m3-md hover:bg-m3-surfaceContainerHigh transition-colors">Licenses</a>
+  <div id="mobile-menu" class="fixed top-16 left-0 w-full bg-m3-surfaceContainer border-b border-m3-outlineVariant z-[90] flex flex-col p-3 shadow-xl">
+    <a href="#about" class="ripple-surface nav-dd-item" style="border-radius:8px; color:var(--text);">About</a>
+    <a href="#projects" class="ripple-surface nav-dd-item" style="border-radius:8px; color:var(--text);">Projects</a>
+    <a href="#social" class="ripple-surface nav-dd-item" style="border-radius:8px; color:var(--text);">Social</a>
+    <a href="#links" class="ripple-surface nav-dd-item" style="border-radius:8px; color:var(--text);">Links</a>
+    <a href="#licenses" class="ripple-surface nav-dd-item" style="border-radius:8px; color:var(--text);">Licenses</a>
   </div>
 
   <main class="pt-32 pb-20 px-6 max-w-4xl mx-auto flex flex-col items-start min-h-[80vh] justify-center">
@@ -351,22 +417,19 @@
 
     brandBtn.addEventListener('click', (e) => {
       e.stopPropagation();
-      const isOpen = brandMenu.classList.contains('opacity-100');
+      const isOpen = brandMenu.classList.contains('is-open');
       if (isOpen) {
-        brandMenu.classList.remove('opacity-100', 'pointer-events-auto');
-        brandMenu.classList.add('opacity-0', 'pointer-events-none');
+        brandMenu.classList.remove('is-open');
         brandIcon.style.transform = 'rotate(0deg)';
       } else {
-        brandMenu.classList.remove('opacity-0', 'pointer-events-none');
-        brandMenu.classList.add('opacity-100', 'pointer-events-auto');
+        brandMenu.classList.add('is-open');
         brandIcon.style.transform = 'rotate(180deg)';
       }
     });
 
     document.addEventListener('click', (e) => {
       if (!brandBtn.contains(e.target) && !brandMenu.contains(e.target)) {
-        brandMenu.classList.remove('opacity-100', 'pointer-events-auto');
-        brandMenu.classList.add('opacity-0', 'pointer-events-none');
+        brandMenu.classList.remove('is-open');
         brandIcon.style.transform = 'rotate(0deg)';
       }
     });
