@@ -599,7 +599,16 @@
       bar.querySelectorAll('button').forEach(btn => {
         btn.addEventListener('click', () => {
           activeTag = btn.dataset.tag;
-          renderTagBar();
+          bar.querySelectorAll('button[data-tag]').forEach(b => {
+            const act = b.dataset.tag === activeTag;
+            b.classList.toggle('bg-m3-primaryContainer', act);
+            b.classList.toggle('text-m3-onPrimaryContainer', act);
+            b.classList.toggle('border-m3-primary/30', act);
+            b.classList.toggle('bg-m3-surfaceContainer', !act);
+            b.classList.toggle('text-m3-onSurfaceVariant', !act);
+            b.classList.toggle('hover:bg-m3-surfaceContainerHigh', !act);
+            b.classList.toggle('hover:text-m3-onSurface', !act);
+          });
           renderList();
         });
       });

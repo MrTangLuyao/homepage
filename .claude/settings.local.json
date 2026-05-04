@@ -34,7 +34,15 @@
       "Bash(Move-Item \"C:\\\\Users\\\\Louie\\\\Documents\\\\GitHub\\\\homepage\\\\learn_readme.md\" \"C:\\\\Users\\\\Louie\\\\Documents\\\\GitHub\\\\homepage\\\\learn_data\\\\learn_readme.md\")",
       "Bash(New-Item -ItemType Directory -Path \"C:\\\\Users\\\\Louie\\\\Documents\\\\GitHub\\\\homepage\\\\blog_data\\\\editor\" -Force)",
       "Bash(Out-Null)",
-      "Bash(Write-Host \"Done\")"
+      "Bash(Write-Host \"Done\")",
+      "Bash(mkdir -p blog_data/python-tute-1 blog_data/python-tute-2 blog_data/python-tute-3)",
+      "Bash(cp blog_data/sql-syntax-guide-1/cover.webp blog_data/python-tute-1/cover.webp)",
+      "Bash(cp blog_data/sql-syntax-guide-1/cover.webp blog_data/python-tute-2/cover.webp)",
+      "Bash(cp blog_data/sql-syntax-guide-1/cover.webp blog_data/python-tute-3/cover.webp)",
+      "PowerShell(New-Item *)",
+      "PowerShell(Invoke-WebRequest -Uri \"https://cdn.jsdelivr.net/npm/skulpt@1.2.0/dist/skulpt.min.js\" -OutFile \"C:\\\\Users\\\\Louie\\\\Documents\\\\GitHub\\\\homepage\\\\lib\\\\webPython\\\\skulpt.min.js\" -UseBasicParsing; Write-Host \"skulpt.min.js done \\($\\(\\(Get-Item 'C:\\\\Users\\\\Louie\\\\Documents\\\\GitHub\\\\homepage\\\\lib\\\\webPython\\\\skulpt.min.js'\\).Length\\) bytes\\)\")",
+      "Bash(node *)",
+      "PowerShell(Set-Content *)"
     ]
   }
 }

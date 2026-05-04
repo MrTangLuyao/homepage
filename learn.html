@@ -517,6 +517,43 @@
       white-space: pre-wrap; word-break: break-word;
     }
 
+    /* ─── PYTHON TERMINAL ─── */
+    .terminal-wrap { margin-top: 14px; }
+    .terminal-label {
+      display: flex; justify-content: space-between; align-items: center;
+      color: var(--muted); font-size: 11px; letter-spacing: 0.18em;
+      text-transform: uppercase; font-weight: 700; margin-bottom: 8px;
+    }
+    .terminal {
+      background: #121211; border: 1px solid var(--border); border-radius: 12px;
+      padding: 12px 16px; font-family: 'JetBrains Mono', monospace;
+      font-size: 13px; line-height: 1.7; color: #e8e8e8;
+      min-height: 100px; max-height: 35vh; overflow-y: auto;
+      word-break: break-word; white-space: pre-wrap;
+    }
+    .t-out  { color: #e8e8e8; }
+    .t-err  { color: var(--err); }
+    .t-pass { color: var(--ok); font-weight: 700; }
+    .t-muted { color: var(--muted); font-style: italic; }
+    .t-input-line { display: flex; align-items: center; }
+    .t-prompt { color: var(--ok); user-select: none; }
+    .t-input-field {
+      background: transparent; border: none; outline: none;
+      color: var(--accent-on); font-family: 'JetBrains Mono', monospace;
+      font-size: 13px; flex: 1; line-height: 1.7; caret-color: var(--accent);
+      white-space: pre;
+    }
+    .t-echo { color: var(--accent-on); }
+
+    /* ─── LESSON WARNING BOX ─── */
+    .lesson-warning {
+      background: rgba(217, 110, 110, 0.08);
+      border: 1px solid rgba(217, 110, 110, 0.3);
+      border-radius: 12px; padding: 12px 16px; margin-bottom: 14px;
+      font-size: 13.5px; line-height: 1.8; color: #f0a8a8;
+    }
+    .lesson-warning .task-label { color: var(--err); margin-bottom: 4px; }
+
     .lesson-nav-foot {
       display: flex; justify-content: space-between; align-items: center;
       gap: 12px; flex-wrap: wrap;
@@ -677,11 +714,20 @@
         'reset-progress': '清除进度',
         'reset-confirm': '确定要清除「{course}」的所有进度吗？\n\n该操作不可撤销 —— 已通过的关卡会全部重置为未完成。',
         'reset-no-progress': '还没有任何进度可清除。',
+        'py-playground-label': '自定义 Python 代码',
         'playground-label': '自定义 SQL 语句',
         'playground-load-demo': '加载 Demo 表',
         'playground-reset': '重置表',
         'playground-tables-label': '当前数据库',
         'playground-empty': '暂无表 — 点击"加载 Demo 表"或用 CREATE TABLE 自行建表。',
+        'py-editor-label': '在这里写 Python 代码',
+        'py-clear': '清空',
+        'py-expected': '期望输出：',
+        'py-got': '你的输出：',
+        'py-loading': '正在加载 Python 环境…',
+        'py-ready': '准备好了，点击 运行 执行代码。',
+        'py-reset-done': '已重置。',
+        'py-running': '运行中…',
       },
       en: {
         'learn-greeting': 'interactive · code to win',
@@ -733,11 +779,20 @@
         'reset-progress': 'Clear progress',
         'reset-confirm': 'Clear all progress for "{course}"?\n\nThis cannot be undone — every passed lesson will be marked unfinished again.',
         'reset-no-progress': 'There is no progress to clear yet.',
+        'py-playground-label': 'Python Playground',
         'playground-label': 'Custom SQL Playground',
         'playground-load-demo': 'Load Demo Tables',
         'playground-reset': 'Reset Tables',
         'playground-tables-label': 'Current Database',
         'playground-empty': 'No tables yet — load demos or CREATE TABLE yourself.',
+        'py-editor-label': 'Write your Python here',
+        'py-clear': 'Clear',
+        'py-expected': 'Expected output:',
+        'py-got': 'Your output:',
+        'py-loading': 'Loading Python environment…',
+        'py-ready': 'Ready — click Run to execute your code.',
+        'py-reset-done': 'Reset.',
+        'py-running': 'Running…',
       }
     };
 
@@ -1160,6 +1215,467 @@
       });
     }
 
+    /* ─── Python Playground view ─── */
+    async function renderPythonPlayground(courseSlug) {
+      const wrap = document.getElementById('lesson-content');
+      wrap.innerHTML = `<div class="result-empty" style="padding:80px 24px;">${currentLang === 'zh' ? '加载中…' : 'Loading…'}</div>`;
+
+      let course;
+      try {
+        course = await loadCourse(courseSlug);
+        await ensurePython();
+        await ensurePyAce();
+      } catch(e) {
+        wrap.innerHTML = `<div class="not-found"><h2>${tt('not-found-title')}</h2><p>${tt('not-found-desc')}</p><pre style="margin-top:14px;color:var(--err);font-size:12px;">${escapeHtml(String(e.message || e))}</pre></div>`;
+        return;
+      }
+
+      wrap.innerHTML = `
+        <div class="lesson-pane lesson-pane-left fade-in">
+          <div class="lesson-meta-row">
+            <span class="lesson-pill">${pickLang(course.title)}</span>
+          </div>
+          <div class="lesson-title-row">
+            <h1 class="lesson-title">${tt('py-playground-label')}</h1>
+          </div>
+          <p style="color:var(--muted); font-size:14px; line-height:1.8; margin-bottom:18px;">${currentLang === 'zh'
+            ? '自由编写 Python 代码。'
+            : 'Free-form Python.'
+          }</p>
+        </div>
+        <div class="lesson-pane lesson-pane-right lesson-right fade-in">
+          <div class="editor-wrap">
+            <div class="editor-label">
+              <span>${tt('py-editor-label')}</span>
+              <span class="editor-actions">
+                <button class="editor-mini-btn" id="pg-py-clear">${tt('py-clear')}</button>
+              </span>
+            </div>
+            <div class="editor-host" id="editor-host">
+              <div id="py-editor"></div>
+            </div>
+          </div>
+          <div class="editor-bar">
+            <button class="btn btn-ghost" id="btn-run">▶  ${tt('btn-run')}</button>
+          </div>
+          <div class="terminal-wrap">
+            <div class="terminal-label">
+              <span>Terminal</span>
+              <button class="editor-mini-btn" id="btn-clear-term">${tt('py-clear')}</button>
+            </div>
+            <div class="terminal" id="py-terminal">
+              <span class="t-muted">${tt('py-ready')}</span>
+            </div>
+          </div>
+        </div>
+      `;
+
+      requestAnimationFrame(() => {
+        wrap.querySelectorAll('.fade-in').forEach(el => el.classList.add('visible'));
+        bindRipples();
+      });
+
+      const editorHost = document.getElementById('editor-host');
+      const aceEd = ace.edit(document.getElementById('py-editor'));
+      aceEd.setTheme('ace/theme/tomorrow_night');
+      aceEd.session.setMode('ace/mode/python');
+      aceEd.session.setUseWorker(false);
+      aceEd.setValue('', -1);
+      aceEd.setOptions({
+        minLines: 12, maxLines: 30, showPrintMargin: false,
+        fontSize: '13px', fontFamily: "'JetBrains Mono', monospace",
+        useSoftTabs: true, tabSize: 4, behavioursEnabled: true, wrap: false,
+      });
+      aceEd.on('focus', () => editorHost.classList.add('is-focused'));
+      aceEd.on('blur',  () => editorHost.classList.remove('is-focused'));
+      aceEd.commands.addCommand({ name: 'run', bindKey: { win: 'Ctrl-Enter', mac: 'Cmd-Enter' }, exec: () => document.getElementById('btn-run')?.click() });
+
+      const editor = { get value() { return aceEd.getValue(); } };
+
+      const termEl = document.getElementById('py-terminal');
+      function termClear() { termEl.innerHTML = ''; }
+      function termAppend(text, cls) {
+        const s = document.createElement('span');
+        s.className = cls || 't-out';
+        s.textContent = text;
+        termEl.appendChild(s);
+        termEl.scrollTop = termEl.scrollHeight;
+      }
+      function termRequestInput(prompt) {
+        return new Promise((resolve) => {
+          if (prompt) termAppend(prompt);
+          const line = document.createElement('div');
+          line.className = 't-input-line';
+          const pSpan = document.createElement('span');
+          pSpan.className = 't-prompt';
+          pSpan.textContent = '▶ ';
+          const inp = document.createElement('input');
+          inp.className = 't-input-field';
+          inp.type = 'text';
+          inp.setAttribute('autocomplete', 'off');
+          inp.setAttribute('spellcheck', 'false');
+          line.appendChild(pSpan);
+          line.appendChild(inp);
+          termEl.appendChild(line);
+          termEl.scrollTop = termEl.scrollHeight;
+          inp.focus();
+          inp.addEventListener('keydown', (e) => {
+            if (e.key !== 'Enter') return;
+            const val = inp.value;
+            inp.disabled = true;
+            inp.style.display = 'none';
+            const echo = document.createElement('span');
+            echo.className = 't-echo';
+            echo.textContent = val + '\n';
+            line.appendChild(echo);
+            termEl.scrollTop = termEl.scrollHeight;
+            resolve(val);
+          });
+        });
+      }
+
+      function skulptRead(x) {
+        if (!Sk.builtinFiles?.files?.[x]) throw new Error("File not found: '" + x + "'");
+        return Sk.builtinFiles.files[x];
+      }
+
+      let _running = false;
+      function setRunning(v) {
+        _running = v;
+        const runBtn = document.getElementById('btn-run');
+        if (runBtn) runBtn.disabled = v;
+      }
+
+      document.getElementById('btn-run').addEventListener('click', () => {
+        if (_running) return;
+        setRunning(true);
+        termClear();
+        const code = editor.value;
+        Sk.configure({
+          output: (t) => termAppend(t),
+          read: skulptRead,
+          inputfun: termRequestInput,
+          inputfunTakesPrompt: true,
+          __future__: Sk.python3,
+        });
+        Sk.misceval.asyncToPromise(() =>
+          Sk.importMainWithBody('<stdin>', false, code, true)
+        ).catch((e) => {
+          termAppend('\n' + e.toString() + '\n', 't-err');
+        }).finally(() => setRunning(false));
+      });
+
+      document.getElementById('btn-clear-term').addEventListener('click', () => { if (!_running) termClear(); });
+      document.getElementById('pg-py-clear').addEventListener('click', () => { aceEd.setValue('', -1); termClear(); });
+    }
+
+    /* ─── Python engine (Skulpt) ─── */
+    let _pythonReady = null;
+    function ensurePython() {
+      if (typeof Sk !== 'undefined') return Promise.resolve();
+      if (_pythonReady) return _pythonReady;
+      _pythonReady = new Promise((resolve, reject) => {
+        const s1 = document.createElement('script');
+        s1.src = 'lib/webPython/skulpt.min.js';
+        s1.onload = () => {
+          const s2 = document.createElement('script');
+          s2.src = 'lib/webPython/skulpt-stdlib.js';
+          s2.onload = resolve;
+          s2.onerror = () => reject(new Error('Failed to load skulpt-stdlib.js'));
+          document.head.appendChild(s2);
+        };
+        s1.onerror = () => reject(new Error('Failed to load skulpt.min.js'));
+        document.head.appendChild(s1);
+      });
+      return _pythonReady;
+    }
+
+    let _pyAceLoaded = false;
+    function ensurePyAce() {
+      if (_pyAceLoaded) return Promise.resolve();
+      return new Promise((resolve, reject) => {
+        const s = document.createElement('script');
+        s.src = 'lib/ace/mode-python.min.js';
+        s.onload = () => { _pyAceLoaded = true; resolve(); };
+        s.onerror = () => reject(new Error('Failed to load mode-python.min.js'));
+        document.head.appendChild(s);
+      });
+    }
+
+    async function renderPythonLesson(course, lesson, lessonId, courseSlug) {
+      const wrap = document.getElementById('lesson-content');
+
+      const lessons = course.lessons || [];
+      const idx = lessons.findIndex(l => l.id === lessonId);
+      const prev = idx > 0 ? lessons[idx - 1] : null;
+      const next = idx < lessons.length - 1 ? lessons[idx + 1] : null;
+
+      const intro   = pickLang(lesson.intro)   || '';
+      const task    = pickLang(lesson.task)    || '';
+      const hint    = pickLang(lesson.hint)    || '';
+      const starter = pickLang(lesson.starter) || '';
+
+      wrap.innerHTML = `
+        <div class="lesson-pane lesson-pane-left fade-in">
+          <div class="lesson-meta-row">
+            <span class="lesson-pill">${pickLang(course.title)}</span>
+            <span>${tt('lessons-count')} ${String(lesson.id).padStart(2,'0')} / ${String(lessons.length).padStart(2,'0')}</span>
+            ${lesson.chapter ? `<span>· ${pickLang(lesson.chapter)}</span>` : ''}
+            ${lesson.difficulty ? `<span>· ${tt('difficulty')}: ${pickLang(lesson.difficulty)}</span>` : ''}
+          </div>
+          <div class="lesson-title-row">
+            <h1 class="lesson-title">${pickLang(lesson.title)}</h1>
+            ${lesson.chapterRef ? `
+              <a class="tutorial-link ripple-surface" href="blog.html#${lesson.chapterRef}" target="_blank" rel="noopener">
+                <span>${tt('tutorial-link')}</span>
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+                  <path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"></path>
+                  <polyline points="15 3 21 3 21 9"></polyline>
+                  <line x1="10" y1="14" x2="21" y2="3"></line>
+                </svg>
+              </a>` : ''}
+          </div>
+          <div id="py-intro">${intro}</div>
+        </div>
+
+        <div class="lesson-pane lesson-pane-right lesson-right fade-in">
+          <div class="task-block">
+            <div class="task-label">${tt('task-label')}</div>
+            <div class="task-text">${task}</div>
+          </div>
+
+          ${lesson.warning ? `
+          <div class="lesson-warning">
+            <div class="task-label">${currentLang === 'zh' ? '⚠ 注意' : '⚠ Note'}</div>
+            <div>${pickLang(lesson.warning)}</div>
+          </div>` : ''}
+
+          ${hint ? `
+            <div class="hint-panel" id="hint-body" style="display:none;">
+              <div class="task-label">${tt('hint-label')}</div>
+              <div>${hint}</div>
+            </div>` : ''}
+
+          <div class="editor-wrap">
+            <div class="editor-label">
+              <span>${tt('py-editor-label')}</span>
+              <span class="editor-actions">
+                <button class="editor-mini-btn" id="btn-reset">${tt('btn-reset')}</button>
+                ${hint ? `<button class="editor-mini-btn" id="hint-toggle">${tt('show-hint')}</button>` : ''}
+                <button class="editor-mini-btn" id="btn-show-answer">${tt('btn-show-answer')}</button>
+              </span>
+            </div>
+            <div class="editor-host" id="editor-host">
+              <div id="py-editor"></div>
+            </div>
+          </div>
+
+          <div class="editor-bar">
+            <button class="btn btn-ghost" id="btn-run">▶  ${tt('btn-run')}</button>
+            <button class="btn btn-primary" id="btn-check">✓  ${tt('btn-check')}</button>
+          </div>
+
+          <div class="terminal-wrap">
+            <div class="terminal-label">
+              <span>Terminal</span>
+              <button class="editor-mini-btn" id="btn-clear-term">${tt('py-clear')}</button>
+            </div>
+            <div class="terminal" id="py-terminal">
+              <span class="t-muted">${tt('py-ready')}</span>
+            </div>
+          </div>
+
+          <div class="lesson-nav-foot">
+            <a class="nav-btn" href="#${courseSlug}/${prev ? prev.id : ''}" aria-disabled="${prev ? 'false' : 'true'}">← ${tt('btn-prev')}</a>
+            <a class="nav-btn" href="#${courseSlug}">${tt('btn-back-list')}</a>
+            <a class="nav-btn" href="#${courseSlug}/${next ? next.id : ''}" aria-disabled="${next ? 'false' : 'true'}">${tt('btn-next')} →</a>
+          </div>
+        </div>
+      `;
+
+      requestAnimationFrame(() => {
+        wrap.querySelectorAll('.fade-in').forEach(el => el.classList.add('visible'));
+        bindRipples();
+      });
+
+      /* ── Ace editor ── */
+      const editorHost = document.getElementById('editor-host');
+      const aceEd = ace.edit(document.getElementById('py-editor'));
+      aceEd.setTheme('ace/theme/tomorrow_night');
+      aceEd.session.setMode('ace/mode/python');
+      aceEd.session.setUseWorker(false);
+      aceEd.setValue(starter, -1);
+      aceEd.setOptions({
+        minLines: 10, maxLines: 24, showPrintMargin: false,
+        fontSize: '13px', fontFamily: "'JetBrains Mono', monospace",
+        useSoftTabs: true, tabSize: 4, behavioursEnabled: true, wrap: false,
+      });
+      aceEd.on('focus', () => editorHost.classList.add('is-focused'));
+      aceEd.on('blur',  () => editorHost.classList.remove('is-focused'));
+      aceEd.commands.addCommand({ name: 'run',   bindKey: { win: 'Ctrl-Enter',       mac: 'Cmd-Enter'       }, exec: () => document.getElementById('btn-run')?.click() });
+      aceEd.commands.addCommand({ name: 'check', bindKey: { win: 'Ctrl-Shift-Enter', mac: 'Cmd-Shift-Enter' }, exec: () => document.getElementById('btn-check')?.click() });
+
+      const editor = {
+        get value() { return aceEd.getValue(); },
+        set value(v) { aceEd.setValue(v, -1); },
+      };
+
+      /* ── Terminal helpers ── */
+      const termEl = document.getElementById('py-terminal');
+
+      function termClear() { termEl.innerHTML = ''; }
+
+      function termAppend(text, cls) {
+        const s = document.createElement('span');
+        s.className = cls || 't-out';
+        s.textContent = text;
+        termEl.appendChild(s);
+        termEl.scrollTop = termEl.scrollHeight;
+      }
+
+      function termRequestInput(prompt) {
+        return new Promise((resolve) => {
+          if (prompt) termAppend(prompt);
+          const line = document.createElement('div');
+          line.className = 't-input-line';
+          const pSpan = document.createElement('span');
+          pSpan.className = 't-prompt';
+          pSpan.textContent = '▶ ';
+          const inp = document.createElement('input');
+          inp.className = 't-input-field';
+          inp.type = 'text';
+          inp.setAttribute('autocomplete', 'off');
+          inp.setAttribute('spellcheck', 'false');
+          line.appendChild(pSpan);
+          line.appendChild(inp);
+          termEl.appendChild(line);
+          termEl.scrollTop = termEl.scrollHeight;
+          inp.focus();
+          inp.addEventListener('keydown', (e) => {
+            if (e.key !== 'Enter') return;
+            const val = inp.value;
+            inp.disabled = true;
+            inp.style.display = 'none';
+            const echo = document.createElement('span');
+            echo.className = 't-echo';
+            echo.textContent = val + '\n';
+            line.appendChild(echo);
+            termEl.scrollTop = termEl.scrollHeight;
+            resolve(val);
+          });
+        });
+      }
+
+      /* ── Run helpers ── */
+      let _running = false;
+
+      function setRunning(v) {
+        _running = v;
+        const runBtn   = document.getElementById('btn-run');
+        const checkBtn = document.getElementById('btn-check');
+        if (runBtn)   runBtn.disabled   = v;
+        if (checkBtn) checkBtn.disabled = v;
+      }
+
+      function skulptRead(x) {
+        if (!Sk.builtinFiles?.files?.[x])
+          throw new Error("File not found: '" + x + "'");
+        return Sk.builtinFiles.files[x];
+      }
+
+      function runInteractive() {
+        if (_running) return;
+        setRunning(true);
+        termClear();
+        const code = editor.value;
+        Sk.configure({
+          output: (t) => termAppend(t),
+          read: skulptRead,
+          inputfun: termRequestInput,
+          inputfunTakesPrompt: true,
+          __future__: Sk.python3,
+        });
+        Sk.misceval.asyncToPromise(() =>
+          Sk.importMainWithBody('<stdin>', false, code, true)
+        ).catch((e) => {
+          termAppend('\n' + e.toString() + '\n', 't-err');
+        }).finally(() => setRunning(false));
+      }
+
+      function runCheck() {
+        if (_running) return;
+        setRunning(true);
+        const code = editor.value;
+        const testInputs = (lesson.testInputs || []).slice();
+        let inputIdx = 0;
+        let output = '';
+        Sk.configure({
+          output: (t) => { output += t; },
+          read: skulptRead,
+          inputfun: (p) => Promise.resolve(testInputs[inputIdx++] || ''),
+          inputfunTakesPrompt: true,
+          __future__: Sk.python3,
+        });
+        Sk.misceval.asyncToPromise(() =>
+          Sk.importMainWithBody('<stdin>', false, code, true)
+        ).then(() => {
+          termClear();
+          const expected = lesson.expectedOutput || '';
+          if (output.trim() === expected.trim()) {
+            markDone(courseSlug, lesson.id);
+            termAppend('✦ ' + tt('msg-pass') + '\n', 't-pass');
+            termAppend('\n' + tt('py-got') + '\n', 't-muted');
+            termAppend(output);
+          } else {
+            termAppend('✗ ' + tt('result-fail') + '\n\n', 't-err');
+            termAppend(tt('py-expected') + '\n', 't-muted');
+            termAppend(expected || '(empty)\n');
+            termAppend('\n' + tt('py-got') + '\n', 't-muted');
+            termAppend(output || '(empty)\n');
+          }
+        }).catch((e) => {
+          termClear();
+          termAppend(e.toString() + '\n', 't-err');
+        }).finally(() => setRunning(false));
+      }
+
+      document.getElementById('btn-run').addEventListener('click', runInteractive);
+      document.getElementById('btn-check').addEventListener('click', runCheck);
+      document.getElementById('btn-clear-term').addEventListener('click', () => {
+        if (!_running) termClear();
+      });
+      document.getElementById('btn-reset').addEventListener('click', () => {
+        editor.value = starter;
+        termClear();
+        termAppend(tt('py-reset-done') + '\n', 't-muted');
+      });
+
+      const showBtn = document.getElementById('btn-show-answer');
+      let answerShown = false, answerSaved = '';
+      showBtn.addEventListener('click', () => {
+        if (!answerShown) {
+          answerSaved = editor.value;
+          editor.value = lesson.answer || '';
+          showBtn.textContent = tt('btn-hide-answer');
+          answerShown = true;
+        } else {
+          editor.value = answerSaved;
+          showBtn.textContent = tt('btn-show-answer');
+          answerShown = false;
+        }
+      });
+
+      const hintToggle = document.getElementById('hint-toggle');
+      if (hintToggle) {
+        hintToggle.addEventListener('click', () => {
+          const body = document.getElementById('hint-body');
+          const open = body.style.display !== 'none';
+          body.style.display = open ? 'none' : 'block';
+          hintToggle.textContent = open ? tt('show-hint') : tt('hide-hint');
+        });
+      }
+    }
+
     /* ─── SQL engine (sql.js / SQLite) ─── */
     let SQL = null;
     let _sqlReady = null;
@@ -1282,11 +1798,10 @@
 
     async function renderLesson(courseSlug, lessonIdRaw) {
       const wrap = document.getElementById('lesson-content');
+      wrap.innerHTML = `<div class="result-empty" style="padding: 80px 24px;">${currentLang === 'zh' ? '加载中…' : 'Loading…'}</div>`;
       let course;
       try {
-        wrap.innerHTML = `<div class="result-empty" style="padding: 80px 24px;">${currentLang === 'zh' ? '加载中…' : 'Loading…'}</div>`;
         course = await loadCourse(courseSlug);
-        await ensureSql();
       } catch (e) {
         wrap.innerHTML = `<div class="not-found"><h2>${tt('not-found-title')}</h2><p>${tt('not-found-desc')}</p><pre style="margin-top:18px; color:var(--err); font-size:12px;">${escapeHtml(String(e.message || e))}</pre></div>`;
         return;
@@ -1296,6 +1811,26 @@
       const lesson = (course.lessons || []).find(l => l.id === lessonId);
       if (!lesson) {
         wrap.innerHTML = `<div class="not-found"><h2>${tt('not-found-title')}</h2><p>${tt('not-found-desc')}</p></div>`;
+        return;
+      }
+
+      /* ── Python course: lazy-load Skulpt + Python ace mode, then render ── */
+      if (course.type === 'python') {
+        wrap.innerHTML = `<div class="result-empty" style="padding: 80px 24px;">${tt('py-loading')}</div>`;
+        try {
+          await Promise.all([ensurePython(), ensurePyAce()]);
+        } catch(e) {
+          wrap.innerHTML = `<div class="not-found"><h2>${tt('not-found-title')}</h2><p>${escapeHtml(String(e.message || e))}</p></div>`;
+          return;
+        }
+        return renderPythonLesson(course, lesson, lessonId, courseSlug);
+      }
+
+      /* ── SQL course: ensure sql.js ── */
+      try {
+        await ensureSql();
+      } catch (e) {
+        wrap.innerHTML = `<div class="not-found"><h2>${tt('not-found-title')}</h2><p>${tt('not-found-desc')}</p><pre style="margin-top:18px; color:var(--err); font-size:12px;">${escapeHtml(String(e.message || e))}</pre></div>`;
         return;
       }
 
@@ -1552,7 +2087,12 @@
         courseList.style.display = 'none';
         courseView.style.display = 'none';
         lessonView.style.display = '';
-        renderPlayground(parts[0]);
+        const courseInfo = (manifest.courses || []).find(c => c.slug === parts[0]);
+        if (courseInfo?.type === 'python' || parts[0] === 'python') {
+          renderPythonPlayground(parts[0]);
+        } else {
+          renderPlayground(parts[0]);
+        }
         window.scrollTo({ top: 0, behavior: 'instant' });
       } else {
         courseList.style.display = 'none';
