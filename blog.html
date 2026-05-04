@@ -78,8 +78,20 @@
       transition: background 0.2s ease;
     }
     #brand-dropdown-btn:hover { background: var(--accent-dim); }
+    .brand-hint-ripple {
+      position: absolute; border-radius: 50%; pointer-events: none;
+      background: rgba(200, 200, 200, 0.2);
+      animation: brand-hint-ripple 1.6s cubic-bezier(0.4, 0, 0.2, 1) forwards;
+    }
+    @keyframes brand-hint-ripple {
+      from { transform: scale(0); opacity: 1; }
+      to   { transform: scale(4); opacity: 0; }
+    }
     #brand-dropdown-btn .b-static { color: var(--text); }
-    #brand-dropdown-btn .b-dot { color: var(--accent); }
+    .b-dot {
+      background: linear-gradient(90deg, #d97757, #ffb49d);
+      -webkit-background-clip: text; background-clip: text; color: transparent;
+    }
     #brand-dropdown-btn .b-page { color: rgba(232,232,232,0.6); font-weight: 500; }
     #brand-dropdown-icon {
       width: 16px; height: 16px; margin-left: 6px;
@@ -254,10 +266,10 @@
         <svg id="brand-dropdown-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"></polyline></svg>
       </button>
       <div id="brand-dropdown-menu">
-        <a href="index.html" class="nav-dd-item ripple-surface"><span style="color:var(--text)">louie</span><span style="color:var(--accent)">.</span><span style="color:var(--muted)">home</span></a>
-        <a href="blog.html" class="nav-dd-item nav-active ripple-surface"><span style="color:var(--text)">louie</span><span style="color:var(--accent)">.</span><span style="color:var(--accent);font-weight:600">blog</span></a>
-        <a href="learn.html" class="nav-dd-item ripple-surface"><span style="color:var(--text)">louie</span><span style="color:var(--accent)">.</span><span style="color:var(--muted)">learn</span></a>
-        <a href="95.html" class="nav-dd-item ripple-surface"><span style="color:var(--text)">louie</span><span style="color:var(--accent)">.</span><span style="color:var(--muted)">95</span></a>
+        <a href="index.html" class="nav-dd-item ripple-surface"><span style="color:var(--text)">louie</span><span class="b-dot">.</span><span style="color:var(--muted)">home</span></a>
+        <a href="blog.html" class="nav-dd-item nav-active ripple-surface"><span style="color:var(--text)">louie</span><span class="b-dot">.</span><span style="color:var(--accent);font-weight:600">blog</span></a>
+        <a href="learn.html" class="nav-dd-item ripple-surface"><span style="color:var(--text)">louie</span><span class="b-dot">.</span><span style="color:var(--muted)">learn</span></a>
+        <a href="95.html" class="nav-dd-item ripple-surface"><span style="color:var(--text)">louie</span><span class="b-dot">.</span><span style="color:var(--muted)">95</span></a>
       </div>
     </div>
     <div class="nav-right">
@@ -388,6 +400,21 @@
         brandIcon.style.transform = 'rotate(0deg)';
       }
     });
+
+    function fireBrandRipple() {
+      const d = Math.max(brandBtn.clientWidth, brandBtn.clientHeight);
+      const el = document.createElement('span');
+      el.className = 'brand-hint-ripple';
+      el.style.width = el.style.height = d + 'px';
+      el.style.left = (brandBtn.clientWidth / 2 - d / 2) + 'px';
+      el.style.top  = (brandBtn.clientHeight / 2 - d / 2) + 'px';
+      brandBtn.appendChild(el);
+      el.addEventListener('animationend', () => el.remove(), { once: true });
+    }
+    setTimeout(() => {
+      fireBrandRipple();
+      setTimeout(fireBrandRipple, 800);
+    }, 1000);
 
     /* ─── Mobile TOC ─── */
     const mobileToc = document.getElementById('mobile-toc');

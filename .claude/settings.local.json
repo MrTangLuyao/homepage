@@ -42,7 +42,8 @@
       "PowerShell(New-Item *)",
       "PowerShell(Invoke-WebRequest -Uri \"https://cdn.jsdelivr.net/npm/skulpt@1.2.0/dist/skulpt.min.js\" -OutFile \"C:\\\\Users\\\\Louie\\\\Documents\\\\GitHub\\\\homepage\\\\lib\\\\webPython\\\\skulpt.min.js\" -UseBasicParsing; Write-Host \"skulpt.min.js done \\($\\(\\(Get-Item 'C:\\\\Users\\\\Louie\\\\Documents\\\\GitHub\\\\homepage\\\\lib\\\\webPython\\\\skulpt.min.js'\\).Length\\) bytes\\)\")",
       "Bash(node *)",
-      "PowerShell(Set-Content *)"
+      "PowerShell(Set-Content *)",
+      "Bash(style=\\\\\"color:var\\\\\\(--accent\\\\\\)\\\\\"\\\\s*>\\\\.\" | head -40)"
     ]
   }
 }
