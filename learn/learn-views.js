@@ -73,7 +73,7 @@ async function renderCourse(slug) {
   try {
     course = await loadCourse(slug);
   } catch (e) {
-    wrap.innerHTML = `<div class="not-found"><h2>${tt('not-found-title')}</h2><p>${tt('not-found-desc')}</p><p style="margin-top:18px;"><a class="course-back" href="#">→ ${tt('not-found-back')}</a></p></div>`;
+    wrap.innerHTML = `<div class="not-found"><h2>${tt('err-course-load')}</h2><p>${tt('not-found-desc')}</p><p style="margin-top:18px;"><a class="course-back" href="#">→ ${tt('not-found-back')}</a></p></div>`;
     return;
   }
   const lessons = course.lessons || [];
@@ -159,16 +159,21 @@ async function renderCourse(slug) {
 /* ─── SQL Playground view ─── */
 async function renderPlayground(courseSlug) {
   const wrap = document.getElementById('lesson-content');
-  wrap.innerHTML = `<div class="result-empty" style="padding:80px 24px;">${currentLang === 'zh' ? '加载中…' : 'Loading…'}</div>`;
+  wrap.innerHTML = loadingHtml(currentLang === 'zh' ? '加载中…' : 'Loading…');
   const navBar = document.getElementById('lesson-nav-bar');
   if (navBar) navBar.innerHTML = '';  // playground has no prev/next
 
   let course;
   try {
     course = await loadCourse(courseSlug);
+  } catch(e) {
+    wrap.innerHTML = `<div class="not-found"><h2>${tt('err-course-load')}</h2><p>${tt('not-found-desc')}</p><pre style="margin-top:14px;color:var(--err);font-size:12px;">${escapeHtml(String(e.message || e))}</pre></div>`;
+    return;
+  }
+  try {
     await Promise.all([ensureSql(), ensureMonaco()]);
   } catch(e) {
-    wrap.innerHTML = `<div class="not-found"><h2>${tt('not-found-title')}</h2><p>${tt('not-found-desc')}</p><pre style="margin-top:14px;color:var(--err);font-size:12px;">${escapeHtml(String(e.message || e))}</pre></div>`;
+    wrap.innerHTML = `<div class="not-found"><h2>${tt('err-engine-sql')}</h2><p>${tt('not-found-desc')}</p><pre style="margin-top:14px;color:var(--err);font-size:12px;">${escapeHtml(String(e.message || e))}</pre></div>`;
     return;
   }
 
@@ -277,16 +282,21 @@ async function renderPlayground(courseSlug) {
 /* ─── Python Playground view ─── */
 async function renderPythonPlayground(courseSlug) {
   const wrap = document.getElementById('lesson-content');
-  wrap.innerHTML = `<div class="result-empty" style="padding:80px 24px;">${currentLang === 'zh' ? '加载中…' : 'Loading…'}</div>`;
+  wrap.innerHTML = loadingHtml(currentLang === 'zh' ? '加载中…' : 'Loading…');
   const navBar = document.getElementById('lesson-nav-bar');
   if (navBar) navBar.innerHTML = '';  // playground has no prev/next
 
   let course;
   try {
     course = await loadCourse(courseSlug);
+  } catch(e) {
+    wrap.innerHTML = `<div class="not-found"><h2>${tt('err-course-load')}</h2><p>${tt('not-found-desc')}</p><pre style="margin-top:14px;color:var(--err);font-size:12px;">${escapeHtml(String(e.message || e))}</pre></div>`;
+    return;
+  }
+  try {
     await Promise.all([ensurePython(), ensureMonaco()]);
   } catch(e) {
-    wrap.innerHTML = `<div class="not-found"><h2>${tt('not-found-title')}</h2><p>${tt('not-found-desc')}</p><pre style="margin-top:14px;color:var(--err);font-size:12px;">${escapeHtml(String(e.message || e))}</pre></div>`;
+    wrap.innerHTML = `<div class="not-found"><h2>${tt('err-engine-python')}</h2><p>${tt('not-found-desc')}</p><pre style="margin-top:14px;color:var(--err);font-size:12px;">${escapeHtml(String(e.message || e))}</pre></div>`;
     return;
   }
 
@@ -420,6 +430,9 @@ async function renderPythonPlayground(courseSlug) {
       inputfun: termRequestInput,
       inputfunTakesPrompt: true,
       __future__: Sk.python3,
+      // Keep the browser responsive during tight loops + hard-kill runaway code.
+      yieldLimit: 100,    // yield to the event loop every ~100ms
+      execLimit: 10000,   // throw TimeoutError after 10s
     });
     Sk.misceval.asyncToPromise(() =>
       Sk.importMainWithBody('<stdin>', false, code, true)

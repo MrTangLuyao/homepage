@@ -242,6 +242,9 @@ async function renderPythonLesson(course, lesson, lessonId, courseSlug) {
       inputfun: termRequestInput,
       inputfunTakesPrompt: true,
       __future__: Sk.python3,
+      // Keep the browser responsive during tight loops + hard-kill runaway code.
+      yieldLimit: 100,
+      execLimit: 10000,
     });
     Sk.misceval.asyncToPromise(() =>
       Sk.importMainWithBody('<stdin>', false, code, true)
@@ -263,6 +266,9 @@ async function renderPythonLesson(course, lesson, lessonId, courseSlug) {
       inputfun: (p) => Promise.resolve(testInputs[inputIdx++] || ''),
       inputfunTakesPrompt: true,
       __future__: Sk.python3,
+      // Keep the browser responsive during tight loops + hard-kill runaway code.
+      yieldLimit: 100,
+      execLimit: 10000,
     });
     Sk.misceval.asyncToPromise(() =>
       Sk.importMainWithBody('<stdin>', false, code, true)
@@ -329,29 +335,29 @@ let _currentLesson = null;
 
 async function renderLesson(courseSlug, lessonIdRaw) {
   const wrap = document.getElementById('lesson-content');
-  wrap.innerHTML = `<div class="result-empty" style="padding: 80px 24px;">${currentLang === 'zh' ? '加载中…' : 'Loading…'}</div>`;
+  wrap.innerHTML = loadingHtml(currentLang === 'zh' ? '加载中…' : 'Loading…');
   let course;
   try {
     course = await loadCourse(courseSlug);
   } catch (e) {
-    wrap.innerHTML = `<div class="not-found"><h2>${tt('not-found-title')}</h2><p>${tt('not-found-desc')}</p><pre style="margin-top:18px; color:var(--err); font-size:12px;">${escapeHtml(String(e.message || e))}</pre></div>`;
+    wrap.innerHTML = `<div class="not-found"><h2>${tt('err-course-load')}</h2><p>${tt('not-found-desc')}</p><pre style="margin-top:18px; color:var(--err); font-size:12px;">${escapeHtml(String(e.message || e))}</pre></div>`;
     return;
   }
 
   const lessonId = parseInt(lessonIdRaw, 10);
   const lesson = (course.lessons || []).find(l => l.id === lessonId);
   if (!lesson) {
-    wrap.innerHTML = `<div class="not-found"><h2>${tt('not-found-title')}</h2><p>${tt('not-found-desc')}</p></div>`;
+    wrap.innerHTML = `<div class="not-found"><h2>${tt('err-lesson-missing')}</h2><p>${tt('not-found-desc')}</p></div>`;
     return;
   }
 
   /* ── Python course: lazy-load Skulpt + Monaco, then render ── */
   if (course.type === 'python') {
-    wrap.innerHTML = `<div class="result-empty" style="padding: 80px 24px;">${tt('py-loading')}</div>`;
+    wrap.innerHTML = loadingHtml(tt('py-loading'));
     try {
       await Promise.all([ensurePython(), ensureMonaco()]);
     } catch(e) {
-      wrap.innerHTML = `<div class="not-found"><h2>${tt('not-found-title')}</h2><p>${escapeHtml(String(e.message || e))}</p></div>`;
+      wrap.innerHTML = `<div class="not-found"><h2>${tt('err-engine-python')}</h2><p>${tt('not-found-desc')}</p><pre style="margin-top:18px; color:var(--err); font-size:12px;">${escapeHtml(String(e.message || e))}</pre></div>`;
       return;
     }
     return renderPythonLesson(course, lesson, lessonId, courseSlug);
@@ -361,7 +367,7 @@ async function renderLesson(courseSlug, lessonIdRaw) {
   try {
     await Promise.all([ensureSql(), ensureMonaco()]);
   } catch (e) {
-    wrap.innerHTML = `<div class="not-found"><h2>${tt('not-found-title')}</h2><p>${tt('not-found-desc')}</p><pre style="margin-top:18px; color:var(--err); font-size:12px;">${escapeHtml(String(e.message || e))}</pre></div>`;
+    wrap.innerHTML = `<div class="not-found"><h2>${tt('err-engine-sql')}</h2><p>${tt('not-found-desc')}</p><pre style="margin-top:18px; color:var(--err); font-size:12px;">${escapeHtml(String(e.message || e))}</pre></div>`;
     return;
   }
 
@@ -452,7 +458,6 @@ async function renderLesson(courseSlug, lessonIdRaw) {
             <div class="result-message" style="color: var(--muted);">${currentLang === 'zh' ? '点击 运行 看你的查询输出，点击 提交 检查答案。' : 'Click Run to see output. Click Submit to check.'}</div>
           </div>
         </div>
-      </div>
   `;
 
   // Render the prev/back/next row into the top bar (above the panes)
@@ -599,6 +604,12 @@ async function renderLesson(courseSlug, lessonIdRaw) {
 
 /* ─── Router ─── */
 function route() {
+  // Dispose any Monaco editors from the previous view BEFORE the new
+  // render replaces lesson-content's DOM. Monaco doesn't auto-clean up
+  // when its container is removed — without this, editors accumulate
+  // and eventually choke the event loop.
+  disposeAllEditors();
+
   const hash = location.hash.replace(/^#/, '').trim();
   const parts = hash.split('/').filter(Boolean);
   const courseList = document.getElementById('view-courses');

@@ -103,6 +103,17 @@ body.lesson-mode #lesson-content {
 }
 .lesson-splitter:hover,
 .lesson-splitter.is-dragging { background: var(--surface-high); }
+/* On touch devices the visual bar is only 20px — extend the hit zone
+ * via an invisible ::before pseudo so finger taps within ±12px count
+ * as splitter drags (≈44px target, matching iOS HIG recommendation). */
+@media (max-width: 1099px) {
+  .lesson-splitter::before {
+    content: '';
+    position: absolute;
+    left: 0; right: 0;
+    top: -12px; bottom: -12px;
+  }
+}
 @media (min-width: 1100px) {
   .lesson-splitter {
     flex-direction: column;

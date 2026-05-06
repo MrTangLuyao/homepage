@@ -11,6 +11,12 @@
  *                                        with project defaults + auto-grow
  *                                        height (mimics Ace's minLines/maxLines).
  *                                        Uses Monaco's stock 'vs-dark' theme.
+ *     disposeAllEditors()              — release every editor created by
+ *                                        createCodeEditor(). Called from
+ *                                        route() on every view transition
+ *                                        to prevent memory leaks (Monaco
+ *                                        does NOT auto-clean up when its
+ *                                        DOM node is removed).
  *
  *   SQL (sql.js / SQLite asm.js, eager init at module load)
  *     ensureSql()         — initialise SQL = await initSqlJs()
@@ -86,6 +92,19 @@ function ensureMonaco() {
   return _monacoReady;
 }
 
+// Every editor returned by createCodeEditor() is tracked here so we can
+// .dispose() them all on view transitions. Monaco editors hold a lot of
+// internal state (ResizeObservers, language services, models) — without
+// disposal, navigating between many lessons accumulates them and eventually
+// chokes the event loop, leaving renders stuck on "Loading…".
+const _activeEditors = [];
+function disposeAllEditors() {
+  const eds = _activeEditors.splice(0);
+  for (const ed of eds) {
+    try { ed.dispose(); } catch (e) { /* ignore */ }
+  }
+}
+
 /**
  * Create a Monaco editor inside `container` with our defaults.
  * Returns the monaco editor instance directly (not an Ace-style wrapper).
@@ -94,6 +113,7 @@ function ensureMonaco() {
  * from minLines..maxLines like Ace did.
  *
  * Caller is responsible for: ensureMonaco() awaited beforehand.
+ * The router calls disposeAllEditors() before each view transition.
  */
 function createCodeEditor(container, opts = {}) {
   const lineHeight = 22;
@@ -127,6 +147,7 @@ function createCodeEditor(container, opts = {}) {
     padding: { top: 8, bottom: 8 },
     fixedOverflowWidgets:   true,
   });
+  _activeEditors.push(ed);
 
   const updateHeight = () => {
     const lines = Math.max(1, ed.getModel()?.getLineCount() || 1);
