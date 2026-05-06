@@ -43,7 +43,12 @@
       "PowerShell(Invoke-WebRequest -Uri \"https://cdn.jsdelivr.net/npm/skulpt@1.2.0/dist/skulpt.min.js\" -OutFile \"C:\\\\Users\\\\Louie\\\\Documents\\\\GitHub\\\\homepage\\\\lib\\\\webPython\\\\skulpt.min.js\" -UseBasicParsing; Write-Host \"skulpt.min.js done \\($\\(\\(Get-Item 'C:\\\\Users\\\\Louie\\\\Documents\\\\GitHub\\\\homepage\\\\lib\\\\webPython\\\\skulpt.min.js'\\).Length\\) bytes\\)\")",
       "Bash(node *)",
       "PowerShell(Set-Content *)",
-      "Bash(style=\\\\\"color:var\\\\\\(--accent\\\\\\)\\\\\"\\\\s*>\\\\.\" | head -40)"
+      "Bash(style=\\\\\"color:var\\\\\\(--accent\\\\\\)\\\\\"\\\\s*>\\\\.\" | head -40)",
+      "PowerShell(Get-ChildItem -Path \"C:\\\\Users\\\\Louie\\\\Documents\\\\GitHub\\\\homepage\" -Recurse | Select-Object FullName, PSIsContainer | Sort-Object FullName | Format-Table @{Label=\"Path\"; Expression={$_.FullName}} -AutoSize | Out-String -Width 250)",
+      "Bash(sed -i '83,231d' learn.html)",
+      "Bash(sed -n '78,86p' learn.html)",
+      "Bash(sed -i '13,132d' blog.html)",
+      "Bash(sed -n '10,16p' blog.html)"
     ]
   }
 }

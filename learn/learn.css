@@ -1,0 +1,583 @@
+/* ============================================================
+ * learn/learn.css
+ * Page-specific styles for learn.html.
+ * Loads AFTER lib/design/louie.css so it can extend the M3 :root
+ * tokens (--bg, --surface, --accent, etc.).
+ * ============================================================ */
+
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+/* learn-only design tokens (extends louie.css :root) */
+:root {
+  --accent2: #c4b87a;
+  --accent2-dim: rgba(196, 184, 122, 0.08);
+  --ok: #6dc198;
+  --err: #d96e6e;
+}
+
+html { scroll-behavior: smooth; background-color: var(--bg); overscroll-behavior: none; }
+
+/* learn-only body extensions (typography + scrollable lesson workbench) */
+body {
+  font-size: 16px;
+  line-height: 1.8;
+  -webkit-font-smoothing: antialiased;
+  overflow-x: hidden;
+  overscroll-behavior: none;
+  display: flex;
+  flex-direction: column;
+  min-height: 100vh;
+}
+
+img, a { -webkit-user-drag: none; }
+
+::-webkit-scrollbar { width: 3px; }
+::-webkit-scrollbar-track { background: var(--bg); }
+::-webkit-scrollbar-thumb { background: rgba(217, 119, 87, 0.3); border-radius: 2px; }
+
+/* ─── LAYOUT ─── */
+main { padding: 112px 24px 80px; max-width: 1100px; margin: 0 auto; position: relative; flex: 1 0 auto; width: 100%; }
+
+/* Lesson view — fixed fullscreen workbench */
+body.lesson-mode { overflow: hidden; }
+body.lesson-mode footer { display: none; }
+
+body.lesson-mode #view-lesson {
+  position: fixed; top: 64px; left: 0; right: 0; bottom: 0;
+  display: grid; grid-template-rows: auto minmax(0, 1fr); z-index: 5;
+  background: var(--surface);
+}
+body.lesson-mode #lesson-top-bar {
+  display: grid;
+  grid-template-columns: 1fr auto 1fr;
+  align-items: center;
+  gap: 12px;
+  padding: 24px 28px 14px;
+}
+body.lesson-mode #lesson-back-link { margin: 0; justify-self: start; }
+body.lesson-mode #lesson-nav-bar   { justify-self: center; }
+@media (max-width: 720px) {
+  body.lesson-mode #lesson-top-bar {
+    grid-template-columns: auto;
+    grid-auto-rows: auto;
+    padding: 18px 18px 10px;
+  }
+  body.lesson-mode #lesson-nav-bar { justify-self: center; margin-top: 4px; }
+}
+body.lesson-mode #lesson-content {
+  --split-ratio: 50%;
+  min-height: 0; min-width: 0; display: grid;
+  grid-template-columns: 1fr;
+  grid-template-rows: minmax(0, var(--split-ratio)) auto minmax(0, 1fr);
+}
+@media (min-width: 1100px) {
+  body.lesson-mode #lesson-content {
+    grid-template-columns: minmax(0, var(--split-ratio)) auto minmax(0, 1fr);
+    grid-template-rows: minmax(0, 1fr);
+  }
+}
+
+/* ─── Splitter ───
+ * The whole splitter element is the drag target. A 3-dot grip in the centre
+ * of the bar is the visible "this is grabbable" indicator. The two collapse
+ * buttons sit on either side of the grip (clustered in the middle) — the
+ * empty space at the far ends is still draggable so the affordance feels
+ * generous. */
+.lesson-splitter {
+  background: var(--surface);
+  border-top: 1px solid var(--border);
+  border-bottom: 1px solid var(--border);
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  justify-content: center;
+  user-select: none;
+  -webkit-user-select: none;
+  position: relative;
+  z-index: 2;
+  cursor: row-resize;
+  height: 20px;
+  padding: 0 14px;
+  gap: 10px;
+  transition: background 0.2s ease;
+}
+.lesson-splitter:hover,
+.lesson-splitter.is-dragging { background: var(--surface-high); }
+@media (min-width: 1100px) {
+  .lesson-splitter {
+    flex-direction: column;
+    cursor: col-resize;
+    width: 20px;
+    height: auto;
+    padding: 14px 0;
+    border-top: none;
+    border-bottom: none;
+    border-left: 1px solid var(--border);
+    border-right: 1px solid var(--border);
+  }
+}
+
+.splitter-btn {
+  background: transparent; border: none; color: var(--muted); cursor: pointer;
+  padding: 3px; border-radius: 4px;
+  display: inline-flex; align-items: center; justify-content: center;
+  transition: color 0.18s ease, background 0.18s ease;
+  flex-shrink: 0;
+}
+.splitter-btn:hover { color: var(--accent); background: rgba(255, 255, 255, 0.06); }
+.splitter-btn svg { width: 12px; height: 12px; display: block; }
+/* Mobile: rotate the chevrons 90° so they read as ∧ / ∨ */
+@media (max-width: 1099px) {
+  .splitter-collapse-prev svg,
+  .splitter-collapse-next svg { transform: rotate(90deg); }
+}
+
+/* Grip: three small dots aligned along the splitter's long axis. */
+.splitter-grip {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  justify-content: center;
+  gap: 4px;
+  flex-shrink: 0;
+  cursor: row-resize;
+}
+@media (min-width: 1100px) {
+  .splitter-grip { flex-direction: column; cursor: col-resize; }
+}
+.splitter-grip span {
+  width: 4px;
+  height: 4px;
+  border-radius: 50%;
+  background: var(--muted);
+  transition: background 0.18s ease, transform 0.18s ease;
+}
+.splitter-grip:hover span,
+.lesson-splitter.is-dragging .splitter-grip span { background: var(--accent); }
+
+/* ─── HERO ─── */
+.learn-hero { margin-bottom: 64px; }
+.learn-hero-greeting {
+  color: var(--accent); font-size: 13px; letter-spacing: 0.25em;
+  text-transform: uppercase; margin-bottom: 20px;
+  display: inline-flex; align-items: center; gap: 12px;
+}
+.learn-hero-greeting::before {
+  content: ''; display: inline-block; width: 32px; height: 2px; background: var(--accent);
+}
+.learn-hero-title {
+  font-size: clamp(2.6rem, 6vw, 4.5rem);
+  font-weight: 800; line-height: 1.1; letter-spacing: -0.03em;
+  color: var(--text); margin-bottom: 18px;
+}
+.learn-hero-sub { color: var(--muted); font-size: 17px; line-height: 1.9; max-width: 600px; }
+
+/* ─── COURSE LIST ─── */
+.course-list { display: grid; grid-template-columns: repeat(auto-fill, minmax(320px, 1fr)); gap: 20px; }
+
+.course-card {
+  background: var(--surface); border: 1px solid var(--border);
+  border-radius: 24px; padding: 28px;
+  text-decoration: none; color: inherit;
+  display: flex; flex-direction: column; gap: 14px;
+  transition: background 0.2s ease, box-shadow 0.2s ease, transform 0.2s ease;
+  position: relative; overflow: hidden;
+}
+.course-card:hover {
+  background: var(--surface-high);
+  box-shadow: 0 8px 16px rgba(0,0,0,0.2);
+  transform: translateY(-2px);
+}
+.course-card-icon { font-size: 32px; line-height: 1; }
+.course-card-title { color: var(--text); font-size: 20px; font-weight: 700; }
+.course-card-desc { color: var(--muted); font-size: 14px; line-height: 1.7; }
+.course-card-meta {
+  display: flex; align-items: center; gap: 8px;
+  font-size: 12px; color: var(--muted); margin-top: 4px; flex-wrap: wrap;
+}
+.course-card-pill {
+  font-size: 11px; color: var(--accent-on); background: var(--accent-dim);
+  padding: 3px 10px; border-radius: 4px;
+  font-family: 'JetBrains Mono', monospace;
+}
+.course-card-coming { filter: grayscale(0.6) opacity(0.55); pointer-events: none; }
+
+/* ─── RESET BUTTON ─── */
+.reset-btn {
+  position: absolute; top: 12px; right: 12px;
+  width: 36px; height: 36px; border-radius: 9999px;
+  border: 1px solid var(--border); background: transparent;
+  color: var(--muted); cursor: pointer;
+  display: inline-flex; align-items: center; justify-content: center;
+  font-family: inherit; overflow: hidden;
+  transition: color 0.2s ease, border-color 0.2s ease, background 0.2s ease;
+  z-index: 2;
+}
+.reset-btn svg { width: 15px; height: 15px; flex-shrink: 0; transition: transform 0.35s ease; }
+.reset-btn:hover { color: var(--err); border-color: rgba(217,110,110,0.4); background: rgba(217,110,110,0.08); }
+.reset-btn:hover svg { transform: rotate(-180deg); }
+
+.reset-btn-inline {
+  position: relative; width: auto; height: auto;
+  border-radius: 9999px; padding: 6px 16px 6px 12px; gap: 6px;
+  font-size: 12px; font-weight: 500; letter-spacing: 0.04em;
+  display: inline-flex; align-items: center;
+  top: auto; right: auto;
+}
+.reset-btn-inline svg { width: 13px; height: 13px; }
+
+/* ─── PLAYGROUND ─── */
+.pg-action-bar { display: flex; gap: 8px; flex-wrap: wrap; margin-bottom: 18px; }
+
+/* ─── BACK LINKS ─── */
+.course-back, .lesson-back {
+  display: inline-flex; align-items: center; gap: 8px;
+  color: var(--muted); text-decoration: none;
+  font-size: 13px; font-weight: 500;
+  padding: 8px 20px 8px 16px; border-radius: 9999px;
+  border: 1px solid var(--outline);
+  position: relative; overflow: hidden;
+  transition: color 0.2s ease, background 0.2s ease, border-color 0.2s ease;
+  margin-bottom: 28px;
+}
+.course-back:hover, .lesson-back:hover {
+  color: var(--text); background: var(--surface); border-color: var(--border);
+}
+
+/* ─── COURSE HEADER ─── */
+.course-header { margin-bottom: 36px; }
+.course-header-title {
+  font-size: clamp(1.8rem, 4vw, 2.6rem); font-weight: 800;
+  line-height: 1.2; color: var(--text); margin-bottom: 12px;
+}
+.course-header-sub { color: var(--muted); font-size: 15px; line-height: 1.8; max-width: 700px; }
+
+.course-progress {
+  display: flex; align-items: center; gap: 14px;
+  margin-top: 20px; font-size: 13px; color: var(--muted); flex-wrap: wrap;
+}
+.progress-bar { flex: 1; max-width: 360px; height: 6px; border-radius: 3px; background: var(--border); overflow: hidden; }
+.progress-bar-inner {
+  height: 100%; background: linear-gradient(90deg, var(--accent), var(--accent-on));
+  transition: width 0.5s ease;
+}
+
+/* ─── LESSON LIST ─── */
+.lesson-list { display: grid; gap: 8px; }
+
+.lesson-section-label {
+  color: var(--accent); font-size: 11px; letter-spacing: 0.18em;
+  text-transform: uppercase; font-weight: 700;
+  margin-top: 28px; margin-bottom: 6px;
+  padding-bottom: 8px; border-bottom: 1px solid var(--accent-dim);
+}
+.lesson-section-label:first-child { margin-top: 0; }
+
+.lesson-row {
+  display: grid; grid-template-columns: 36px 1fr auto;
+  gap: 16px; align-items: center;
+  padding: 14px 18px;
+  background: var(--surface); border: 1px solid var(--border); border-radius: 12px;
+  text-decoration: none; color: inherit;
+  transition: background 0.2s ease, box-shadow 0.2s ease;
+}
+.lesson-row:hover { background: var(--surface-high); box-shadow: 0 4px 8px rgba(0,0,0,0.15); }
+.lesson-row-num { font-size: 13px; font-weight: 700; color: var(--muted); font-variant-numeric: tabular-nums; }
+.lesson-row-title { color: var(--text); font-size: 15px; font-weight: 600; }
+.lesson-row-sub { color: var(--muted); font-size: 12px; margin-top: 2px; }
+.lesson-row-status {
+  display: inline-flex; align-items: center; color: var(--muted); opacity: 0.6;
+  transition: color 0.2s ease, opacity 0.2s ease;
+}
+.lesson-row-status svg { width: 18px; height: 18px; }
+.lesson-row:hover .lesson-row-status { color: var(--accent); opacity: 1; }
+.lesson-row.is-done .lesson-row-num { color: var(--ok); }
+.lesson-row.is-done .lesson-row-status { color: var(--ok); opacity: 1; }
+.lesson-row.is-current { border-color: rgba(217, 119, 87, 0.4); background: var(--accent-dim); }
+.lesson-row.is-current .lesson-row-num { color: var(--accent); }
+
+/* ─── LESSON PANES ─── */
+.lesson-wrap {
+  display: grid; grid-template-columns: 1fr;
+  grid-template-rows: minmax(0, 1fr) minmax(0, 1fr);
+  gap: 0; height: 100%; width: 100%;
+}
+@media (min-width: 1100px) {
+  .lesson-wrap { grid-template-columns: 1fr 1fr; grid-template-rows: minmax(0, 1fr); align-items: stretch; }
+}
+
+body.lesson-mode .lesson-pane {
+  background: var(--surface); border: none; border-radius: 0;
+  padding: 22px 26px; min-width: 0; min-height: 0;
+  overflow-y: auto; overflow-x: hidden;
+}
+body.lesson-mode .lesson-pane-left { border-right: 1px solid var(--border); }
+@media (max-width: 1099px) {
+  body.lesson-mode .lesson-pane-left { border-right: none; border-bottom: 1px solid var(--border); }
+}
+
+.lesson-right { display: block; }
+.lesson-right > * + * { margin-top: 14px; }
+.lesson-right .editor-host { min-height: 200px; }
+.lesson-right .result-box { max-height: 38vh; overflow: auto; }
+
+.hint-panel {
+  background: var(--accent2-dim); border: 1px solid rgba(196, 184, 122, 0.2);
+  border-radius: 12px; padding: 12px 16px; color: var(--text); font-size: 13.5px; line-height: 1.7;
+}
+.hint-panel .task-label { color: var(--accent2); margin-bottom: 4px; }
+
+.lesson-pane {
+  background: var(--surface); border: 1px solid var(--border);
+  border-radius: 16px; padding: 26px 28px;
+}
+.lesson-pane h2 {
+  font-size: 20px; font-weight: 700; color: var(--text);
+  margin-top: 28px; margin-bottom: 12px;
+  padding-top: 16px; border-top: 1px solid var(--border);
+}
+.lesson-pane h2:first-child { margin-top: 0; padding-top: 0; border-top: none; }
+.lesson-pane h3 { font-size: 15px; font-weight: 700; color: var(--text); margin-top: 20px; margin-bottom: 8px; }
+.lesson-pane p { color: var(--text); font-size: 14.5px; line-height: 1.85; margin-bottom: 10px; }
+.lesson-pane strong { color: var(--accent); font-weight: 700; }
+.lesson-pane em { color: var(--accent-on); }
+.lesson-pane ul, .lesson-pane ol { padding-left: 22px; margin: 6px 0 14px; }
+.lesson-pane li { margin: 4px 0; color: var(--text); font-size: 14.5px; }
+.lesson-pane code {
+  font-family: 'JetBrains Mono', monospace; font-size: 0.9em;
+  color: var(--accent-on); background: var(--accent-dim);
+  padding: 2px 6px; border-radius: 6px;
+}
+.lesson-pane pre {
+  background: var(--bg); border: 1px solid var(--border);
+  border-radius: 12px; padding: 14px 18px; overflow-x: auto;
+  font-size: 13px; line-height: 1.7; margin: 10px 0;
+}
+.lesson-pane pre code { color: var(--text); background: none; padding: 0; font-size: 13px; }
+.lesson-pane blockquote {
+  border-left: 4px solid rgba(217, 119, 87, 0.6); padding: 8px 16px; margin: 12px 0;
+  color: var(--muted); font-style: italic; background: var(--accent-dim);
+  border-radius: 0 12px 12px 0;
+}
+
+.lesson-meta-row {
+  display: flex; align-items: center; gap: 12px; flex-wrap: wrap;
+  font-size: 12px; color: var(--muted); margin-bottom: 14px;
+}
+.lesson-pill {
+  color: var(--accent-on); background: var(--accent-dim);
+  padding: 3px 10px; border-radius: 6px; font-size: 11px; font-weight: 600;
+}
+.lesson-title {
+  font-size: clamp(1.6rem, 3.4vw, 2.2rem); font-weight: 800;
+  color: var(--text); line-height: 1.2; margin-bottom: 8px;
+}
+.lesson-subtitle { color: var(--muted); font-size: 14px; margin-bottom: 22px; }
+
+.lesson-title-row { display: flex; justify-content: space-between; align-items: flex-start; gap: 18px; margin-bottom: 8px; }
+.lesson-title-row .lesson-title { margin-bottom: 0; flex: 1 1 auto; min-width: 0; }
+.lesson-title-row .tutorial-link { margin-top: 6px; flex: 0 0 auto; white-space: nowrap; }
+@media (max-width: 720px) {
+  .lesson-title-row { flex-direction: column; align-items: flex-start; }
+  .lesson-title-row .tutorial-link { margin-top: 4px; }
+}
+
+.tutorial-link {
+  display: inline-flex; align-items: center; gap: 8px; margin-top: 18px;
+  color: var(--accent); text-decoration: none; font-size: 13px;
+  padding: 7px 16px; border-radius: 9999px; border: 1px solid var(--outline);
+  position: relative; overflow: hidden;
+  transition: background 0.2s ease, border-color 0.2s ease;
+}
+.tutorial-link svg { transition: transform 0.25s ease; }
+.tutorial-link:hover { background: var(--accent-dim); border-color: rgba(217,119,87,0.4); }
+.tutorial-link:hover svg { transform: translate(2px, -2px); }
+
+/* ─── TABLES ─── */
+.lesson-pane table, .data-table {
+  width: 100%; border-collapse: collapse; font-size: 13px; margin: 10px 0;
+  border: 1px solid var(--border); border-radius: 8px; overflow: hidden;
+}
+.lesson-pane th, .data-table th {
+  background: var(--accent-dim); color: var(--accent-on); font-weight: 700;
+  padding: 8px 12px; text-align: left;
+  border-bottom: 1px solid var(--border); font-size: 12px;
+}
+.lesson-pane td, .data-table td {
+  padding: 6px 12px; color: var(--text);
+  border-bottom: 1px solid var(--border); vertical-align: top;
+  font-family: 'JetBrains Mono', monospace; font-size: 12.5px;
+}
+.lesson-pane tr:last-child td, .data-table tr:last-child td { border-bottom: none; }
+.data-table-name {
+  color: var(--accent); font-size: 12px; font-weight: 700;
+  letter-spacing: 0.05em; margin: 14px 0 4px; text-transform: lowercase;
+}
+.data-table-name::before { content: '▸ '; opacity: 0.7; }
+
+/* ─── TASK / EDITOR ─── */
+.task-block {
+  background: var(--accent-dim); border: 1px solid rgba(217, 119, 87, 0.25);
+  border-radius: 12px; padding: 16px 18px; margin-bottom: 18px;
+}
+.task-label {
+  color: var(--accent); font-size: 11px; font-weight: 700;
+  letter-spacing: 0.18em; text-transform: uppercase; margin-bottom: 6px;
+}
+.task-text { color: var(--text); font-size: 14.5px; line-height: 1.8; }
+.task-text code {
+  font-family: 'JetBrains Mono', monospace; font-size: 0.9em;
+  color: var(--accent-on); background: var(--accent-dim);
+  padding: 1px 6px; border-radius: 6px;
+}
+
+.editor-wrap { position: relative; margin-bottom: 14px; }
+.editor-label {
+  display: flex; justify-content: space-between; align-items: center;
+  color: var(--muted); font-size: 11px; letter-spacing: 0.18em;
+  text-transform: uppercase; font-weight: 700; margin-bottom: 8px;
+}
+.editor-actions { display: flex; gap: 6px; }
+.editor-mini-btn {
+  background: var(--surface); border: 1px solid var(--border);
+  color: var(--muted); font-family: inherit; font-size: 11px;
+  letter-spacing: 0.05em; padding: 4px 10px; border-radius: 8px; cursor: pointer;
+  position: relative; overflow: hidden;
+  transition: color 0.2s ease, border-color 0.2s ease, background 0.2s ease;
+}
+.editor-mini-btn:hover { color: var(--accent); border-color: rgba(217,119,87,0.3); background: var(--surface-high); }
+
+.editor-host {
+  border: 1px solid var(--border); border-radius: 12px; overflow: hidden;
+  transition: border-color 0.25s ease, box-shadow 0.25s ease;
+}
+.editor-host.is-focused { border-color: var(--accent); box-shadow: 0 0 0 3px rgba(217,119,87,0.1); }
+
+/* ─── Monaco editor overrides ───
+ * Editor colors come from Monaco's stock 'vs-dark' theme — we don't override
+ * those. Only patch the container shape so the rounded corners on .editor-host
+ * aren't squared off by Monaco's overflow-guard. */
+.editor-host .monaco-editor,
+.editor-host .monaco-editor .overflow-guard {
+  border-radius: 12px;
+}
+/* Monaco's built-in focus ring is redundant — .editor-host paints a focus
+ * glow when .is-focused is on. */
+.editor-host .monaco-editor .focused .view-line { outline: none; }
+
+.editor-bar { display: flex; gap: 10px; align-items: center; flex-wrap: wrap; margin-top: 14px; }
+.btn {
+  font-family: inherit; cursor: pointer; font-size: 13px; font-weight: 600;
+  padding: 9px 20px; border-radius: 9999px; border: 1px solid transparent;
+  transition: all 0.2s ease; display: inline-flex; align-items: center; gap: 8px;
+  position: relative; overflow: hidden;
+}
+.btn-primary { background: var(--accent); color: #fff; border-color: var(--accent); }
+.btn-primary:hover { filter: brightness(1.08); box-shadow: 0 4px 12px rgba(217,119,87,0.3); }
+.btn-ghost { background: var(--surface); color: var(--muted); border-color: var(--border); }
+.btn-ghost:hover { color: var(--text); background: var(--surface-high); }
+.btn-ok { background: var(--ok); color: #07150e; border-color: var(--ok); }
+.btn-ok:hover { filter: brightness(1.08); }
+
+.result-box {
+  margin-top: 16px; background: var(--bg);
+  border: 1px solid var(--border); border-radius: 12px; padding: 14px 16px; min-height: 80px;
+}
+.result-status {
+  display: flex; align-items: center; gap: 10px;
+  font-size: 12px; font-weight: 700; letter-spacing: 0.1em;
+  text-transform: uppercase; margin-bottom: 10px;
+}
+.result-status.is-pass { color: var(--ok); }
+.result-status.is-fail { color: var(--err); }
+.result-status.is-info { color: var(--muted); }
+.result-status .dot { width: 8px; height: 8px; border-radius: 50%; background: currentColor; box-shadow: 0 0 8px currentColor; }
+.result-message { color: var(--text); font-size: 13px; margin-bottom: 6px; }
+.result-tables-row { display: grid; gap: 14px; grid-template-columns: 1fr; }
+@media (min-width: 700px) { .result-tables-row.has-expected { grid-template-columns: 1fr 1fr; } }
+.result-table-wrap { min-width: 0; overflow-x: auto; }
+.result-table-label { font-size: 11px; color: var(--muted); margin-bottom: 4px; letter-spacing: 0.1em; text-transform: uppercase; font-weight: 700; }
+.result-empty { color: var(--muted); font-style: italic; padding: 8px 0; font-size: 13px; }
+.result-error {
+  background: rgba(217, 110, 110, 0.08); border: 1px solid rgba(217, 110, 110, 0.25);
+  color: #f0a8a8; border-radius: 12px; padding: 10px 14px;
+  font-family: 'JetBrains Mono', monospace; font-size: 12.5px;
+  white-space: pre-wrap; word-break: break-word;
+}
+
+/* ─── PYTHON TERMINAL ─── */
+.terminal-wrap { margin-top: 14px; }
+.terminal-label {
+  display: flex; justify-content: space-between; align-items: center;
+  color: var(--muted); font-size: 11px; letter-spacing: 0.18em;
+  text-transform: uppercase; font-weight: 700; margin-bottom: 8px;
+}
+.terminal {
+  background: #121211; border: 1px solid var(--border); border-radius: 12px;
+  padding: 12px 16px; font-family: 'JetBrains Mono', monospace;
+  font-size: 13px; line-height: 1.7; color: #e8e8e8;
+  min-height: 100px; max-height: 35vh; overflow-y: auto;
+  word-break: break-word; white-space: pre-wrap;
+}
+.t-out  { color: #e8e8e8; }
+.t-err  { color: var(--err); }
+.t-pass { color: var(--ok); font-weight: 700; }
+.t-muted { color: var(--muted); font-style: italic; }
+.t-input-line { display: flex; align-items: center; }
+.t-prompt { color: var(--ok); user-select: none; }
+.t-input-field {
+  background: transparent; border: none; outline: none;
+  color: var(--accent-on); font-family: 'JetBrains Mono', monospace;
+  font-size: 13px; flex: 1; line-height: 1.7; caret-color: var(--accent);
+  white-space: pre;
+}
+.t-echo { color: var(--accent-on); }
+
+/* ─── LESSON WARNING BOX ─── */
+.lesson-warning {
+  background: rgba(217, 110, 110, 0.08);
+  border: 1px solid rgba(217, 110, 110, 0.3);
+  border-radius: 12px; padding: 12px 16px; margin-bottom: 14px;
+  font-size: 13.5px; line-height: 1.8; color: #f0a8a8;
+}
+.lesson-warning .task-label { color: var(--err); margin-bottom: 4px; }
+
+.lesson-nav-foot {
+  display: flex; justify-content: center; align-items: center;
+  gap: 12px; flex-wrap: wrap;
+}
+.nav-btn {
+  display: inline-flex; align-items: center; gap: 8px;
+  color: var(--muted); text-decoration: none; font-size: 13px;
+  padding: 8px 16px; border-radius: 9999px;
+  border: 1px solid var(--outline); background: transparent;
+  position: relative; overflow: hidden;
+  transition: color 0.2s ease, background 0.2s ease;
+}
+.nav-btn:hover { color: var(--text); background: var(--surface); }
+.nav-btn[aria-disabled="true"] { opacity: 0.35; pointer-events: none; }
+
+/* ─── FADE IN ─── */
+.fade-in {
+  opacity: 0; transform: translateY(20px);
+  transition: opacity 0.7s cubic-bezier(0.25, 1, 0.5, 1), transform 0.7s cubic-bezier(0.25, 1, 0.5, 1);
+}
+.fade-in.visible { opacity: 1; transform: none; }
+
+/* ─── FOOTER ─── */
+footer {
+  text-align: center; padding: 40px 24px;
+  color: var(--muted); font-size: 13px;
+  border-top: 1px solid var(--border);
+  background: rgba(42, 42, 41, 0.3); letter-spacing: 0.05em;
+}
+
+.not-found { text-align: center; padding: 80px 24px; color: var(--muted); }
+.not-found h2 { color: var(--text); font-size: 24px; margin-bottom: 12px; }
+
+/* ─── RESPONSIVE ─── */
+@media (max-width: 768px) {
+  main { padding: 96px 18px 60px; }
+  .lesson-pane { padding: 20px 18px; }
+  .editor-bar .btn { flex: 1; justify-content: center; }
+}
