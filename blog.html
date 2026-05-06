@@ -3,14 +3,54 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
-  <meta name="description" content="Louie's Blog — dev logs, notes, and small experiments">
   <title>Louie — Blog</title>
+
+  <!-- ─── SEO ─── -->
+  <meta name="description" content="Louie's blog — dev logs, notes, and small experiments. Bilingual posts on Python, SQL, networking, and life as a CS student abroad.">
+  <meta name="author" content="Louie">
+  <meta name="theme-color" content="#1f1f1e">
+  <link rel="canonical" href="https://louie1.com/blog.html">
+
+  <!-- ─── Open Graph ─── -->
+  <meta property="og:type" content="website">
+  <meta property="og:site_name" content="Louie">
+  <meta property="og:title" content="Louie — Blog">
+  <meta property="og:description" content="Dev logs, notes, and small experiments. Bilingual posts on Python, SQL, and networking.">
+  <meta property="og:url" content="https://louie1.com/blog.html">
+  <meta property="og:image" content="https://louie1.com/lib/resources/po.webp">
+  <meta property="og:locale" content="zh_CN">
+  <meta property="og:locale:alternate" content="en_US">
+
+  <!-- ─── Twitter Card ─── -->
+  <meta name="twitter:card" content="summary">
+  <meta name="twitter:title" content="Louie — Blog">
+  <meta name="twitter:description" content="Dev logs, notes, and small experiments.">
+  <meta name="twitter:image" content="https://louie1.com/lib/resources/po.webp">
+
   <link rel="icon" href="lib/resources/po.webp">
   <link rel="stylesheet" href="lib/design/fonts.css">
   <link rel="stylesheet" href="lib/design/louie.css">
   <link rel="stylesheet" href="blog/blog.css">
   <script src="lib/design/tailwindcss.js"></script>
   <script src="lib/design/tailwind.config.js"></script>
+
+  <!-- ─── Structured data (Blog) ─── -->
+  <script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@type": "Blog",
+    "url": "https://louie1.com/blog.html",
+    "name": "Louie's Blog",
+    "description": "Dev logs, notes, and small experiments.",
+    "inLanguage": ["zh-CN", "en"],
+    "author": {
+      "@type": "Person",
+      "name": "Louie",
+      "url": "https://louie1.com",
+      "image": "https://louie1.com/lib/resources/po.webp"
+    }
+  }
+  </script>
 </head>
 <body class="min-h-screen flex flex-col">
 

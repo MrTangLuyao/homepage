@@ -4,10 +4,63 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
   <title>Louie — Portfolio</title>
+
+  <!-- ─── SEO ─── -->
+  <meta name="description" content="Louie's personal site — developer, learner, AI enjoyer. Projects, a bilingual blog, and an interactive coding playground for SQL and Python.">
+  <meta name="author" content="Louie">
+  <meta name="theme-color" content="#1f1f1e">
+  <link rel="canonical" href="https://louie1.com/index.html">
+
+  <!-- ─── Open Graph (Facebook / LinkedIn / WeChat / Slack / Discord) ─── -->
+  <meta property="og:type" content="website">
+  <meta property="og:site_name" content="Louie">
+  <meta property="og:title" content="Louie — Portfolio">
+  <meta property="og:description" content="Developer, learner, AI enjoyer. Projects, a bilingual blog, and an interactive coding playground.">
+  <meta property="og:url" content="https://louie1.com/index.html">
+  <meta property="og:image" content="https://louie1.com/lib/resources/po.webp">
+  <meta property="og:locale" content="zh_CN">
+  <meta property="og:locale:alternate" content="en_US">
+
+  <!-- ─── Twitter Card ─── -->
+  <meta name="twitter:card" content="summary">
+  <meta name="twitter:title" content="Louie — Portfolio">
+  <meta name="twitter:description" content="Developer, learner, AI enjoyer.">
+  <meta name="twitter:image" content="https://louie1.com/lib/resources/po.webp">
+
+  <link rel="icon" href="lib/resources/po.webp">
   <link rel="stylesheet" href="lib/design/fonts.css">
   <link rel="stylesheet" href="lib/design/louie.css">
   <script src="lib/design/tailwindcss.js"></script>
   <script src="lib/design/tailwind.config.js"></script>
+
+  <!-- ─── Structured data (Person + WebSite) ─── -->
+  <script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@graph": [
+      {
+        "@type": "Person",
+        "@id": "https://louie1.com/#louie",
+        "name": "Louie",
+        "url": "https://louie1.com",
+        "image": "https://louie1.com/lib/resources/po.webp",
+        "jobTitle": "Computer Science Student",
+        "sameAs": [
+          "https://github.com/mrtangluyao",
+          "https://space.bilibili.com/501015028"
+        ]
+      },
+      {
+        "@type": "WebSite",
+        "@id": "https://louie1.com/#website",
+        "url": "https://louie1.com",
+        "name": "Louie",
+        "inLanguage": ["zh-CN", "en"],
+        "author": { "@id": "https://louie1.com/#louie" }
+      }
+    ]
+  }
+  </script>
   <style>
     /* index-only: disable text selection on the homepage */
     body { -webkit-user-select: none; user-select: none; }
