@@ -9,7 +9,7 @@
 LEARN.course('c', {
   slug: 'c',
   type: 'c',
-  title: { zh: 'C 语言基础语法', en: 'C · Core Syntax' },
+  title: { zh: 'C 语言基础语法 (Canary)', en: 'C · Core Syntax (Canary)' },
   desc:  {
     zh: '开发中，敬请期待。',
     en: 'Under development. Coming soon.',

@@ -32,7 +32,7 @@ window.__LEARN_MANIFEST = {
       slug: 'c',
       icon: 'C',
       family: 'c',                  // route() gates on this; future C++ courses also family:'c'
-      title: { zh: 'C 语言基础语法', en: 'C · Core Syntax' },
+      title: { zh: 'C 语言基础语法 (Canary)', en: 'C · Core Syntax (Canary)' },
       desc: {
         zh: '开发中，敬请期待。',
         en: 'Under development. Coming soon.',
