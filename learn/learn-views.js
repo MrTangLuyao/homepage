@@ -237,7 +237,17 @@ async function renderPlayground(courseSlug) {
       : `<div class="result-empty" style="padding:8px 0;">${tt('playground-empty')}</div>`;
   }
 
-  document.getElementById('pg-load-demo').addEventListener('click', () => {
+  document.getElementById('pg-load-demo').addEventListener('click', async () => {
+    // v1: course.playgroundSetup is set at course-load time.
+    // v2: lazy-load the schema named in course.playgroundSchema on first click.
+    if (!course.playgroundSetup && course.playgroundSchema) {
+      try {
+        course.playgroundSetup = await loadSchema(courseSlug, course.playgroundSchema, course);
+      } catch(e) {
+        schemaContainer.innerHTML = `<div class="result-error">${escapeHtml(e.message || String(e))}</div>`;
+        return;
+      }
+    }
     if (!course.playgroundSetup) return;
     playgroundDb = freshDb();
     try { runSetup(playgroundDb, course.playgroundSetup); } catch(e) {

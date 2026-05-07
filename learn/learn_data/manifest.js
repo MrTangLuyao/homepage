@@ -2,7 +2,7 @@
 
 window.__LEARN_MANIFEST = {
   version: 1,
-  updated: '2026-05-02',
+  updated: '2026-05-08',
   courses: [
     {
       slug: 'sql',

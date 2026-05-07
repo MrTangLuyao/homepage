@@ -116,27 +116,116 @@ function loadManifest() {
 }
 
 const _courseLoading = {};
+const _lessonLoading = {};   // 'slug:id'   → Promise<lesson>
+const _schemaLoading = {};   // 'slug:name' → Promise<void>
+
+// Inject a <script src="..."> and resolve when it fires onload.
+function _injectScript(src) {
+  return new Promise((resolve, reject) => {
+    const s = document.createElement('script');
+    s.src = src;
+    s.async = false;
+    s.onload  = () => resolve(src);
+    s.onerror = () => reject(new Error(`Failed to load ${src}`));
+    document.head.appendChild(s);
+  });
+}
+
+// Load (or return cached) the course metadata + lesson INDEX.
+// v2: course.js sets `_needsAssembly` and provides `lessons[]` as an index
+// (id, section, slug, title, chapter, file) plus `schemas: {name → file}`.
+// v1: course.js drops a fully-populated course object including lesson content.
 function loadCourse(slug) {
   const cached = (window.__LEARN_COURSES || {})[slug];
-  if (cached) return Promise.resolve(cached);
+  if (cached && !cached._needsAssembly) return Promise.resolve(cached);
+  if (cached && cached._needsAssembly) {
+    // course.js already executed; just clear the flag and hand it back.
+    delete cached._needsAssembly;
+    return Promise.resolve(cached);
+  }
   if (_courseLoading[slug]) return _courseLoading[slug];
-  _courseLoading[slug] = new Promise((resolve, reject) => {
-    const script = document.createElement('script');
-    script.src = `learn/learn_data/${slug}/course.js`;
-    script.async = false;
-    script.onload = () => {
-      delete _courseLoading[slug];
+
+  const courseSrc = `learn/learn_data/${slug}/course.js`;
+  _courseLoading[slug] = _injectScript(courseSrc)
+    .then(() => {
       const c = (window.__LEARN_COURSES || {})[slug];
-      if (c) resolve(c);
-      else reject(new Error(`${script.src} did not register window.__LEARN_COURSES['${slug}']`));
-    };
-    script.onerror = () => {
-      delete _courseLoading[slug];
-      reject(new Error(`Failed to load ${script.src}`));
-    };
-    document.head.appendChild(script);
-  });
+      if (!c) throw new Error(`${courseSrc} did not register window.__LEARN_COURSES['${slug}']`);
+      delete c._needsAssembly;   // v2: clear marker; v1: no-op
+      return c;
+    })
+    .then(c => { delete _courseLoading[slug]; return c; })
+    .catch(e   => { delete _courseLoading[slug]; throw e; });
+
   return _courseLoading[slug];
+}
+
+// Lazy-load one schema by its declared name. Reads the file path from
+// course.schemas, dedups concurrent calls, and caches via LEARN._schemas.
+// Resolves with the SQL string.
+function loadSchema(slug, name, course) {
+  const fullName = `${slug}:${name}`;
+  const cached   = (window.LEARN && window.LEARN._schemas) ? window.LEARN._schemas[fullName] : null;
+  if (cached != null) return Promise.resolve(cached);
+  if (_schemaLoading[fullName]) return _schemaLoading[fullName];
+
+  const file = course && course.schemas ? course.schemas[name] : null;
+  if (!file) {
+    return Promise.reject(new Error(`Schema "${name}" not declared in course "${slug}".schemas`));
+  }
+  const src = `learn/learn_data/${slug}/${file}`;
+  _schemaLoading[fullName] = _injectScript(src)
+    .then(() => {
+      const sql = (window.LEARN._schemas || {})[fullName];
+      if (sql == null) throw new Error(`${src} did not register schema "${fullName}"`);
+      return sql;
+    })
+    .then(v => { delete _schemaLoading[fullName]; return v; })
+    .catch(e => { delete _schemaLoading[fullName]; throw e; });
+  return _schemaLoading[fullName];
+}
+
+// Lazy-load ONE lesson's full content. Resolves with the merged lesson object
+// (index entry + parsed content + resolved setup SQL).
+//   v1: lesson index entries have no `file` field — content is already there,
+//       so we just return the entry as-is. Backward compatible.
+//   v2: inject the lesson's own .js, parse the raw text it registered, lazy-
+//       load its schema if any, merge content into the index entry.
+function loadLesson(slug, lessonId) {
+  return loadCourse(slug).then(course => {
+    const entry = (course.lessons || []).find(l => l.id === lessonId);
+    if (!entry) throw new Error(`Lesson ${lessonId} not in course "${slug}"`);
+
+    // v1 OR already-loaded v2 entry → return as-is
+    if (!entry.file || entry._loaded) return entry;
+
+    const key = `${slug}:${lessonId}`;
+    if (_lessonLoading[key]) return _lessonLoading[key];
+
+    _lessonLoading[key] = _injectScript(`learn/learn_data/${slug}/${entry.file}`)
+      .then(() => {
+        // Parse the raw text the lesson file registered under this id
+        const blocks  = parseLessonRaw(((window.LEARN._lessonsRaw || {})[slug] || {})[lessonId]);
+        const content = assembleLesson(blocks, slug);
+
+        // Lazy-load referenced schema if any, then resolve setup SQL
+        if (content.schema) {
+          return loadSchema(slug, content.schema, course).then(sql => {
+            content.setup = sql;
+            return content;
+          });
+        }
+        return content;
+      })
+      .then(content => {
+        Object.assign(entry, content);
+        entry._loaded = true;
+        delete _lessonLoading[key];
+        return entry;
+      })
+      .catch(e => { delete _lessonLoading[key]; throw e; });
+
+    return _lessonLoading[key];
+  });
 }
 
 /* ─── Progress (per course) ─── */

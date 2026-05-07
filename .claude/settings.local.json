@@ -49,7 +49,18 @@
       "Bash(sed -n '78,86p' learn.html)",
       "Bash(sed -i '13,132d' blog.html)",
       "Bash(sed -n '10,16p' blog.html)",
-      "PowerShell(Test-Path *)"
+      "PowerShell(Test-Path *)",
+      "Bash(mv sql *)",
+      "Bash(mv sql_new sql)",
+      "Bash(rm -rf sql_v2)",
+      "Bash(awk '{print $1, \"bytes\"}')",
+      "Bash(awk '{tot+=$1} END {print tot, \"bytes \\(3 files\\)\"}')",
+      "Bash(rm -rf learn/learn_data/sql_legacy_backup)",
+      "Bash(rm -rf learn/build)",
+      "Bash(grep *)",
+      "Bash(rm -rf python)",
+      "Bash(mv python_new python)",
+      "Bash(awk '{tot+=$1} END {print tot, \"bytes \\(2 files\\)\"}')"
     ]
   }
 }

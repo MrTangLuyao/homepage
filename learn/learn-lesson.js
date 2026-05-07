@@ -345,9 +345,17 @@ async function renderLesson(courseSlug, lessonIdRaw) {
   }
 
   const lessonId = parseInt(lessonIdRaw, 10);
-  const lesson = (course.lessons || []).find(l => l.id === lessonId);
-  if (!lesson) {
+  if (!(course.lessons || []).find(l => l.id === lessonId)) {
     wrap.innerHTML = `<div class="not-found"><h2>${tt('err-lesson-missing')}</h2><p>${tt('not-found-desc')}</p></div>`;
+    return;
+  }
+  // Lazy-load full content (v2). For v1 courses this is a no-op — loadLesson
+  // returns the already-populated entry as-is.
+  let lesson;
+  try {
+    lesson = await loadLesson(courseSlug, lessonId);
+  } catch (e) {
+    wrap.innerHTML = `<div class="not-found"><h2>${tt('err-lesson-missing')}</h2><p>${tt('not-found-desc')}</p><pre style="margin-top:18px; color:var(--err); font-size:12px;">${escapeHtml(String(e.message || e))}</pre></div>`;
     return;
   }
 
