@@ -1,0 +1,28 @@
+# Files NOT to upload to Cloudflare's edge.
+# Anything matching these globs is excluded from the static asset deploy.
+
+# Version control
+.git/
+.gitignore
+.gitattributes
+
+# Cloudflare config (consumed by wrangler at deploy time, not served)
+wrangler.toml
+.assetsignore
+
+# Repo docs / notes (live in the repo for humans, not for end users)
+README.md
+LICENSE
+**/learn_readme.md
+
+# OS / editor cruft
+.DS_Store
+Thumbs.db
+*.swp
+*~
+.vscode/
+.idea/
+
+# If we ever add node tooling
+node_modules/
+package-lock.json

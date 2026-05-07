@@ -1,0 +1,19 @@
+# Cloudflare Workers config — homepage is a pure-static site, no Worker code.
+# `npx wrangler deploy` reads this and uploads the contents of `directory`
+# as Static Assets. Limits to be aware of:
+#   - 20,000 files per deployment   (current: ~530)
+#   - 25 MiB per file               (largest: 23 MB lib/runtime/webC/*.br)
+#   - ~9.5 GB total                  (current: ~470 MB, mostly emception mirror)
+#
+# Edit Cloudflare Pages "Build command" to empty, "Deploy command" stays
+# as `npx wrangler deploy`, and this file drives the rest.
+
+name = "homepage"
+compatibility_date = "2025-05-08"
+
+[assets]
+directory = "./"
+
+# Pretty URLs: /blog → /blog.html (Cloudflare strips ".html" automatically).
+# Keep `not_found_handling = "single-page-application"` OFF — this is a
+# multi-page site, not an SPA, so 404s should 404, not be rewritten to /.
