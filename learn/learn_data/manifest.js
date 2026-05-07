@@ -31,14 +31,15 @@ window.__LEARN_MANIFEST = {
     {
       slug: 'c',
       icon: 'C',
+      family: 'c',                  // route() gates on this; future C++ courses also family:'c'
       title: { zh: 'C 语言基础语法', en: 'C · Core Syntax' },
       desc: {
         zh: '开发中，敬请期待。',
         en: 'Under development. Coming soon.',
       },
       level: { zh: '入门', en: 'Beginner' },
-      lessonsCount: 1,
-      coming: true,
+      lessonsCount: 0,
+      coming: false,
     },
   ]
 };

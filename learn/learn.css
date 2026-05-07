@@ -592,3 +592,88 @@ footer {
   .lesson-pane { padding: 20px 18px; }
   .editor-bar .btn { flex: 1; justify-content: center; }
 }
+
+/* ─── M3 modal (used by C-family resource warning) ─── */
+.m3-modal {
+  position: fixed; inset: 0; z-index: 9999;
+  display: flex; align-items: center; justify-content: center;
+}
+.m3-modal[hidden] { display: none !important; }
+.m3-modal-backdrop {
+  position: absolute; inset: 0;
+  background: rgba(0, 0, 0, 0.6);
+  backdrop-filter: blur(4px);
+  -webkit-backdrop-filter: blur(4px);
+  animation: m3-fade-in 0.18s ease;
+}
+.m3-modal-card {
+  position: relative;
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 14px;
+  padding: 28px;
+  max-width: 480px;
+  width: calc(100vw - 40px);
+  box-shadow: 0 12px 40px rgba(0, 0, 0, 0.55);
+  animation: m3-modal-pop 0.22s cubic-bezier(0.2, 0.9, 0.3, 1.2);
+}
+@keyframes m3-fade-in   { from { opacity: 0; } to { opacity: 1; } }
+@keyframes m3-modal-pop { from { opacity: 0; transform: translateY(10px) scale(0.96); }
+                          to   { opacity: 1; transform: translateY(0) scale(1); } }
+.m3-modal-title {
+  font-size: 16px; font-weight: 600;
+  margin: 0 0 14px;
+  color: var(--text);
+  letter-spacing: 0.01em;
+  display: flex; align-items: center; gap: 10px;
+}
+.m3-modal-title .warn-glyph {
+  color: var(--accent);
+  font-size: 18px; line-height: 1;
+}
+.m3-modal-body { font-size: 13px; color: var(--muted); line-height: 1.7; margin-bottom: 22px; }
+.m3-modal-body p  { margin: 0 0 8px; }
+.m3-modal-body ul { margin: 8px 0 0; padding-left: 1.2em; }
+.m3-modal-body li { margin: 4px 0; }
+.m3-modal-body code {
+  background: rgba(255, 255, 255, 0.06);
+  padding: 1px 5px; border-radius: 4px;
+  font-size: 12px;
+}
+.m3-modal-actions {
+  display: flex; justify-content: flex-end; gap: 10px;
+  flex-wrap: wrap;
+}
+@media (max-width: 480px) {
+  .m3-modal-card { padding: 22px 18px; }
+  .m3-modal-actions .btn { flex: 1; justify-content: center; }
+}
+
+/* ─── C playground status card states ─── */
+.c-load-card { transition: border-color 0.5s ease, background 0.5s ease; }
+.c-load-card .c-load-title  { transition: color 0.5s ease; }
+.c-load-card .c-load-fill   { transition: width 0.4s ease, background 0.5s ease; }
+
+.c-load-card.is-ready              { border-color: rgba(74, 222, 128, 0.55);
+                                     background: rgba(74, 222, 128, 0.08); }
+.c-load-card.is-ready .c-load-title { color: #4ade80; }
+.c-load-card.is-ready .c-load-fill  { background: linear-gradient(90deg, #34d399, #4ade80) !important; }
+
+.c-load-card.is-error              { border-color: var(--err); }
+.c-load-card.is-error .c-load-title { color: var(--err); }
+
+/* ─── Run button states (C playground) ─── */
+.btn.is-busy {
+  background: var(--border) !important;
+  color: var(--muted) !important;
+  cursor: wait !important;
+  border-color: var(--border) !important;
+  opacity: 0.85;
+}
+.btn.is-done {
+  background: rgba(74, 222, 128, 0.18) !important;
+  color: #4ade80 !important;
+  border-color: rgba(74, 222, 128, 0.55) !important;
+  cursor: default !important;
+  transition: background 0.3s ease, color 0.3s ease;
+}

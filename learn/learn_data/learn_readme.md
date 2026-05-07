@@ -6,13 +6,16 @@
 
 ## Architecture overview
 
-**Zero build step. Zero backend. Zero `fetch()`. Lazy per-lesson loading.**
+**Zero build step. Zero backend. Lazy per-lesson loading.**
 
-- All code runs 100% in the browser — SQL via sql.js (SQLite asm.js), Python via Skulpt.
-- All data loads via `<script>` tags so the site works when opened as `file://` locally.
-- A course's metadata + lesson index loads when the user opens that course; each lesson's full content (and any SQL schema it references) loads only when the user navigates into that lesson. The playground's demo schema loads only when the user clicks "Load Demo Tables".
+- SQL and Python run 100% in the browser — sql.js (SQLite asm.js) and Skulpt — loaded via `<script>` tags. file:// works locally.
+- C is heavier: it runs the real **clang** compiler in a hidden `<iframe>` via [emception](https://github.com/jprendes/emception). The iframe is same-origin (mirrored under `lib/runtime/webC/`), so `<script>` and Worker creation succeed without cross-origin issues. **C lessons require HTTPS or `http://localhost`**; raw `file://` is gated off by the C-family modal.
+- A course's metadata + lesson index loads when the user opens that course; each lesson's full content (and any SQL schema it references) loads only when the user navigates into that lesson.
 
-So opening the SQL course list pulls **~8 KB** (one `course.js`); opening one lesson pulls **another ~5–15 KB** (one lesson file + maybe one schema file). Compared to the old monolith (the original SQL `course.js` was 134 KB; Python was 270 KB), users now download an order of magnitude less.
+Per-course download cost (first visit, browser-cached after):
+- SQL: ~8 KB course index + ~5-15 KB per lesson
+- Python: ~6 KB course index + ~3-10 KB per lesson
+- **C: ~25-30 MB** (clang.wasm + libc/libc++ archives) on first playground entry; subsequent visits free
 
 ---
 
@@ -38,15 +41,24 @@ learn/
     │   ├── course.js                   ← metadata + lesson index + schema manifest
     │   ├── schemas/<name>.js           ← shared SQL schemas (LEARN.schema)
     │   └── lessons/<NN>-<slug>.js      ← per-lesson content (LEARN.lesson)
-    └── python/
-        ├── course.js                   ← metadata + lesson index (no schemas)
-        └── lessons/<NN>-<slug>.js
+    ├── python/
+    │   ├── course.js                   ← metadata + lesson index (no schemas)
+    │   └── lessons/<NN>-<slug>.js
+    └── c/
+        └── course.js                   ← C course (currently playground-only)
 lib/
 ├── design/                             ← visual assets (fonts, M3 tokens, shared CSS)
 ├── resources/                          ← static images (po.webp, etc.)
 └── runtime/
     ├── sql-asm.js                      ← sql.js engine (eager init at module load)
     ├── webPython/                      ← Skulpt Python interpreter (lazy)
+    ├── webC/                           ← emception clang mirror (~450 MB, lazy)
+    │   ├── iframe.html                 ← C runtime iframe entry
+    │   ├── postmsg-bridge.js           ← parent ↔ wasm postMessage adapter
+    │   ├── main.bundle.js              ← upstream emception webpack bundle (3 MB)
+    │   ├── emception.worker.bundle.worker.js  (530 KB)
+    │   ├── cecdfcda360457a8f204.br     ← compressed clang (22 MB)
+    │   └── 249 × *.a / *.gz            ← libc, libc++, libGL, etc. — fetched on demand
     ├── luxon.min.js                    ← date library (used by blog/95)
     └── monaco/vs/                      ← Monaco editor (~3MB, vs/loader.js eager,
                                           vs/editor/editor.main lazy)
@@ -294,6 +306,96 @@ The fully-qualified name is `<courseSlug>:<schemaName>`. Lessons reference by `<
 - `vs/loader.js` (small AMD loader) is fetched eagerly by `learn.html`. `vs/editor/editor.main` (~3 MB) is loaded lazily by `ensureMonaco()` the first time a lesson or playground opens.
 - Editors are created via `createCodeEditor(container, opts)` — wraps `monaco.editor.create` with project defaults + auto-grow height (mimics Ace's `minLines`/`maxLines`).
 - Workers are routed to an empty `data:` URL so language services degrade to the main thread (required for `file://` compatibility). DevTools shows many `data:text/javascrip…` 0-byte requests; that's normal — filter `-data:` to hide.
+
+### C — emception (real clang in the browser)
+
+C is a special case. There's no good "C interpreter" library for browsers (we tried JSCPP, TCC.wasm — both broken). The only viable option is real LLVM/clang compiled to WebAssembly via [emception](https://github.com/jprendes/emception) — a complete IDE app, not a clean library.
+
+**Architecture** (`ensureC()` in `learn-engines.js`):
+
+```
+learn.html (parent)
+  │ creates hidden <iframe src="lib/runtime/webC/iframe.html">
+  ▼
+iframe.html
+  │ <script src="postmsg-bridge.js">
+  ▼
+postmsg-bridge.js
+  ├─ stream-fetch main.bundle.js (with byte-progress UI)
+  ├─ inject via <script src=> (so webpack auto-publicPath finds the bundle)
+  ├─ wait for window.emception (set by upstream demo bundle)
+  ├─ hide upstream demo UI elements
+  └─ accept {type:'run', id, code, stdin?} via postMessage
+       └─ writeFile /working/main.c → emcc → read /working/main.js
+            └─ execute via `new Function('Module', code)(Module)`
+                 with our Module.print/printErr/stdin/onExit hooks
+```
+
+The whole emception demo branch is **mirrored locally** under `lib/runtime/webC/` (~450 MB, 522 files). This is necessary because:
+- Cross-origin Workers are forbidden by browsers (CORS doesn't unlock them)
+- Loading from jsDelivr would put `main.bundle.js` cross-origin → its workers fail with `SecurityError`
+- Same-origin mirror sidesteps every cross-origin restriction
+
+Cloudflare Pages handles 450 MB easily (25 GB / 20k file limits, **unlimited bandwidth**). The browser only fetches what each program needs — typically **~25-30 MB on first C-playground entry**, cached forever after.
+
+**C-family modal gate**: any course with `family: 'c'` in its manifest entry triggers `gateCFamilyAccess()` (in `learn-core.js`) before render. The modal warns about download size and `file://` incompatibility. Confirmation is sticky in `localStorage['louie-learn:cfamily-loaded']`. To re-prompt: clear that key.
+
+**Compile flags currently used**:
+```
+emcc -O0 -sSINGLE_FILE=1 -sEXIT_RUNTIME=1 -sFORCE_FILESYSTEM=1 main.c -o main.js
+```
+
+- `-sSINGLE_FILE=1` — embed wasm as base64 in JS (one-file output)
+- `-sEXIT_RUNTIME=1` — fire `Module.onExit(status)` when main returns (so we know exit code)
+- `-sFORCE_FILESYSTEM=1` — wire `/dev/stdin` to `Module.stdin` (without it emcc may strip FS init)
+
+### C runtime — known limitations
+
+These are **not bugs in our code** — they're upstream constraints.
+
+1. **No interactive `scanf`/`getchar`**. Stdin is **pre-filled** from the textarea before Run; the program reads it synchronously. We tried `-sASYNCIFY=1 -sASYNCIFY_IMPORTS=fd_read`, but emception's specific emscripten build has a bug where ASYNCIFY's state machine corrupts immediately on first `Module.stdin`-via-`handleSleep`. Adding more imports (`proc_exit`, `fd_close`) trips the WASM layout earlier still. Without ASYNCIFY, `Module.stdin` is synchronous, can't pause WASM to wait for input.
+   - **Future fix**: when JSPI (JavaScript Promise Integration) is universally available — Chrome 133+ default, Firefox 132+ behind flag — replace ASYNCIFY with `-sJSPI=1`. JSPI uses native browser promise integration, doesn't have ASYNCIFY's state machine. Code stubs are kept (`onInputRequest` in `learn-engines.js`, `termRequestInput` in `learn-views.js`, `input-request`/`response` postMessage protocol in `postmsg-bridge.js`) — re-enable when JSPI ships.
+
+2. **stdout buffering can reorder output around `scanf`**. Symptom: `printf("Hello"); scanf(...);` may swallow or delay the prompt. Two fixes work:
+   - End every prompt `printf` with `\n` — line-buffered stdout flushes on newline (this is what the default playground demo does)
+   - Or call `fflush(stdout);` explicitly before each `scanf` (works without `\n`, useful for inline prompts like `printf("> ");`)
+   - Likely cause: libc line-buffers stdout when target is a TTY. With FORCE_FILESYSTEM, /dev/stdout is detected as a TTY, triggering buffering that delays our `Module.print` callbacks.
+
+3. **First-time C playground load is slow on cold cache** (~25-30 MB). Mitigated by:
+   - The C-family modal warning users upfront
+   - The progress bar in the playground showing real bytes-loaded
+   - Browser HTTP cache + Cloudflare edge cache making subsequent loads instant
+
+4. **`file://` users see a "needs HTTPS" message** instead of the playground. emception's worker construction needs HTTPS or `http://localhost`.
+
+### C playground — defaults
+
+When the user opens `#c/playground` (after dismissing the C-family modal), the editor pre-loads a teaching demo that touches every C concept the playground supports:
+
+```c
+#include <stdio.h>
+
+int main(void) {
+    char name[64];
+    int  age;
+    char *p = name;          // pointer to the array's first element
+
+    printf("What's your name?\n");
+    scanf("%63s", p);        // write the name through the pointer
+
+    printf("How old are you?\n");
+    scanf("%d", &age);       // &age is the address of `age` (also a pointer)
+
+    printf("Hello, %s! You are %d years old.\n", p, age);
+    return 0;
+}
+```
+
+Stdin textarea is pre-filled with `Louie\n19` so a single click on Run produces a complete output without any user typing. Comments switch between zh and en based on `currentLang`. Definition lives in `renderCPlayground()` in `learn-views.js`.
+
+### emcc stderr formatting
+
+emception forwards emcc's compiler messages line-by-line to `Module.printErr`, but each call carries no trailing newline. Without intervention, multi-line errors squash into one wrapped blob. `postmsg-bridge.js`'s compile-time `onOut` / `onErr` handlers wrap output through `withTrailingNl()` so each line lands on its own line in the terminal. ANSI color codes (e.g. `\x1b[32m`) are stripped, and emscripten internal info messages matching `^[a-z_]+:(INFO|DEBUG):` (like `shared:INFO: (Emscripten: Running sanity checks)`) are dropped — they're noise for students.
 
 ---
 

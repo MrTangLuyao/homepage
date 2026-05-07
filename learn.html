@@ -120,6 +120,23 @@
     <span data-i18n="footer-copy">Copyright © 2026 路易的学习室</span>
   </footer>
 
+  <!-- C-family resource warning modal. Hidden by default; opened by
+       gateCFamilyAccess() in learn-core.js before any C-family course route. -->
+  <div id="c-resources-modal" class="m3-modal" hidden>
+    <div class="m3-modal-backdrop"></div>
+    <div class="m3-modal-card" role="dialog" aria-labelledby="c-modal-title">
+      <h2 class="m3-modal-title" id="c-modal-title">
+        <span class="warn-glyph">⚠</span>
+        <span id="c-modal-title-text" data-i18n="c-modal-title">你正在尝试访问 C 语言相关的资源</span>
+      </h2>
+      <div class="m3-modal-body" id="c-modal-body"></div>
+      <div class="m3-modal-actions">
+        <button class="btn btn-ghost ripple-surface" id="c-modal-cancel" data-i18n="c-modal-cancel">取消</button>
+        <button class="btn btn-primary ripple-surface" id="c-modal-confirm" data-i18n="c-modal-confirm">加载资源</button>
+      </div>
+    </div>
+  </div>
+
   <script src="lib/runtime/sql-asm.js"></script>
   <script src="lib/runtime/monaco/vs/loader.js"></script>
   <script src="learn/learn_data/manifest.js"></script>

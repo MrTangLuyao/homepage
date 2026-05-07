@@ -59,6 +59,134 @@ function ensurePython() {
   return _pythonReady;
 }
 
+/* ─── C engine (emception, lazy-loaded via hidden iframe) ─── */
+//
+// emception is a complete C/C++ compiler (clang+lld+libc++ → WASM) but
+// it's shipped as a webapp, not a library. We can't pull it into the main
+// thread because it contains workers that load cross-origin assets and
+// sysroot tarballs. Instead we host a tiny shell at lib/runtime/webC/
+// that loads the upstream demo bundle from jsDelivr; we communicate via
+// postMessage.
+//
+// First-use cost: ~25 MB of compiler/sysroot from CDN (browser-cached after).
+// Subsequent runs: instant — the iframe stays alive for the whole session.
+//
+// Public API:
+//   ensureC({ onProgress? }) → Promise<cEngine>
+//   cEngine.run(code, { stdin?, flags?, onStdout?, onStderr? })
+//          → Promise<{ exitCode, error? }>
+//
+// Stdout / stderr are NOT collected by run() itself — pipe them via the
+// onStdout/onStderr callbacks (mirrors Skulpt's pattern). Errors at the
+// compile or runtime level surface as { error: '...' }; clean program
+// exits give exitCode = 0.
+let _cReady    = null;
+let _cIframe   = null;
+let _cRuns     = {};   // run id → { onStdout, onStderr, resolve, reject }
+let _cNextId   = 1;
+let _cOnInitProgress = () => {};
+
+function ensureC(opts = {}) {
+  if (_cReady) {
+    // Allow caller to subscribe to progress on a pre-existing init
+    if (opts.onProgress) _cOnInitProgress = opts.onProgress;
+    return _cReady;
+  }
+  _cOnInitProgress = opts.onProgress || (() => {});
+
+  _cReady = new Promise((resolve, reject) => {
+    // Hidden iframe lives in body; one per session.
+    _cIframe = document.createElement('iframe');
+    _cIframe.src = 'lib/runtime/webC/iframe.html';
+    _cIframe.setAttribute('aria-hidden', 'true');
+    _cIframe.style.cssText = 'position:fixed;left:0;top:0;width:0;height:0;border:0;visibility:hidden;';
+    document.body.appendChild(_cIframe);
+
+    // Hard timeout: cold-loading 25 MB on a slow network can be slow.
+    const TIMEOUT_MS = 120 * 1000;
+    const timeoutId = setTimeout(() => {
+      reject(new Error('C runtime did not initialise within 120 s — check your network'));
+    }, TIMEOUT_MS);
+
+    window.addEventListener('message', (ev) => {
+      if (!_cIframe || ev.source !== _cIframe.contentWindow) return;
+      const msg = ev.data;
+      if (!msg || typeof msg !== 'object') return;
+
+      if (msg.type === 'progress') {
+        // Pass through the iframe's progress shape:
+        //   { phase: 'download' | 'init' | 'ready' | 'error',
+        //     loaded?, total?, message? }
+        _cOnInitProgress({
+          phase:   msg.phase   || 'init',
+          loaded:  msg.loaded,
+          total:   msg.total,
+          message: msg.message || '',
+        });
+        return;
+      }
+      if (msg.type === 'ready') {
+        clearTimeout(timeoutId);
+        resolve(_cEngine);
+        return;
+      }
+      // Per-run streaming + terminal frames
+      const run = _cRuns[msg.id];
+      if (!run) return;
+      if (msg.type === 'stdout') run.onStdout(msg.text);
+      else if (msg.type === 'stderr') run.onStderr(msg.text);
+      else if (msg.type === 'input-request') {
+        // The compiled program is blocked on scanf/getchar. Ask the caller
+        // for input (via their onInputRequest callback) and post back.
+        const respond = (text) => {
+          if (!_cIframe || !_cIframe.contentWindow) return;
+          _cIframe.contentWindow.postMessage({
+            type: 'input-response', id: msg.id, text,
+          }, '*');
+        };
+        if (typeof run.onInputRequest === 'function') {
+          Promise.resolve(run.onInputRequest()).then(respond, () => respond(null));
+        } else {
+          respond(null);   // no handler — send EOF, scanf returns
+        }
+      }
+      else if (msg.type === 'done') {
+        delete _cRuns[msg.id];
+        run.resolve({ exitCode: msg.exitCode, error: msg.error });
+      }
+    });
+  });
+
+  return _cReady;
+}
+
+const _cEngine = {
+  run(code, opts = {}) {
+    return new Promise((resolve, reject) => {
+      if (!_cIframe || !_cIframe.contentWindow) {
+        reject(new Error('C runtime iframe is not ready'));
+        return;
+      }
+      const id = _cNextId++;
+      _cRuns[id] = {
+        onStdout:       opts.onStdout       || (() => {}),
+        onStderr:       opts.onStderr       || (() => {}),
+        // Async callback: must return a Promise<string|null>. Used for
+        // interactive scanf — null means EOF, string is one input line.
+        onInputRequest: opts.onInputRequest,
+        resolve, reject,
+      };
+      _cIframe.contentWindow.postMessage({
+        type:  'run',
+        id,
+        code:  String(code),
+        stdin: String(opts.stdin || ''),
+        flags: opts.flags || '-O0',
+      }, '*');
+    });
+  },
+};
+
 /* ─── Monaco editor (lazy-loaded, ~3MB) ─── */
 //
 // Monaco ships with its own AMD loader. The pattern:

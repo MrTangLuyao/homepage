@@ -60,7 +60,30 @@
       "Bash(grep *)",
       "Bash(rm -rf python)",
       "Bash(mv python_new python)",
-      "Bash(awk '{tot+=$1} END {print tot, \"bytes \\(2 files\\)\"}')"
+      "Bash(awk '{tot+=$1} END {print tot, \"bytes \\(2 files\\)\"}')",
+      "Bash(curl -sL --max-time 20 -w '\\\\nHTTP %{http_code}, %{size_download} bytes\\\\n' https://cdn.jsdelivr.net/npm/jscpp/dist/JSCPP.es5.min.js -o C:/Users/Louie/Documents/GitHub/homepage/lib/runtime/jscpp.min.js)",
+      "Bash(curl -sL \"https://data.jsdelivr.com/v1/package/npm/jscpp\")",
+      "Bash(curl -sL \"https://registry.npmjs.org/JSCPP\")",
+      "Bash(curl -sL \"https://data.jsdelivr.com/v1/package/npm/JSCPP@2.0.9/flat\")",
+      "Bash(curl -sL \"https://data.jsdelivr.com/v1/package/npm/JSCPP@2.0.0/flat\")",
+      "Bash(curl -sL --max-time 60 -w '\\\\nHTTP %{http_code}, %{size_download} bytes\\\\n' https://cdn.jsdelivr.net/npm/JSCPP@2.0.0/dist/JSCPP.js -o C:/Users/Louie/Documents/GitHub/homepage/lib/runtime/jscpp.js)",
+      "Bash(awk 'NR<=13270' \"C:/Users/Louie/Documents/GitHub/homepage/lib/runtime/jscpp.js\")",
+      "Bash(sed -i 's|process.env.TEMP + .\\\\\\\\\\\\\\\\jscpp|\"C:/Users/Louie/AppData/Local/Temp/jscpp|; s|jscpp-bundle.js.\\\\;|jscpp-bundle.js\";|' /tmp/test-jscpp-clean.js)",
+      "Read(//tmp/**)",
+      "Bash(curl -sL --max-time 30 -w '\\\\nHTTP %{http_code} | %{size_download} bytes\\\\n' https://raw.githubusercontent.com/felixhao28/JSCPP/gh-pages/dist/JSCPP.es5.min.js -o /tmp/JSCPP.es5.min.js)",
+      "Bash(curl -sIL \"https://cdn.jsdelivr.net/gh/eliot-akira/tcc-wasm@main/tcc.min.js\")",
+      "Bash(curl -sL --max-time 60 -w '\\\\nHTTP %{http_code} | %{size_download} bytes\\\\n' https://cdn.jsdelivr.net/gh/eliot-akira/tcc-wasm@main/tcc.min.js -o C:/Users/Louie/AppData/Local/Temp/tcc.min.js)",
+      "Bash(curl -s \"https://api.github.com/repos/jprendes/emception\")",
+      "Bash(curl -s \"https://api.github.com/repos/jprendes/emception/git/trees/gh-pages?recursive=0\")",
+      "Bash(curl -s \"https://raw.githubusercontent.com/jprendes/emception/demo/index.html\")",
+      "Bash(curl -s \"https://raw.githubusercontent.com/jprendes/emception/master/README.md\")",
+      "Bash(bun     --version)",
+      "Bash(emcc    --version)",
+      "Bash(docker  --version)",
+      "Bash(git     --version)",
+      "Bash(curl -s \"https://raw.githubusercontent.com/jprendes/emception/master/demo/package.json\")",
+      "Bash(curl -s \"https://raw.githubusercontent.com/jprendes/emception/master/demo/webpack.config.js\")",
+      "Bash(curl -s \"https://raw.githubusercontent.com/jprendes/emception/master/demo/emception.worker.js\")"
     ]
   }
 }

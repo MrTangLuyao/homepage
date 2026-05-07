@@ -259,6 +259,76 @@ function promptResetCourse(slug, courseTitle) {
   route();
 }
 
+/* ─── C-family resource warning gate ───
+ * route() calls this before any course whose manifest entry has family:'c'.
+ * Resolves true if user confirmed (or has confirmed previously); false if
+ * they cancelled (router then sends them back to the course list).
+ *
+ * On file://, the dialog swaps into a "you need HTTPS" message and only
+ * exposes a 取消/Back button — there's no point letting them proceed because
+ * the C runtime cannot fetch its assets cross-origin from a null origin.
+ *
+ * Confirmation persists across visits via localStorage. To re-prompt, run
+ *   localStorage.removeItem('louie-learn:cfamily-loaded')
+ * in DevTools.
+ */
+const _CFAMILY_LS_KEY = 'louie-learn:cfamily-loaded';
+
+function gateCFamilyAccess() {
+  // Already passed once on this device — skip.
+  try {
+    if (localStorage.getItem(_CFAMILY_LS_KEY) === '1') return Promise.resolve(true);
+  } catch (e) {}
+
+  const modal      = document.getElementById('c-resources-modal');
+  const titleText  = document.getElementById('c-modal-title-text');
+  const body       = document.getElementById('c-modal-body');
+  const cancelBtn  = document.getElementById('c-modal-cancel');
+  const confirmBtn = document.getElementById('c-modal-confirm');
+  if (!modal) return Promise.resolve(true);   // safety fallback
+
+  const isFile = (location.protocol === 'file:');
+  titleText.textContent = tt('c-modal-title');
+  body.innerHTML = isFile ? tt('c-modal-body-file') : tt('c-modal-body-online');
+  cancelBtn.textContent  = isFile ? tt('c-modal-back') : tt('c-modal-cancel');
+  confirmBtn.textContent = tt('c-modal-confirm');
+  confirmBtn.style.display = isFile ? 'none' : '';
+
+  modal.hidden = false;
+  // Prevent background scroll while modal is open
+  const prevOverflow = document.body.style.overflow;
+  document.body.style.overflow = 'hidden';
+
+  return new Promise((resolve) => {
+    function close(result) {
+      modal.hidden = true;
+      document.body.style.overflow = prevOverflow;
+      cancelBtn.removeEventListener('click', onCancel);
+      confirmBtn.removeEventListener('click', onConfirm);
+      modal.removeEventListener('click', onBackdrop);
+      document.removeEventListener('keydown', onKey);
+      resolve(result);
+    }
+    function onCancel()   { close(false); }
+    function onConfirm()  {
+      try { localStorage.setItem(_CFAMILY_LS_KEY, '1'); } catch (e) {}
+      close(true);
+    }
+    function onBackdrop(e) {
+      // Click on the dimmed backdrop (not the card) cancels
+      if (e.target.classList && e.target.classList.contains('m3-modal-backdrop')) onCancel();
+    }
+    function onKey(e) {
+      if (e.key === 'Escape') onCancel();
+      else if (e.key === 'Enter' && !isFile) onConfirm();
+    }
+    cancelBtn.addEventListener('click', onCancel);
+    confirmBtn.addEventListener('click', onConfirm);
+    modal.addEventListener('click', onBackdrop);
+    document.addEventListener('keydown', onKey);
+  });
+}
+
 /* ─── Loading placeholder with refresh fallback ───
  * Used everywhere we show "加载中…" / "Loading…". The refresh button is
  * an escape hatch in case the load gets stuck (Monaco / SQL.js / Skulpt

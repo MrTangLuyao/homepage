@@ -611,7 +611,7 @@ async function renderLesson(courseSlug, lessonIdRaw) {
 }
 
 /* ─── Router ─── */
-function route() {
+async function route() {
   // Dispose any Monaco editors from the previous view BEFORE the new
   // render replaces lesson-content's DOM. Monaco doesn't auto-clean up
   // when its container is removed — without this, editors accumulate
@@ -620,6 +620,17 @@ function route() {
 
   const hash = location.hash.replace(/^#/, '').trim();
   const parts = hash.split('/').filter(Boolean);
+
+  // Gate C-family course routes behind the resource-loading warning modal.
+  // First-time confirmation is sticky in localStorage; subsequent visits
+  // skip the prompt. If the user cancels, send them back to the course list.
+  if (parts.length >= 1) {
+    const courseInfo = (manifest.courses || []).find(c => c.slug === parts[0]);
+    if (courseInfo && courseInfo.family === 'c') {
+      const ok = await gateCFamilyAccess();
+      if (!ok) { location.hash = ''; return; }
+    }
+  }
   const courseList = document.getElementById('view-courses');
   const courseView = document.getElementById('view-course');
   const lessonView = document.getElementById('view-lesson');
@@ -653,6 +664,8 @@ function route() {
     const courseInfo = (manifest.courses || []).find(c => c.slug === parts[0]);
     if (courseInfo?.type === 'python' || parts[0] === 'python') {
       renderPythonPlayground(parts[0]);
+    } else if (courseInfo?.type === 'c' || parts[0] === 'c') {
+      renderCPlayground(parts[0]);
     } else {
       renderPlayground(parts[0]);
     }

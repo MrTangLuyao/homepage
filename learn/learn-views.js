@@ -454,3 +454,349 @@ async function renderPythonPlayground(courseSlug) {
   document.getElementById('btn-clear-term').addEventListener('click', () => { if (!_running) termClear(); });
   document.getElementById('pg-py-clear').addEventListener('click', () => { monacoEd.setValue(''); termClear(); });
 }
+
+/* ─── C Playground view ─── */
+//
+// Differs from Python's:
+//   - C runtime lives in a hidden iframe (lib/runtime/webC/iframe.html);
+//     ensureC() may take 15–60 s on first cold load (~25 MB from CDN).
+//   - We show progress messages during init (forwarded from the iframe).
+//   - No interactive stdin: emcc compiles + runs as a unit; if the user
+//     code calls scanf, it reads from a "Stdin" textarea pre-populated
+//     before clicking Run.
+async function renderCPlayground(courseSlug) {
+  const wrap = document.getElementById('lesson-content');
+  wrap.innerHTML = loadingHtml(currentLang === 'zh' ? '加载中…' : 'Loading…');
+  const navBar = document.getElementById('lesson-nav-bar');
+  if (navBar) navBar.innerHTML = '';
+
+  let course;
+  try {
+    course = await loadCourse(courseSlug);
+  } catch(e) {
+    wrap.innerHTML = `<div class="not-found"><h2>${tt('err-course-load')}</h2><p>${tt('not-found-desc')}</p><pre style="margin-top:14px;color:var(--err);font-size:12px;">${escapeHtml(String(e.message || e))}</pre></div>`;
+    return;
+  }
+
+  // Render skeleton immediately so users see something while the C runtime
+  // boots. Monaco loads in parallel (small) — emception is the long pole.
+  wrap.innerHTML = `
+    <div class="lesson-pane lesson-pane-left fade-in">
+      <div class="lesson-meta-row">
+        <span class="lesson-pill">${pickLang(course.title)}</span>
+      </div>
+      <div class="lesson-title-row">
+        <h1 class="lesson-title">${pickLang(course.playgroundTitle) || (currentLang === 'zh' ? '自定义 C 代码' : 'C Playground')}</h1>
+      </div>
+      <p style="color:var(--muted); font-size:14px; line-height:1.8; margin-bottom:18px;">${currentLang === 'zh'
+        ? '自由编写 C 代码，使用真 clang 编译器（emception，~25 MB 首次加载）。'
+        : 'Free-form C with the real clang compiler (emception, ~25 MB first load).'
+      }</p>
+      <style>
+        .c-load-card { padding: 14px 16px; border: 1px solid var(--border); border-radius: 10px; background: rgba(0,0,0,0.15); }
+        .c-load-title { font-size: 13px; color: var(--text); margin-bottom: 12px; }
+        .c-load-track { height: 4px; background: var(--border); border-radius: 2px; overflow: hidden; position: relative; }
+        .c-load-fill  { height: 100%; background: linear-gradient(90deg, var(--accent), var(--accent-on)); border-radius: 2px; transition: width 0.4s ease; width: 0%; }
+        .c-load-fill.is-indeterminate { width: 30% !important; animation: c-load-bounce 1.4s ease-in-out infinite; }
+        @keyframes c-load-bounce {
+          0%   { transform: translateX(-50%); }
+          50%  { transform: translateX(250%); }
+          100% { transform: translateX(-50%); }
+        }
+        .c-load-detail { font-size: 11px; color: var(--muted); margin-top: 8px; font-variant-numeric: tabular-nums; line-height: 1.5; }
+        /* is-error / is-ready visuals live in learn.css so they share the
+           transition palette with other cards; do NOT add display:none here. */
+      </style>
+      <div id="c-load-card" class="c-load-card">
+        <div class="c-load-title" id="c-load-title">${currentLang === 'zh' ? '正在加载 C 编译器…' : 'Loading C compiler…'}</div>
+        <div class="c-load-track"><div class="c-load-fill is-indeterminate" id="c-load-fill"></div></div>
+        <div class="c-load-detail" id="c-load-detail">${currentLang === 'zh' ? '首次约 25 MB，浏览器会缓存。' : 'First time ~25 MB; cached after.'}</div>
+      </div>
+    </div>
+    ${SPLITTER_HTML}
+    <div class="lesson-pane lesson-pane-right lesson-right fade-in">
+      <div class="editor-wrap">
+        <div class="editor-label">
+          <span>${currentLang === 'zh' ? '在这里写 C 代码' : 'Write your C here'}</span>
+          <span class="editor-actions">
+            <button class="editor-mini-btn" id="pg-c-clear">${tt('py-clear')}</button>
+          </span>
+        </div>
+        <div class="editor-host" id="editor-host">
+          <div id="c-editor"></div>
+        </div>
+      </div>
+      <div class="editor-wrap" style="margin-top:10px;">
+        <div class="editor-label">
+          <span>${currentLang === 'zh' ? 'stdin · 标准输入' : 'stdin · standard input'}</span>
+          <span class="editor-actions" style="font-size:11px; color:var(--muted);">${currentLang === 'zh'
+            ? '点 Run 之前在这里填好程序需要的所有输入'
+            : 'Fill all input here before clicking Run'}</span>
+        </div>
+        <textarea id="c-stdin" rows="3" spellcheck="false"
+          placeholder="${currentLang === 'zh'
+            ? '示例：scanf(&quot;%d&quot;, &amp;a) → 在这里输入数字。多个输入用换行分隔。'
+            : 'e.g. scanf(&quot;%d&quot;, &amp;a) → type a number here. Use newlines for multiple inputs.'}"
+          style="width:100%; box-sizing:border-box; resize:vertical;
+                 background:#1e1e1e; color:#d4d4d4; border:1px solid var(--border);
+                 border-radius:6px; padding:8px 10px;
+                 font:13px ui-monospace, 'JetBrains Mono', monospace;">Louie
+19</textarea>
+      </div>
+      <div class="editor-bar">
+        <button class="btn btn-ghost" id="btn-run" disabled>▶  ${tt('btn-run')}</button>
+      </div>
+      <div class="terminal-wrap">
+        <div class="terminal-label">
+          <span>Terminal</span>
+          <button class="editor-mini-btn" id="btn-clear-term">${tt('py-clear')}</button>
+        </div>
+        <div class="terminal" id="c-terminal">
+          <span class="t-muted">${currentLang === 'zh' ? '编译器加载完成后即可运行。' : 'Once the compiler is loaded you can run.'}</span>
+        </div>
+      </div>
+    </div>
+  `;
+
+  requestAnimationFrame(() => {
+    wrap.querySelectorAll('.fade-in').forEach(el => el.classList.add('visible'));
+    bindRipples();
+    bindSplitter();
+  });
+
+  // Editor (Monaco). Default code shows pointers + two scanf inputs:
+  //   - char *p = name      → pointer to the array's first element
+  //   - scanf("%63s", p)    → write through the pointer
+  //   - scanf("%d", &age)   → &age is itself a pointer (address-of)
+  // printf strings end with \n so libc's line buffering flushes cleanly —
+  // no need for fflush(stdout) here. (fflush is its own teaching topic.)
+  const DEFAULT_C_CODE = (currentLang === 'zh')
+    ? `#include <stdio.h>
+
+int main(void) {
+    char name[64];
+    int  age;
+    char *p = name;          // 指向 name 数组首元素的指针
+
+    printf("What's your name?\\n");
+    scanf("%63s", p);        // 通过指针 p 把名字写进 name
+
+    printf("How old are you?\\n");
+    scanf("%d", &age);       // &age 取 age 的地址 —— 也是个指针
+
+    printf("Hello, %s! You are %d years old.\\n", p, age);
+    return 0;
+}
+`
+    : `#include <stdio.h>
+
+int main(void) {
+    char name[64];
+    int  age;
+    char *p = name;          // pointer to name's first element
+
+    printf("What's your name?\\n");
+    scanf("%63s", p);        // write the name through the pointer p
+
+    printf("How old are you?\\n");
+    scanf("%d", &age);       // &age is the address of age — also a pointer
+
+    printf("Hello, %s! You are %d years old.\\n", p, age);
+    return 0;
+}
+`;
+
+  await ensureMonaco();
+  const editorHost = document.getElementById('editor-host');
+  const monacoEd = createCodeEditor(document.getElementById('c-editor'), {
+    language: 'c',
+    value: DEFAULT_C_CODE,
+    minLines: 12, maxLines: 30,
+    tabSize: 4, wordWrap: 'off',
+  });
+  monacoEd.onDidFocusEditorWidget(() => editorHost.classList.add('is-focused'));
+  monacoEd.onDidBlurEditorWidget (() => editorHost.classList.remove('is-focused'));
+  monacoEd.addCommand(monaco.KeyMod.CtrlCmd | monaco.KeyCode.Enter,
+    () => document.getElementById('btn-run')?.click()
+  );
+
+  // Terminal helpers
+  const termEl = document.getElementById('c-terminal');
+  function termClear() { termEl.innerHTML = ''; }
+  function termAppend(text, cls) {
+    const s = document.createElement('span');
+    s.className = cls || 't-out';
+    s.textContent = text;
+    termEl.appendChild(s);
+    termEl.scrollTop = termEl.scrollHeight;
+  }
+
+  // Interactive input prompt — appears in the terminal when scanf/getchar
+  // blocks. Returns a Promise<string|null>. Enter commits the line; Ctrl+D
+  // sends EOF (null).
+  function termRequestInput() {
+    return new Promise((resolve) => {
+      const line = document.createElement('div');
+      line.className = 't-input-line';
+      const pSpan = document.createElement('span');
+      pSpan.className = 't-prompt';
+      pSpan.textContent = '▶ ';
+      const inp = document.createElement('input');
+      inp.className = 't-input-field';
+      inp.type = 'text';
+      inp.setAttribute('autocomplete', 'off');
+      inp.setAttribute('spellcheck', 'false');
+      line.appendChild(pSpan);
+      line.appendChild(inp);
+      termEl.appendChild(line);
+      termEl.scrollTop = termEl.scrollHeight;
+      // Defer focus so it survives terminal scroll
+      requestAnimationFrame(() => inp.focus());
+      function commit(value) {
+        inp.disabled = true;
+        inp.style.display = 'none';
+        const echo = document.createElement('span');
+        echo.className = 't-echo';
+        echo.textContent = (value == null ? '(EOF)' : value) + '\n';
+        line.appendChild(echo);
+        termEl.scrollTop = termEl.scrollHeight;
+        resolve(value);
+      }
+      inp.addEventListener('keydown', (e) => {
+        if (e.key === 'Enter') { e.preventDefault(); commit(inp.value); }
+        else if (e.key === 'd' && (e.ctrlKey || e.metaKey)) { e.preventDefault(); commit(null); }
+      });
+    });
+  }
+
+  // ─── Progress card driver ───
+  const card    = document.getElementById('c-load-card');
+  const titleEl = document.getElementById('c-load-title');
+  const fillEl  = document.getElementById('c-load-fill');
+  const detail  = document.getElementById('c-load-detail');
+
+  function fmtMB(bytes) {
+    if (bytes == null) return '?';
+    return (bytes / (1024 * 1024)).toFixed(bytes < 1024 * 1024 ? 2 : 1) + ' MB';
+  }
+  let _readySeen = false;   // once set, lower-priority init warnings can't downgrade the card
+  function setProgress({ phase, loaded, total, message }) {
+    if (!card) return;
+    // After the engine reports 'ready', ignore stray 'init' warnings —
+    // those are typically runtime-level errors that belong in the terminal,
+    // not in the compiler-status card.
+    if (_readySeen && phase === 'init') return;
+    if (phase === 'download') {
+      titleEl.textContent = currentLang === 'zh' ? '下载 C 编译器' : 'Downloading C compiler';
+      if (total) {
+        const pct = Math.min(100, Math.round((loaded / total) * 100));
+        fillEl.classList.remove('is-indeterminate');
+        fillEl.style.width = pct + '%';
+        detail.textContent = `${pct}%  ·  ${fmtMB(loaded)} / ${fmtMB(total)}` +
+                             (message ? `  ·  ${message}` : '');
+      } else {
+        // Server didn't give content-length; show indeterminate + bytes loaded
+        fillEl.classList.add('is-indeterminate');
+        detail.textContent = `${fmtMB(loaded)}` + (message ? `  ·  ${message}` : '');
+      }
+    } else if (phase === 'init') {
+      titleEl.textContent = currentLang === 'zh' ? '初始化 clang 与系统库' : 'Initialising clang + sysroot';
+      fillEl.classList.add('is-indeterminate');
+      detail.textContent = (message || (currentLang === 'zh'
+        ? '正在加载 libc / libc++（来自浏览器缓存或 CDN）。'
+        : 'Loading libc / libc++ (from cache or CDN).'));
+    } else if (phase === 'ready') {
+      // Don't hide the card — transition it to a green "Clang Ready" state
+      // so the user sees confirmation that loading succeeded.
+      _readySeen = true;
+      card.classList.remove('is-error');
+      card.classList.add('is-ready');
+      fillEl.classList.remove('is-indeterminate');
+      fillEl.style.width = '100%';
+      titleEl.textContent = tt('c-ready-title');
+      detail.textContent  = tt('c-ready-detail');
+    } else if (phase === 'error') {
+      card.classList.add('is-error');
+      titleEl.textContent = currentLang === 'zh' ? 'C 编译器加载失败' : 'C compiler failed to load';
+      fillEl.classList.remove('is-indeterminate');
+      fillEl.style.width = '100%';
+      detail.textContent = message || '';
+    }
+  }
+
+  // Bring up the C runtime
+  const runBtn = document.getElementById('btn-run');
+  let cEngine;
+  try {
+    cEngine = await ensureC({ onProgress: setProgress });
+    setProgress({ phase: 'ready' });
+    runBtn.disabled = false;
+    termClear();
+    termAppend((currentLang === 'zh' ? '编译器已就绪，点击运行。' : 'Compiler ready — click Run.') + '\n', 't-muted');
+  } catch (e) {
+    setProgress({ phase: 'error', message: String(e.message || e) });
+    return;
+  }
+
+  // Run handler — three button states for clearer feedback:
+  //   idle       : "▶ 运行"            primary, clickable
+  //   compiling  : "编译中…"           greyed, disabled
+  //   done       : "✓ 完成"            green flash, then auto-revert to idle
+  let _running = false;
+  const RUN_LABEL = '▶  ' + tt('btn-run');
+  function setRunBtn(state) {
+    if (!runBtn) return;
+    runBtn.classList.remove('is-busy', 'is-done');
+    if (state === 'compiling') {
+      runBtn.disabled = true;
+      runBtn.classList.add('is-busy');
+      runBtn.textContent = tt('c-compiling');
+      _running = true;
+    } else if (state === 'done') {
+      runBtn.disabled = true;
+      runBtn.classList.add('is-done');
+      runBtn.textContent = tt('c-done');
+      // _running stays true through the flash so a quick double-click does nothing
+    } else { // idle
+      runBtn.disabled = false;
+      runBtn.textContent = RUN_LABEL;
+      _running = false;
+    }
+  }
+
+  runBtn.addEventListener('click', async () => {
+    if (_running) return;
+    setRunBtn('compiling');
+    termClear();
+
+    const code  = monacoEd.getValue();
+    const stdin = document.getElementById('c-stdin').value;
+    try {
+      const result = await cEngine.run(code, {
+        stdin,
+        flags: '-O0',
+        onStdout: (t) => termAppend(t, 't-out'),
+        onStderr: (t) => termAppend(t, 't-err'),
+        // Interactive: scanf / getchar block here until user types in terminal.
+        // The pre-filled stdin textarea drains FIRST; this only fires once
+        // those bytes are exhausted.
+        onInputRequest: termRequestInput,
+      });
+      if (result.error) {
+        termAppend('\n' + result.error + '\n', 't-err');
+      } else {
+        termAppend('\n' + (currentLang === 'zh' ? '程序退出，状态码 ' : 'Process exited, code ') + result.exitCode + '\n',
+                   result.exitCode === 0 ? 't-muted' : 't-err');
+      }
+    } catch (e) {
+      termAppend('\n' + String(e.message || e) + '\n', 't-err');
+    } finally {
+      // Brief "✓ 完成" flash then revert to idle
+      setRunBtn('done');
+      setTimeout(() => setRunBtn('idle'), 1200);
+    }
+  });
+
+  document.getElementById('btn-clear-term').addEventListener('click', () => { if (!_running) termClear(); });
+  document.getElementById('pg-c-clear').addEventListener('click', () => { monacoEd.setValue(''); });
+}
