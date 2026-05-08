@@ -247,6 +247,7 @@ function createCodeEditor(container, opts = {}) {
   const lineHeight = 22;
   const minLines = opts.minLines || 10;
   const maxLines = opts.maxLines || 30;
+  const fillParent = opts.fillParent === true;
 
   const ed = monaco.editor.create(container, {
     value:                 opts.value || '',
@@ -277,14 +278,30 @@ function createCodeEditor(container, opts = {}) {
   });
   _activeEditors.push(ed);
 
-  const updateHeight = () => {
-    const lines = Math.max(1, ed.getModel()?.getLineCount() || 1);
-    const visible = Math.min(maxLines, Math.max(minLines, lines));
-    container.style.height = (visible * lineHeight + 16) + 'px'; // +16 = top/bottom padding
-    ed.layout();
-  };
-  ed.onDidContentSizeChange(updateHeight);
-  updateHeight();
+  if (fillParent) {
+    // Belt + suspenders: force Monaco to its container's actual size at
+    // multiple points. automaticLayout's ResizeObserver sometimes misses
+    // the initial render and leaves the editor stuck at ~10 lines.
+    const forceLayout = () => {
+      const rect = container.getBoundingClientRect();
+      if (rect.width > 0 && rect.height > 0) {
+        ed.layout({ width: rect.width, height: rect.height });
+      }
+    };
+    requestAnimationFrame(forceLayout);
+    setTimeout(forceLayout, 50);
+    setTimeout(forceLayout, 200);
+    setTimeout(forceLayout, 600);
+  } else {
+    const updateHeight = () => {
+      const lines = Math.max(1, ed.getModel()?.getLineCount() || 1);
+      const visible = Math.min(maxLines, Math.max(minLines, lines));
+      container.style.height = (visible * lineHeight + 16) + 'px'; // +16 = top/bottom padding
+      ed.layout();
+    };
+    ed.onDidContentSizeChange(updateHeight);
+    updateHeight();
+  }
 
   return ed;
 }

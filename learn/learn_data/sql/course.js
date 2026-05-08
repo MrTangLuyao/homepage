@@ -1,10 +1,9 @@
 /* learn/learn_data/sql/course.js
- * v2 lazy-loading layout. Course metadata + lesson index + schema manifest only.
- * Lesson content (intro/task/hint/setup/expectedSql/...) lives in lessons/*.js
- * and is loaded by loadLesson() on demand. Schemas in schemas/*.js, loaded by
- * loadSchema() the first time a lesson or the playground references them.
+ * Course metadata + lesson index + schema manifest. Lesson content
+ * (intro/task/hint/setup/expectedSql/...) lives in lessons/*.js, loaded by
+ * loadLesson() on demand. Schemas in schemas/*.js, loaded by loadSchema()
+ * the first time a lesson or the playground references them.
  *
- * Generated from the legacy single-file course.js by learn/build/migrate-sql.js.
  * Edit lesson files directly — keep title/chapter in this index in sync. */
 
 LEARN.course('sql', {

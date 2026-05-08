@@ -91,6 +91,7 @@ async function renderCourse(slug) {
   const sectionLabel = (sec) => {
     if (sec === 'final') return tt('final-section');
     if (sec === 'main') return tt('lesson-section');
+    if (sec === 'stdlib') return tt('stdlib-section');
     return sec;
   };
 
@@ -201,19 +202,22 @@ async function renderPlayground(courseSlug) {
       </div>
     </div>
     ${SPLITTER_HTML}
-    <div class="lesson-pane lesson-pane-right lesson-right fade-in">
-      <div class="editor-wrap">
-        <div class="editor-label"><span>${tt('editor-label')}</span></div>
-        <div class="editor-host" id="editor-host">
-          <div id="sql-editor"></div>
+    <div class="lesson-pane lesson-pane-right editor-pane fade-in">
+      <div class="tab-pane code-tab is-active" data-tab="code">
+        <div id="sql-editor" class="editor-fill"></div>
+      </div>
+      <div class="tab-pane output-tab" data-tab="output">
+        <div class="result-box" id="result-box">
+          <div class="result-status is-info"><span class="dot"></span><span>—</span></div>
+          <div class="result-message" style="color:var(--muted);">${currentLang === 'zh' ? '点击运行查看结果。' : 'Click Run to see results.'}</div>
         </div>
       </div>
-      <div class="editor-bar">
-        <button class="btn btn-ghost" id="btn-run">▶  ${tt('btn-run')}</button>
-      </div>
-      <div class="result-box" id="result-box">
-        <div class="result-status is-info"><span class="dot"></span><span>—</span></div>
-        <div class="result-message" style="color:var(--muted);">${currentLang === 'zh' ? '点击运行查看结果。' : 'Click Run to see results.'}</div>
+      <div class="editor-foot">
+        <div class="tab-strip">
+          <button class="tab-btn is-active" data-tab="code">${currentLang === 'zh' ? '代码' : 'Code'}</button>
+          <button class="tab-btn" data-tab="output">${currentLang === 'zh' ? '输出' : 'Output'}</button>
+        </div>
+        <button class="btn btn-ghost ripple-surface" id="btn-run">▶  ${tt('btn-run')}</button>
       </div>
     </div>
   `;
@@ -238,9 +242,10 @@ async function renderPlayground(courseSlug) {
   }
 
   document.getElementById('pg-load-demo').addEventListener('click', async () => {
-    // v1: course.playgroundSetup is set at course-load time.
-    // v2: lazy-load the schema named in course.playgroundSchema on first click.
-    if (!course.playgroundSetup && course.playgroundSchema) {
+    // Lazy-load the schema named in course.playgroundSchema on first click,
+    // then cache the SQL string on `course` for re-use on subsequent clicks.
+    if (!course.playgroundSetup) {
+      if (!course.playgroundSchema) return;
       try {
         course.playgroundSetup = await loadSchema(courseSlug, course.playgroundSchema, course);
       } catch(e) {
@@ -248,7 +253,6 @@ async function renderPlayground(courseSlug) {
         return;
       }
     }
-    if (!course.playgroundSetup) return;
     playgroundDb = freshDb();
     try { runSetup(playgroundDb, course.playgroundSetup); } catch(e) {
       schemaContainer.innerHTML = `<div class="result-error">${escapeHtml(e.message || String(e))}</div>`;
@@ -262,18 +266,37 @@ async function renderPlayground(courseSlug) {
     refreshSchema();
   });
 
-  const editorHost = document.getElementById('editor-host');
   const resultBox = document.getElementById('result-box');
   const monacoEd = createCodeEditor(document.getElementById('sql-editor'), {
     language: 'sql',
-    minLines: 12, maxLines: 30,
+    fillParent: true,
     tabSize: 2, wordWrap: 'on',
   });
-  monacoEd.onDidFocusEditorWidget(() => editorHost.classList.add('is-focused'));
-  monacoEd.onDidBlurEditorWidget (() => editorHost.classList.remove('is-focused'));
+  monacoEd.addCommand(monaco.KeyMod.CtrlCmd | monaco.KeyCode.Enter,
+    () => document.getElementById('btn-run')?.click()
+  );
   const editor = { get value() { return monacoEd.getValue(); } };
 
+  /* Tab switching */
+  const tabPanes = wrap.querySelectorAll('.tab-pane');
+  const tabBtns  = wrap.querySelectorAll('.tab-btn');
+  function activateTab(name) {
+    tabPanes.forEach(p => p.classList.toggle('is-active', p.dataset.tab === name));
+    tabBtns .forEach(b => b.classList.toggle('is-active', b.dataset.tab === name));
+    if (name === 'code') {
+      requestAnimationFrame(() => {
+        const el = document.getElementById('sql-editor');
+        if (el) {
+          const r = el.getBoundingClientRect();
+          if (r.width > 0 && r.height > 0) monacoEd.layout({ width: r.width, height: r.height });
+        }
+      });
+    }
+  }
+  tabBtns.forEach(b => b.addEventListener('click', () => activateTab(b.dataset.tab)));
+
   document.getElementById('btn-run').addEventListener('click', () => {
+    activateTab('output');
     const sql = (editor.value || '').trim();
     if (!sql) {
       resultBox.innerHTML = `<div class="result-status is-info"><span class="dot"></span><span>—</span></div><div class="result-message">${tt('msg-empty-query')}</div>`;
@@ -324,29 +347,24 @@ async function renderPythonPlayground(courseSlug) {
       }</p>
     </div>
     ${SPLITTER_HTML}
-    <div class="lesson-pane lesson-pane-right lesson-right fade-in">
-      <div class="editor-wrap">
-        <div class="editor-label">
-          <span>${tt('py-editor-label')}</span>
-          <span class="editor-actions">
-            <button class="editor-mini-btn" id="pg-py-clear">${tt('py-clear')}</button>
-          </span>
-        </div>
-        <div class="editor-host" id="editor-host">
-          <div id="py-editor"></div>
+    <div class="lesson-pane lesson-pane-right editor-pane fade-in">
+      <div class="tab-pane code-tab is-active" data-tab="code">
+        <div id="py-editor" class="editor-fill"></div>
+        <div class="tab-actions">
+          <button class="editor-mini-btn" id="pg-py-clear">${tt('py-clear')}</button>
         </div>
       </div>
-      <div class="editor-bar">
-        <button class="btn btn-ghost" id="btn-run">▶  ${tt('btn-run')}</button>
-      </div>
-      <div class="terminal-wrap">
-        <div class="terminal-label">
-          <span>Terminal</span>
-          <button class="editor-mini-btn" id="btn-clear-term">${tt('py-clear')}</button>
-        </div>
+      <div class="tab-pane output-tab" data-tab="output">
         <div class="terminal" id="py-terminal">
           <span class="t-muted">${tt('py-ready')}</span>
         </div>
+      </div>
+      <div class="editor-foot">
+        <div class="tab-strip">
+          <button class="tab-btn is-active" data-tab="code">${currentLang === 'zh' ? '代码' : 'Code'}</button>
+          <button class="tab-btn" data-tab="output">${currentLang === 'zh' ? '输出' : 'Output'}</button>
+        </div>
+        <button class="btn btn-ghost ripple-surface" id="btn-run">▶  ${tt('btn-run')}</button>
       </div>
     </div>
   `;
@@ -357,18 +375,33 @@ async function renderPythonPlayground(courseSlug) {
     bindSplitter();
   });
 
-  const editorHost = document.getElementById('editor-host');
   const monacoEd = createCodeEditor(document.getElementById('py-editor'), {
     language: 'python',
     value: '',
-    minLines: 12, maxLines: 30,
+    fillParent: true,
     tabSize: 4, wordWrap: 'off',
   });
-  monacoEd.onDidFocusEditorWidget(() => editorHost.classList.add('is-focused'));
-  monacoEd.onDidBlurEditorWidget (() => editorHost.classList.remove('is-focused'));
   monacoEd.addCommand(monaco.KeyMod.CtrlCmd | monaco.KeyCode.Enter,
     () => document.getElementById('btn-run')?.click()
   );
+
+  /* Tab switching */
+  const tabPanes = wrap.querySelectorAll('.tab-pane');
+  const tabBtns  = wrap.querySelectorAll('.tab-btn');
+  function activateTab(name) {
+    tabPanes.forEach(p => p.classList.toggle('is-active', p.dataset.tab === name));
+    tabBtns .forEach(b => b.classList.toggle('is-active', b.dataset.tab === name));
+    if (name === 'code') {
+      requestAnimationFrame(() => {
+        const el = document.getElementById('py-editor');
+        if (el) {
+          const r = el.getBoundingClientRect();
+          if (r.width > 0 && r.height > 0) monacoEd.layout({ width: r.width, height: r.height });
+        }
+      });
+    }
+  }
+  tabBtns.forEach(b => b.addEventListener('click', () => activateTab(b.dataset.tab)));
 
   const editor = {
     get value() { return monacoEd.getValue(); },
@@ -431,6 +464,7 @@ async function renderPythonPlayground(courseSlug) {
 
   document.getElementById('btn-run').addEventListener('click', () => {
     if (_running) return;
+    activateTab('output');
     setRunning(true);
     termClear();
     const code = editor.value;
@@ -451,7 +485,6 @@ async function renderPythonPlayground(courseSlug) {
     }).finally(() => setRunning(false));
   });
 
-  document.getElementById('btn-clear-term').addEventListener('click', () => { if (!_running) termClear(); });
   document.getElementById('pg-py-clear').addEventListener('click', () => { monacoEd.setValue(''); termClear(); });
 }
 
@@ -514,46 +547,32 @@ async function renderCPlayground(courseSlug) {
       </div>
     </div>
     ${SPLITTER_HTML}
-    <div class="lesson-pane lesson-pane-right lesson-right fade-in">
-      <div class="editor-wrap">
-        <div class="editor-label">
-          <span>${currentLang === 'zh' ? '在这里写 C 代码' : 'Write your C here'}</span>
-          <span class="editor-actions">
-            <button class="editor-mini-btn" id="pg-c-clear">${tt('py-clear')}</button>
-          </span>
-        </div>
-        <div class="editor-host" id="editor-host">
-          <div id="c-editor"></div>
+    <div class="lesson-pane lesson-pane-right editor-pane fade-in">
+      <div class="tab-pane code-tab is-active" data-tab="code">
+        <div id="c-editor" class="editor-fill"></div>
+        <div class="tab-actions">
+          <button class="editor-mini-btn" id="pg-c-clear">${tt('py-clear')}</button>
         </div>
       </div>
-      <div class="editor-wrap" style="margin-top:10px;">
-        <div class="editor-label">
-          <span>${currentLang === 'zh' ? 'stdin · 标准输入' : 'stdin · standard input'}</span>
-          <span class="editor-actions" style="font-size:11px; color:var(--muted);">${currentLang === 'zh'
-            ? '点 Run 之前在这里填好程序需要的所有输入'
-            : 'Fill all input here before clicking Run'}</span>
-        </div>
-        <textarea id="c-stdin" rows="3" spellcheck="false"
+      <div class="tab-pane input-tab" data-tab="input">
+        <textarea id="c-stdin" spellcheck="false"
           placeholder="${currentLang === 'zh'
             ? '示例：scanf(&quot;%d&quot;, &amp;a) → 在这里输入数字。多个输入用换行分隔。'
-            : 'e.g. scanf(&quot;%d&quot;, &amp;a) → type a number here. Use newlines for multiple inputs.'}"
-          style="width:100%; box-sizing:border-box; resize:vertical;
-                 background:#1e1e1e; color:#d4d4d4; border:1px solid var(--border);
-                 border-radius:6px; padding:8px 10px;
-                 font:13px ui-monospace, 'JetBrains Mono', monospace;">Louie
+            : 'e.g. scanf(&quot;%d&quot;, &amp;a) → type a number here. Use newlines for multiple inputs.'}">Louie
 19</textarea>
       </div>
-      <div class="editor-bar">
-        <button class="btn btn-ghost" id="btn-run" disabled>▶  ${tt('btn-run')}</button>
-      </div>
-      <div class="terminal-wrap">
-        <div class="terminal-label">
-          <span>Terminal</span>
-          <button class="editor-mini-btn" id="btn-clear-term">${tt('py-clear')}</button>
-        </div>
+      <div class="tab-pane output-tab" data-tab="output">
         <div class="terminal" id="c-terminal">
           <span class="t-muted">${currentLang === 'zh' ? '编译器加载完成后即可运行。' : 'Once the compiler is loaded you can run.'}</span>
         </div>
+      </div>
+      <div class="editor-foot">
+        <div class="tab-strip">
+          <button class="tab-btn is-active" data-tab="code">${currentLang === 'zh' ? '代码' : 'Code'}</button>
+          <button class="tab-btn" data-tab="input">${currentLang === 'zh' ? '输入' : 'Input'}</button>
+          <button class="tab-btn" data-tab="output">${currentLang === 'zh' ? '输出' : 'Output'}</button>
+        </div>
+        <button class="btn btn-ghost ripple-surface" id="btn-run" disabled>▶  ${tt('btn-run')}</button>
       </div>
     </div>
   `;
@@ -607,18 +626,33 @@ int main(void) {
 `;
 
   await ensureMonaco();
-  const editorHost = document.getElementById('editor-host');
   const monacoEd = createCodeEditor(document.getElementById('c-editor'), {
     language: 'c',
     value: DEFAULT_C_CODE,
-    minLines: 12, maxLines: 30,
+    fillParent: true,
     tabSize: 4, wordWrap: 'off',
   });
-  monacoEd.onDidFocusEditorWidget(() => editorHost.classList.add('is-focused'));
-  monacoEd.onDidBlurEditorWidget (() => editorHost.classList.remove('is-focused'));
   monacoEd.addCommand(monaco.KeyMod.CtrlCmd | monaco.KeyCode.Enter,
     () => document.getElementById('btn-run')?.click()
   );
+
+  /* Tab switching */
+  const tabPanes = wrap.querySelectorAll('.tab-pane');
+  const tabBtns  = wrap.querySelectorAll('.tab-btn');
+  function activateTab(name) {
+    tabPanes.forEach(p => p.classList.toggle('is-active', p.dataset.tab === name));
+    tabBtns .forEach(b => b.classList.toggle('is-active', b.dataset.tab === name));
+    if (name === 'code') {
+      requestAnimationFrame(() => {
+        const el = document.getElementById('c-editor');
+        if (el) {
+          const r = el.getBoundingClientRect();
+          if (r.width > 0 && r.height > 0) monacoEd.layout({ width: r.width, height: r.height });
+        }
+      });
+    }
+  }
+  tabBtns.forEach(b => b.addEventListener('click', () => activateTab(b.dataset.tab)));
 
   // Terminal helpers
   const termEl = document.getElementById('c-terminal');
@@ -766,6 +800,7 @@ int main(void) {
 
   runBtn.addEventListener('click', async () => {
     if (_running) return;
+    activateTab('output');
     setRunBtn('compiling');
     termClear();
 
@@ -797,6 +832,5 @@ int main(void) {
     }
   });
 
-  document.getElementById('btn-clear-term').addEventListener('click', () => { if (!_running) termClear(); });
   document.getElementById('pg-c-clear').addEventListener('click', () => { monacoEd.setValue(''); });
 }

@@ -1,6 +1,6 @@
 # learn_readme.md
 
-> Notes for future-me and AI collaborators. This is how `learn.html` is wired together and how to add or extend interactive courses without breaking anything.
+> Notes for future-me. How `learn.html` is wired together and how to add or extend interactive courses without breaking anything.
 
 ---
 
@@ -13,9 +13,9 @@
 - A course's metadata + lesson index loads when the user opens that course; each lesson's full content (and any SQL schema it references) loads only when the user navigates into that lesson.
 
 Per-course download cost (first visit, browser-cached after):
-- SQL: ~8 KB course index + ~5-15 KB per lesson
-- Python: ~6 KB course index + ~3-10 KB per lesson
-- **C: ~25-30 MB** (clang.wasm + libc/libc++ archives) on first playground entry; subsequent visits free
+- SQL: ~8 KB course index + ~5–15 KB per lesson
+- Python: ~6 KB course index + ~3–10 KB per lesson
+- **C: ~25–30 MB** (clang.wasm + libc/libc++ archives) on first lesson or playground entry; subsequent visits free
 
 ---
 
@@ -26,16 +26,18 @@ learn.html                              ← interactive UI (routing, rendering, 
 learn/
 ├── learn-core.js                       ← loadCourse / loadLesson / loadSchema, ripple,
 │                                         splitter, progress, course caching
-├── learn-engines.js                    ← sql.js + Skulpt + Monaco wrappers,
+├── learn-engines.js                    ← sql.js + Skulpt + Monaco + emception wrappers,
 │                                         result-table rendering helpers
 ├── learn-i18n.js                       ← zh / en translations + applyLang / tt / pickLang
 ├── learn-lesson-parser.js              ← `@@key` parser + LEARN.{course,lesson,schema}
 │                                         registrars + assembleOneLesson
-├── learn-views.js                      ← course list, lesson list, playgrounds
-├── learn-lesson.js                     ← lesson runners (SQL grading, Python grading),
+├── learn-views.js                      ← course list, lesson list, playgrounds (SQL/Py/C)
+├── learn-lesson.js                     ← lesson runners (SQL/Python/C grading),
 │                                         hash router, boot
+├── learn.css                           ← shared styles incl. the new .editor-pane layout
 └── learn_data/
     ├── learn_readme.md                 ← this file
+    ├── learn_readme_c.md               ← Chinese version
     ├── manifest.js                     ← course catalogue (window.__LEARN_MANIFEST)
     ├── sql/
     │   ├── course.js                   ← metadata + lesson index + schema manifest
@@ -45,7 +47,9 @@ learn/
     │   ├── course.js                   ← metadata + lesson index (no schemas)
     │   └── lessons/<NN>-<slug>.js
     └── c/
-        └── course.js                   ← C course (currently playground-only)
+        ├── course.js                   ← metadata + lesson index (no schemas);
+        │                                 'main' (syntax) and 'stdlib' sections
+        └── lessons/<NN>-<slug>.js      ← 44 lessons total (30 syntax + 14 stdlib)
 lib/
 ├── design/                             ← visual assets (fonts, M3 tokens, shared CSS)
 ├── resources/                          ← static images (po.webp, etc.)
@@ -120,23 +124,24 @@ window.__LEARN_MANIFEST = {
       level: { zh: '入门', en: 'Beginner' },
       lessonsCount: 42,
       coming: false,                            // true → greyed-out "Coming Soon"
+      family: 'c',                              // OPTIONAL — gates entry behind the C-resource modal
     }
   ]
 };
 ```
 
-Manifest only tells the course list view what cards to show. The course's *contents* live behind `loadCourse(slug)`.
+Manifest only tells the course list view what cards to show. The course's *contents* live behind `loadCourse(slug)`. `family: 'c'` is currently the only family value, and it triggers `gateCFamilyAccess()` to warn about download size before the C-family course loads.
 
 ---
 
-## `course.js` schema (v2)
+## `course.js` schema
 
 A course file calls `LEARN.course(slug, meta)`. It carries metadata, a lesson INDEX, and (for SQL) a schema manifest:
 
 ```js
 LEARN.course('sql', {
   slug: 'sql',
-  type: 'sql',                                  // 'sql' | 'python'
+  type: 'sql',                                  // 'sql' | 'python' | 'c'
   title: { zh: '...', en: '...' },
   desc:  { zh: '...', en: '...' },
 
@@ -163,7 +168,7 @@ LEARN.course('sql', {
 });
 ```
 
-`section` defaults to `'main'`. The router treats `'final'` as a separate group with its own header in the lesson list (e.g., "最终挑战" / "Final challenges").
+`section` defaults to `'main'`. The router treats `'final'` and `'stdlib'` as separate groups with their own headers in the lesson list (e.g., "最终挑战" / "标准库"). The C course uses both `'main'` (syntax lessons) and `'stdlib'` (`<stdio.h>`, `<string.h>`, etc.).
 
 ---
 
@@ -229,14 +234,19 @@ The parser preserves the value verbatim — including a trailing `\n`. The conve
 @@starter:en
 ```
 
-This matters for `starter` (Monaco cursor placement) and `answer` / `expectedOutput` (Python grading compares stdout exactly).
+This matters for `starter` (Monaco cursor placement) and `answer` / `expectedOutput` (Python and C grading compare stdout exactly).
+
+### Bilingual content rules
+
+1. **Every prose field needs both `@@key:zh` and `@@key:en`.** Lessons are bilingual end-to-end.
+2. **Verbatim HTML.** `intro` / `task` / `hint` use raw HTML (`<p class="lead">`, `<pre><code>`, `<strong>`, `<code>`). Don't switch to Markdown — the parser is verbatim pass-through, not a Markdown renderer.
 
 ### Field reference
 
 | Field             | Type            | Where                 | Notes                                            |
 |-------------------|-----------------|-----------------------|--------------------------------------------------|
 | `id`              | int             | LEARN.lesson 2nd arg + course.js index | Stable identity, used for routing & progress    |
-| `section`         | string          | course.js index       | `'main'` (default) or `'final'`                  |
+| `section`         | string          | course.js index       | `'main'` (default), `'final'`, or `'stdlib'`     |
 | `slug`            | string          | course.js index       | URL-friendly; used in filename                   |
 | `title`           | bilingual       | course.js index       |                                                  |
 | `chapter`         | bilingual       | course.js index       | Sub-label shown under the lesson title           |
@@ -253,10 +263,10 @@ This matters for `starter` (Monaco cursor placement) and `answer` / `expectedOut
 | `tables`          | array           | lesson file           | Table names to preview in the left pane          |
 | `expectedSql`     | string          | lesson file           | Grader runs this against the same fresh DB       |
 | `checkOrder`      | bool            | lesson file           | `true` → row order must match (ORDER BY/LIMIT)   |
-| **Python only**   |                 |                       |                                                  |
+| **Python / C**    |                 |                       |                                                  |
 | `answer`          | code            | lesson file           | Reference solution (revealed by "Show answer")   |
 | `expectedOutput`  | string          | lesson file           | Grader compares stdout (after trim) to this      |
-| `testInputs`      | array           | lesson file           | Strings fed to `input()` during grading run      |
+| `testInputs`      | array           | lesson file           | Strings fed to `input()` (Py) / stdin (C) on grade |
 
 Bilingual fields appear as `@@key:zh` and `@@key:en` blocks. Scalar string/int/bool fields appear as plain `@@key` blocks. `tables` is comma- or space-separated. `testInputs` is one input per line.
 
@@ -283,7 +293,7 @@ The fully-qualified name is `<courseSlug>:<schemaName>`. Lessons reference by `<
 - **`final_schema`** — the big shared library/bookstore database. Used by every "final challenge" lesson + the playground.
 - **`c<N>_schema`** — single-use schema owned by lesson `N` (most lessons).
 - **Shared schemas keep the lowest member's id** in the name (`c3_schema` if shared by L3 + L5).
-- **Identical bytes only**. If two lessons differ even by one row, they get separate files. Don't merge for cosmetic reasons — the principle is "the lesson author chose those exact rows on purpose; respect it."
+- **Identical bytes only.** If two lessons differ even by one row, they get separate files. Don't merge for cosmetic reasons — the principle is "the lesson author chose those exact rows on purpose; respect it."
 - For *truly* shared concepts that read better with a name (e.g., `students_basic`, `books_with_genre`), give them semantic names. Use this sparingly.
 
 ---
@@ -300,11 +310,14 @@ The fully-qualified name is `<courseSlug>:<schemaName>`. Lessons reference by `<
 - Lazy-loaded on first Python lesson or playground entry (`ensurePython()`).
 - Output is captured for grading. `input()` is pumped through an in-page terminal during interactive runs; during grading runs it pulls from `testInputs` in order.
 - Hard runtime limits: `yieldLimit: 100` (event-loop yield cadence), `execLimit: 10000` (10s timeout for runaway loops).
+- Skulpt is Python 3-ish but not 100%. f-strings, list/dict/set comprehensions, basic stdlib (`math`, `random`, `re`) work; `numpy`, `pandas`, `requests` etc. don't.
 
 ### Code editor — Monaco
 - Lives at `lib/runtime/monaco/vs/`. Install: download monaco-editor's npm tarball, extract `package/min/vs/` into that path.
 - `vs/loader.js` (small AMD loader) is fetched eagerly by `learn.html`. `vs/editor/editor.main` (~3 MB) is loaded lazily by `ensureMonaco()` the first time a lesson or playground opens.
-- Editors are created via `createCodeEditor(container, opts)` — wraps `monaco.editor.create` with project defaults + auto-grow height (mimics Ace's `minLines`/`maxLines`).
+- Editors are created via `createCodeEditor(container, opts)`. Two height modes:
+  - `fillParent: true` — the container's height is set by its parent's CSS (used by lesson views with `.editor-pane`); the function calls `ed.layout()` multiple times after creation to recover from initial-render race conditions.
+  - default — auto-grow from `minLines` to `maxLines` based on content (Ace-like).
 - Workers are routed to an empty `data:` URL so language services degrade to the main thread (required for `file://` compatibility). DevTools shows many `data:text/javascrip…` 0-byte requests; that's normal — filter `-data:` to hide.
 
 ### C — emception (real clang in the browser)
@@ -336,7 +349,7 @@ The whole emception demo branch is **mirrored locally** under `lib/runtime/webC/
 - Loading from jsDelivr would put `main.bundle.js` cross-origin → its workers fail with `SecurityError`
 - Same-origin mirror sidesteps every cross-origin restriction
 
-Cloudflare Pages handles 450 MB easily (25 GB / 20k file limits, **unlimited bandwidth**). The browser only fetches what each program needs — typically **~25-30 MB on first C-playground entry**, cached forever after.
+Cloudflare Pages handles 450 MB easily (25 GB / 20k file limits, **unlimited bandwidth**). The browser only fetches what each program needs — typically **~25–30 MB on first C entry**, cached forever after.
 
 **C-family modal gate**: any course with `family: 'c'` in its manifest entry triggers `gateCFamilyAccess()` (in `learn-core.js`) before render. The modal warns about download size and `file://` incompatibility. Confirmation is sticky in `localStorage['louie-learn:cfamily-loaded']`. To re-prompt: clear that key.
 
@@ -361,12 +374,12 @@ These are **not bugs in our code** — they're upstream constraints.
    - Or call `fflush(stdout);` explicitly before each `scanf` (works without `\n`, useful for inline prompts like `printf("> ");`)
    - Likely cause: libc line-buffers stdout when target is a TTY. With FORCE_FILESYSTEM, /dev/stdout is detected as a TTY, triggering buffering that delays our `Module.print` callbacks.
 
-3. **First-time C playground load is slow on cold cache** (~25-30 MB). Mitigated by:
+3. **First-time C load is slow on cold cache** (~25–30 MB). Mitigated by:
    - The C-family modal warning users upfront
    - The progress bar in the playground showing real bytes-loaded
    - Browser HTTP cache + Cloudflare edge cache making subsequent loads instant
 
-4. **`file://` users see a "needs HTTPS" message** instead of the playground. emception's worker construction needs HTTPS or `http://localhost`.
+4. **`file://` users see a "needs HTTPS" message** instead of the playground/lesson. emception's worker construction needs HTTPS or `http://localhost`.
 
 ### C playground — defaults
 
@@ -399,6 +412,39 @@ emception forwards emcc's compiler messages line-by-line to `Module.printErr`, b
 
 ---
 
+## Right-pane editor layout
+
+The lesson and playground views share a single right-pane structure (`.editor-pane`). It uses absolute positioning to give Monaco a stable container size — `flex` and `overflow:auto` together caused several initial-render races where Monaco locked to ~10 lines.
+
+```
+┌──────────────────────────────────────┐  ← .editor-pane (background: var(--surface))
+│  ╭────────────────────────────────╮  │
+│  │                                │  │  ← .tab-pane.code-tab.is-active (background: #1e1e1e)
+│  │   Monaco editor (.editor-fill) │  │     position: absolute; top: 0; bottom: 50px;
+│  │   [reset][hint][answer]        │  │     border-bottom-radius: 14px (Chrome-tab-style merge)
+│  │   ← .tab-actions (top-right)   │  │
+│  ╰╮                              ╭╯  │
+│   │                              │   │
+│   │ [Code][Input][Output] ▶ ✓    │   │  ← .editor-foot (height: 50px)
+│   │                              │   │     ↑ tabs (left)        ↑ Run/Submit (right)
+│   ╰──────────────────────────────╯   │
+└──────────────────────────────────────┘
+```
+
+Key CSS rules (in `learn.css`, all marked `!important` because they need to defeat the more-specific `body.lesson-mode .lesson-pane { padding; overflow }` rules):
+
+- `.editor-pane` — `padding: 0; position: relative; overflow: hidden; background: var(--surface)`
+- `.editor-pane .tab-pane` — `position: absolute; top: 0; left: 0; right: 0; bottom: 50px; background: #1e1e1e; border-bottom-{left,right}-radius: 14px; overflow: hidden`. Hidden by default (`display: none`); active tab gets `display: block`.
+- `.editor-pane .editor-fill` — Monaco container, `position: absolute; inset: 0; width: 100%; height: 100%`.
+- `.editor-pane .editor-foot` — `position: absolute; bottom: 0; left: 0; right: 0; height: 50px` — bottom action bar.
+- `.tab-strip` / `.tab-btn` — Excel-style sheet tabs hanging from the foot's top edge. Active tab uses `background: #1e1e1e` (matching the editor) and `margin-top: -1px` to fuse seamlessly with the editor card above.
+
+Monaco internally renders its own scrollbar / overflow-guard layers that sometimes bypass the parent's `border-radius` clip — `learn.css` adds an explicit `border-bottom-{left,right}-radius` on `.editor-pane .tab-pane.code-tab .monaco-editor` and its `.overflow-guard` to keep both bottom corners clean.
+
+`createCodeEditor(container, { fillParent: true })` is the entry point. It runs `ed.layout({ width, height })` at four points (RAF, +50ms, +200ms, +600ms) to recover from the case where the parent's layout isn't fully resolved at create-time.
+
+---
+
 ## How to add a new lesson (SQL)
 
 1. Pick an `id` (next free integer in the course).
@@ -410,6 +456,14 @@ emception forwards emcc's compiler messages line-by-line to `Module.printErr`, b
 5. Append the index entry to `course.lessons` in `course.js`.
 6. Bump `lessonsCount` in `manifest.js` if visible.
 
+**SQL grader rules:**
+
+1. **Match `expectedSql` to the task exactly**: if the task says "name and age", `expectedSql` must `SELECT name, age` — not `SELECT *`.
+2. **SQLite dialect**: dates are ISO strings (`'YYYY-MM-DD'`); comparison is lexicographic AND chronological for that format. No `RIGHT JOIN` or `FULL OUTER JOIN`.
+3. **`checkOrder: false` (default)**: both result sets are sorted before compare. Set `true` only for `ORDER BY` / `LIMIT` lessons.
+4. **Hints nudge, don't solve**: "Try `WHERE`" beats giving the answer.
+5. **Write the schema first, then the task, then `expectedSql`** — this proves the problem is solvable and the data set is sufficient.
+
 ## How to add a new lesson (Python)
 
 1. Pick an `id`.
@@ -418,37 +472,33 @@ emception forwards emcc's compiler messages line-by-line to `Module.printErr`, b
 4. Append the index entry to `course.lessons` in `course.js`.
 5. No schema work — Python lessons are self-contained.
 
+**Python grader rules:**
+
+1. **`expectedOutput` must match stdout exactly** (after trim). If the task says "print the sum", make sure `answer` produces *only* that, with the right trailing `\n`.
+2. **`testInputs` order matches `input()` calls**. Inputs are strings (Python's `input()` returns string).
+3. **Sandbox limits**: no file I/O, no network. If a topic needs a file, simulate the content as a string variable.
+4. **Skulpt is Python 3-ish but not 100%** — see "Engines / Python" above for what works.
+
+## How to add a new lesson (C)
+
+1. Pick an `id` (next free integer; current C course goes 1–44).
+2. Pick a `slug` (`hello-c`, `pointers`, `malloc-free`, …).
+3. Decide the section: `'main'` for syntax, `'stdlib'` for `<header.h>` lessons.
+4. Create `learn/learn_data/c/lessons/<NN>-<slug>.js`.
+5. Append the index entry to `course.lessons` in `course.js`. Bump `lessonsCount` in `manifest.js`.
+
+**C grader rules:**
+
+1. **`expectedOutput` is whitespace-tolerant trim compare** against stdout. Stderr is included so compile errors are visible.
+2. **`testInputs` array is joined by newlines and pre-filled into stdin.** No interactive input — see the runtime limitations above.
+3. **Format every prompt's `printf` with a trailing `\n`**, otherwise libc line-buffering can swallow output.
+4. **Pin RNG / time-dependent output**. `srand(time(NULL))` will fail grading because output varies; use a fixed seed (`srand(42)`) or check only invariants (`time(NULL) > 0`).
+
 ## How to add a new course
 
 1. Pick a slug (lowercase, hyphenated). The folder name = the slug.
-2. Create `learn/learn_data/<slug>/course.js` registering with `LEARN.course('<slug>', { type: 'sql' | 'python', ... })`.
+2. Create `learn/learn_data/<slug>/course.js` registering with `LEARN.course('<slug>', { type: 'sql' | 'python' | 'c', ... })`.
 3. Create `lessons/` (and `schemas/` if SQL).
 4. Add an entry to `manifest.js`.
 
-A new language type (e.g., JavaScript, C) requires runtime work — adding an `ensure<Language>()` engine wrapper, a grading path in `learn-lesson.js`, and a playground in `learn-views.js`.
-
----
-
-## If you are an AI writing course content
-
-### General
-
-1. **Bilingual**: every prose field needs both `@@key:zh` and `@@key:en`.
-2. **Verbatim HTML**: intro/task/hint use raw HTML (`<p class="lead">`, `<pre><code>`, `<strong>`, `<code>`). Don't switch to Markdown — the parser doesn't render Markdown today (it's verbatim pass-through).
-3. **`@@` (double-at)** at column 0 is the field marker. Inside a code example a single `@` (Python decorator) is fine.
-4. **Trailing `\n` in `starter` / `answer` / `expectedOutput` is meaningful**. Encode it by leaving a blank line before the next `@@key`.
-
-### SQL specifics
-
-1. **Match `expectedSql` to the task exactly**: if the task says "name and age", `expectedSql` must `SELECT name, age` — not `SELECT *`.
-2. **SQLite dialect**: dates are ISO strings (`'YYYY-MM-DD'`); comparison is lexicographic AND chronological for that format. No `RIGHT JOIN` or `FULL OUTER JOIN`.
-3. **`checkOrder: false` (default)**: both result sets are sorted before compare. Set `true` only for `ORDER BY` / `LIMIT` lessons.
-4. **Hints nudge, don't solve**: "Try `WHERE`" beats giving the answer.
-5. **Write the schema first, then the task, then `expectedSql`** — this proves the problem is solvable and the data set is sufficient.
-
-### Python specifics
-
-1. **`expectedOutput` must match stdout exactly** (after trim). If your task says "print the sum", make sure `answer` produces *only* that, with the right trailing `\n`.
-2. **`testInputs` order matches `input()` calls**. Inputs are strings (Python's `input()` returns string).
-3. **Sandbox limits**: no file I/O, no network. If a topic needs a file, simulate the content as a string variable (see L48 / L49 for the convention).
-4. **Skulpt is Python 3-ish but not 100%**. f-strings, list/dict/set comprehensions, basic stdlib (`math`, `random`, `re`) all work; `numpy`, `pandas`, `requests` etc. don't.
+A new language type (e.g., JavaScript, Rust) requires runtime work — adding an `ensure<Language>()` engine wrapper in `learn-engines.js`, a grading path in `learn-lesson.js`, and a playground in `learn-views.js`. Match the C course's structure as the reference: it has the most complex runtime gating and is the cleanest example.

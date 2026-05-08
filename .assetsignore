@@ -14,6 +14,7 @@ wrangler.toml
 README.md
 LICENSE
 **/learn_readme.md
+claude*.md
 
 # OS / editor cruft
 .DS_Store

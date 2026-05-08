@@ -1,7 +1,7 @@
 /* ============================================================
  * learn/learn-lesson-parser.js
  * Defines the LEARN global (course/lesson/schema registrars) and
- * the @@key text-format parser used by the v2 lesson layout.
+ * the @@key text-format parser used by the lazy-loading lesson layout.
  *
  *   window.LEARN
  *     .course(slug, meta)        — register course metadata + lazy index
@@ -47,12 +47,10 @@ window.LEARN = window.LEARN || {
   },
 
   course(courseSlug, meta) {
-    (window.__LEARN_COURSES = window.__LEARN_COURSES || {})[courseSlug] = {
-      ...meta,
-      // meta.lessons is the index (id, section, slug, title, chapter, file).
-      // Lessons stay as index until loadLesson() lazily fills in content.
-      _needsAssembly: true,
-    };
+    // meta.lessons is the lesson INDEX (id, section, slug, title, chapter,
+    // file). Each entry stays as index until loadLesson() lazily fills in
+    // its content (intro, task, hint, setup, ...) via the lesson .js file.
+    (window.__LEARN_COURSES = window.__LEARN_COURSES || {})[courseSlug] = { ...meta };
   },
 };
 
@@ -141,9 +139,9 @@ function assembleLesson(blocks, courseSlug) {
         continue;
       }
       lesson[baseKey] = lesson[baseKey] || {};
-      // Verbatim — no trimming. fields like `starter` rely on a trailing '\n'.
-      // For HTML prose (intro/task/hint), v1 values have no surrounding
-      // whitespace anyway, so this is a no-op for those.
+      // Verbatim — no trimming. Fields like `starter` rely on a trailing '\n'
+      // (cursor placement). HTML prose (intro/task/hint) has no surrounding
+      // whitespace by convention so the no-trim is a no-op for those.
       lesson[baseKey][lang] = _MARKDOWN_FIELDS.has(baseKey)
         ? renderField(value)
         : String(value);

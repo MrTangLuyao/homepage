@@ -22,7 +22,7 @@
  * ============================================================ */
 
 /* ─── Ripple ─── */
-const RIPPLE_SEL = '.ripple-surface, .btn, .editor-mini-btn, .nav-btn, .reset-btn, .tutorial-link, .course-back, .lesson-back';
+const RIPPLE_SEL = '.ripple-surface, .btn, .editor-mini-btn, .tab-btn, .nav-btn, .reset-btn, .tutorial-link, .course-back, .lesson-back';
 function bindRipples() {
   document.querySelectorAll(RIPPLE_SEL).forEach(el => {
     if (el.classList.contains('ripple-bound')) return;
@@ -132,17 +132,14 @@ function _injectScript(src) {
 }
 
 // Load (or return cached) the course metadata + lesson INDEX.
-// v2: course.js sets `_needsAssembly` and provides `lessons[]` as an index
-// (id, section, slug, title, chapter, file) plus `schemas: {name → file}`.
-// v1: course.js drops a fully-populated course object including lesson content.
+// course.js calls LEARN.course(slug, meta) which puts a course object onto
+// window.__LEARN_COURSES[slug]. The object holds metadata + a `lessons[]`
+// INDEX (id/section/slug/title/chapter/file) + `schemas: {name → file}` for
+// SQL courses. Lesson content + schema bodies are loaded lazily by
+// loadLesson() / loadSchema() the first time they're needed.
 function loadCourse(slug) {
   const cached = (window.__LEARN_COURSES || {})[slug];
-  if (cached && !cached._needsAssembly) return Promise.resolve(cached);
-  if (cached && cached._needsAssembly) {
-    // course.js already executed; just clear the flag and hand it back.
-    delete cached._needsAssembly;
-    return Promise.resolve(cached);
-  }
+  if (cached) return Promise.resolve(cached);
   if (_courseLoading[slug]) return _courseLoading[slug];
 
   const courseSrc = `learn/learn_data/${slug}/course.js`;
@@ -150,7 +147,6 @@ function loadCourse(slug) {
     .then(() => {
       const c = (window.__LEARN_COURSES || {})[slug];
       if (!c) throw new Error(`${courseSrc} did not register window.__LEARN_COURSES['${slug}']`);
-      delete c._needsAssembly;   // v2: clear marker; v1: no-op
       return c;
     })
     .then(c => { delete _courseLoading[slug]; return c; })
@@ -185,18 +181,16 @@ function loadSchema(slug, name, course) {
 }
 
 // Lazy-load ONE lesson's full content. Resolves with the merged lesson object
-// (index entry + parsed content + resolved setup SQL).
-//   v1: lesson index entries have no `file` field — content is already there,
-//       so we just return the entry as-is. Backward compatible.
-//   v2: inject the lesson's own .js, parse the raw text it registered, lazy-
-//       load its schema if any, merge content into the index entry.
+// (index entry + parsed content + resolved setup SQL). Once loaded, the
+// content is cached onto the index entry (`entry._loaded = true`) so a second
+// click on the same lesson is free.
 function loadLesson(slug, lessonId) {
   return loadCourse(slug).then(course => {
     const entry = (course.lessons || []).find(l => l.id === lessonId);
     if (!entry) throw new Error(`Lesson ${lessonId} not in course "${slug}"`);
 
-    // v1 OR already-loaded v2 entry → return as-is
-    if (!entry.file || entry._loaded) return entry;
+    // Already-loaded entry → return as-is
+    if (entry._loaded) return entry;
 
     const key = `${slug}:${lessonId}`;
     if (_lessonLoading[key]) return _lessonLoading[key];

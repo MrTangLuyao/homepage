@@ -21,8 +21,8 @@ window.__LEARN_MANIFEST = {
       icon: 'Python',
       title: { zh: 'Python 基础语法 (Beta)', en: 'Python Core Syntax (Beta)' },
       desc: {
-        zh: '早期测试，可能包含大量未知错误。',
-        en: 'Early access. May contain many unknown bugs.',
+        zh: '早期测试，可能包含未知错误。',
+        en: 'Early access. May contain unknown bugs.',
       },
       level: { zh: '入门', en: 'Beginner' },
       lessonsCount: 68,
@@ -32,13 +32,13 @@ window.__LEARN_MANIFEST = {
       slug: 'c',
       icon: 'C',
       family: 'c',                  // route() gates on this; future C++ courses also family:'c'
-      title: { zh: 'C 语言基础语法 (Canary)', en: 'C · Core Syntax (Canary)' },
+      title: { zh: 'C 语言基础语法 (Beta)', en: 'C · Core Syntax (Beta)' },
       desc: {
-        zh: '开发中，敬请期待。',
-        en: 'Under development. Coming soon.',
+        zh: '早期测试，可能包含错误。',
+        en: 'Early access. May contain bugs.',
       },
       level: { zh: '入门', en: 'Beginner' },
-      lessonsCount: 0,
+      lessonsCount: 44,
       coming: false,
     },
   ]

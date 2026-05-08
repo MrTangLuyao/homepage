@@ -1,9 +1,8 @@
 /* learn/learn_data/python/course.js
- * v2 lazy-loading layout. Course metadata + lesson index only.
- * Lesson content (intro/task/hint/starter/answer/expectedOutput/testInputs)
- * lives in lessons/*.js, loaded by loadLesson() on demand.
+ * Course metadata + lesson index. Lesson content
+ * (intro/task/hint/starter/answer/expectedOutput/testInputs) lives in
+ * lessons/*.js and is loaded by loadLesson() on demand.
  *
- * Generated from the legacy single-file course.js by learn/build/migrate-python.js.
  * Edit lesson files directly — keep title/chapter in this index in sync. */
 
 LEARN.course('python', {

@@ -66,6 +66,7 @@ const translations = {
     'err-engine-python':  'Python 环境加载失败',
     'final-section': '最终挑战',
     'lesson-section': '语法教程',
+    'stdlib-section': '标准库',
     'tutorial-link': '博客中学习这一章的知识',
     'nav-hint': '点击这里能切换我的不同网页',
     'reset-progress': '清除进度',
@@ -104,6 +105,7 @@ const translations = {
     'c-ready-detail': '编译器已加载，点击运行即可。',
     'c-compiling': '编译中…',
     'c-done': '✓ 完成',
+    'runoob-link': '查看菜鸟教程',
   },
   en: {
     'learn-greeting': 'interactive · code to win',
@@ -155,6 +157,7 @@ const translations = {
     'err-engine-python':  'Python environment failed to load',
     'final-section': 'Final Challenge',
     'lesson-section': 'Syntax lessons',
+    'stdlib-section': 'Standard Library',
     'tutorial-link': 'Read this chapter on the blog',
     'nav-hint': 'Click here to switch between my different pages',
     'reset-progress': 'Clear progress',
@@ -193,6 +196,7 @@ const translations = {
     'c-ready-detail': 'Compiler loaded — click Run when ready.',
     'c-compiling': 'Compiling…',
     'c-done': '✓ Done',
+    'runoob-link': 'View on runoob',
   }
 };
 
