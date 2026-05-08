@@ -144,3 +144,14 @@ body {
   border-color: rgba(217, 119, 87, 0.5);
 }
 #github-btn svg { width: 18px; height: 18px; display: block; }
+
+/* On mobile, collapse the language toggle into a circular icon button that
+ * mirrors #github-btn — drop the "EN ⇄ 文" label and keep only the icon. */
+@media (max-width: 767px) {
+  #lang-toggle {
+    width: 40px; padding: 0; gap: 0;
+    justify-content: center; letter-spacing: 0;
+  }
+  #lang-toggle #lang-label { display: none; }
+  #lang-toggle svg { width: 18px; height: 18px; }
+}
