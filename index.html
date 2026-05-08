@@ -377,21 +377,6 @@
       }
     });
 
-    function fireBrandRipple() {
-      const d = Math.max(brandBtn.clientWidth, brandBtn.clientHeight);
-      const el = document.createElement('span');
-      el.className = 'brand-hint-ripple';
-      el.style.width = el.style.height = d + 'px';
-      el.style.left = (brandBtn.clientWidth / 2 - d / 2) + 'px';
-      el.style.top  = (brandBtn.clientHeight / 2 - d / 2) + 'px';
-      brandBtn.appendChild(el);
-      el.addEventListener('animationend', () => el.remove(), { once: true });
-    }
-    setTimeout(() => {
-      fireBrandRipple();
-      setTimeout(fireBrandRipple, 800);
-    }, 1000);
-
     const menuBtn = document.getElementById('menu-btn');
     const mobileMenu = document.getElementById('mobile-menu');
     menuBtn.addEventListener('click', () => mobileMenu.classList.toggle('open'));

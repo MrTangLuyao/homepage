@@ -983,13 +983,20 @@ async function route() {
   const parts = hash.split('/').filter(Boolean);
 
   // Gate C-family course routes behind the resource-loading warning modal.
-  // First-time confirmation is sticky in localStorage; subsequent visits
-  // skip the prompt. If the user cancels, send them back to the course list.
-  if (parts.length >= 1) {
-    const courseInfo = (manifest.courses || []).find(c => c.slug === parts[0]);
-    if (courseInfo && courseInfo.family === 'c') {
+  // The gate remembers confirmation for the duration the user stays inside
+  // the C course (list ↔ lesson nav skips the prompt). Leaving the C
+  // course — back to the course list, into another course family, or any
+  // other non-C route — clears the ack so re-entry re-prompts.
+  {
+    const courseInfo = parts.length >= 1
+      ? (manifest.courses || []).find(c => c.slug === parts[0])
+      : null;
+    const inCFamily = !!(courseInfo && courseInfo.family === 'c');
+    if (inCFamily) {
       const ok = await gateCFamilyAccess();
       if (!ok) { location.hash = ''; return; }
+    } else {
+      _cfamilyAckedThisSession = false;
     }
   }
   const courseList = document.getElementById('view-courses');

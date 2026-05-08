@@ -76,21 +76,6 @@ document.addEventListener('click', (e) => {
   }
 });
 
-function fireBrandRipple() {
-  const d = Math.max(brandBtn.clientWidth, brandBtn.clientHeight);
-  const el = document.createElement('span');
-  el.className = 'brand-hint-ripple';
-  el.style.width = el.style.height = d + 'px';
-  el.style.left = (brandBtn.clientWidth / 2 - d / 2) + 'px';
-  el.style.top  = (brandBtn.clientHeight / 2 - d / 2) + 'px';
-  brandBtn.appendChild(el);
-  el.addEventListener('animationend', () => el.remove(), { once: true });
-}
-setTimeout(() => {
-  fireBrandRipple();
-  setTimeout(fireBrandRipple, 800);
-}, 1000);
-
 /* ─── Fade in ─── */
 let fadeObserver = null;
 function bindFadeIn() {
@@ -255,24 +240,19 @@ function promptResetCourse(slug, courseTitle) {
 
 /* ─── C-family resource warning gate ───
  * route() calls this before any course whose manifest entry has family:'c'.
- * Resolves true if user confirmed (or has confirmed previously); false if
- * they cancelled (router then sends them back to the course list).
+ * Shown every time the user enters a C-family route from outside it
+ * (homepage / shared link / coming back from the course list or another
+ * course). Internal C-course nav (list ↔ lesson, lesson ↔ lesson) does
+ * NOT re-prompt — the ack flag is set on confirm and cleared by route()
+ * whenever the active route isn't a C-family course.
  *
  * On file://, the dialog swaps into a "you need HTTPS" message and only
  * exposes a 取消/Back button — there's no point letting them proceed because
  * the C runtime cannot fetch its assets cross-origin from a null origin.
- *
- * Confirmation persists across visits via localStorage. To re-prompt, run
- *   localStorage.removeItem('louie-learn:cfamily-loaded')
- * in DevTools.
  */
-const _CFAMILY_LS_KEY = 'louie-learn:cfamily-loaded';
-
+let _cfamilyAckedThisSession = false;
 function gateCFamilyAccess() {
-  // Already passed once on this device — skip.
-  try {
-    if (localStorage.getItem(_CFAMILY_LS_KEY) === '1') return Promise.resolve(true);
-  } catch (e) {}
+  if (_cfamilyAckedThisSession) return Promise.resolve(true);
 
   const modal      = document.getElementById('c-resources-modal');
   const titleText  = document.getElementById('c-modal-title-text');
@@ -305,7 +285,7 @@ function gateCFamilyAccess() {
     }
     function onCancel()   { close(false); }
     function onConfirm()  {
-      try { localStorage.setItem(_CFAMILY_LS_KEY, '1'); } catch (e) {}
+      _cfamilyAckedThisSession = true;
       close(true);
     }
     function onBackdrop(e) {

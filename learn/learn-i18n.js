@@ -88,16 +88,15 @@ const translations = {
     'py-running': '运行中…',
     'c-modal-title': '你正在尝试访问 C 语言相关的资源',
     'c-modal-cancel': '取消',
-    'c-modal-confirm': '加载资源',
+    'c-modal-confirm': '我已知晓',
     'c-modal-back': '返回课程列表',
     'c-modal-body-online':
-      '<p>C/C++ 教学需要在浏览器里运行真实的 <strong>clang 编译器</strong>（emception，约 25-30 MB）。</p>' +
+      '<p><strong>注意：</strong>C 语言的相关运行环境在早期实验阶段，可能会遇到各种玄学问题。</p>' +
+      '<p style="margin-top:14px;">C/C++ 教学需要在浏览器里运行真实的 <strong>clang 编译器</strong>（emception，约 25-30 MB）。</p>' +
       '<ul>' +
       '<li>首次访问需从本站下载约 <strong>25-30 MB</strong> 的编译器与 sysroot</li>' +
-      '<li>之后由浏览器缓存，再次访问几乎无感</li>' +
       '<li>支持指针、malloc、struct、链表、函数指针等完整 C 特性</li>' +
-      '</ul>' +
-      '<p style="margin-top:14px;">点击「加载资源」开始下载并进入课程。本提示<strong>仅显示一次</strong>。</p>',
+      '</ul>',
     'c-modal-body-file':
       '<p>C 课需要从网络加载真实的 <strong>clang 编译器</strong>，本地以 <code>file://</code> 协议打开时<strong>无法运行</strong>。</p>' +
       '<p>请访问 <strong>louie1.com/learn</strong> 在线版，或在本地启动一个 HTTP 服务器（如 <code>python -m http.server</code>）后通过 <code>http://localhost</code> 访问。</p>',
@@ -179,16 +178,15 @@ const translations = {
     'py-running': 'Running…',
     'c-modal-title': "You're entering C-related content",
     'c-modal-cancel': 'Cancel',
-    'c-modal-confirm': 'Load resources',
+    'c-modal-confirm': 'I understand',
     'c-modal-back': 'Back to courses',
     'c-modal-body-online':
-      '<p>C/C++ teaching runs a real <strong>clang compiler</strong> in the browser (emception, ~25-30 MB).</p>' +
+      '<p><strong>Note:</strong> the C runtime is in an early experimental stage and may run into unexpected quirks.</p>' +
+      '<p style="margin-top:14px;">C/C++ teaching runs a real <strong>clang compiler</strong> in the browser (emception, ~25-30 MB).</p>' +
       '<ul>' +
       '<li>First visit downloads ~<strong>25-30 MB</strong> of compiler + sysroot from this site</li>' +
-      '<li>Browser-cached after — subsequent visits are near-instant</li>' +
       '<li>Full C: pointers, malloc, structs, function pointers, linked lists, etc.</li>' +
-      '</ul>' +
-      '<p style="margin-top:14px;">Click <strong>Load resources</strong> to start. This prompt is shown <strong>once only</strong>.</p>',
+      '</ul>',
     'c-modal-body-file':
       '<p>C lessons need to load a real <strong>clang compiler</strong> over the network. Opened locally via <code>file://</code> this <strong>cannot run</strong>.</p>' +
       '<p>Visit <strong>louie1.com/learn</strong>, or run a local HTTP server (e.g. <code>python -m http.server</code>) and load via <code>http://localhost</code>.</p>',

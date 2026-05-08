@@ -6,10 +6,6 @@
  *     bindRipples()        — bind ripple effect to any new
  *                            .ripple-surface element
  *
- *   Brand-dropdown nav (immediate setup at module load)
- *     fireBrandRipple()    — first-visit hint ripple (called twice
- *                            via setTimeout to draw the user's eye)
- *
  *   Fade-in (IntersectionObserver)
  *     bindFadeIn()         — re-bind on each render
  *
@@ -74,21 +70,6 @@ document.addEventListener('click', (e) => {
     brandIcon.style.transform = 'rotate(0deg)';
   }
 });
-
-function fireBrandRipple() {
-  const d = Math.max(brandBtn.clientWidth, brandBtn.clientHeight);
-  const el = document.createElement('span');
-  el.className = 'brand-hint-ripple';
-  el.style.width = el.style.height = d + 'px';
-  el.style.left = (brandBtn.clientWidth / 2 - d / 2) + 'px';
-  el.style.top  = (brandBtn.clientHeight / 2 - d / 2) + 'px';
-  brandBtn.appendChild(el);
-  el.addEventListener('animationend', () => el.remove(), { once: true });
-}
-setTimeout(() => {
-  fireBrandRipple();
-  setTimeout(fireBrandRipple, 800);
-}, 1000);
 
 /* ─── Fade-in observer ─── */
 let fadeObserver = null;

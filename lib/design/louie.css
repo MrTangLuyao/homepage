@@ -92,16 +92,6 @@ body {
 }
 #brand-dropdown-menu.is-open { opacity: 1; pointer-events: auto; }
 
-.brand-hint-ripple {
-  position: absolute; border-radius: 50%; pointer-events: none;
-  background: rgba(200, 200, 200, 0.2);
-  animation: brand-hint-ripple 1.6s cubic-bezier(0.4, 0, 0.2, 1) forwards;
-}
-@keyframes brand-hint-ripple {
-  from { transform: scale(0); opacity: 1; }
-  to   { transform: scale(4); opacity: 0; }
-}
-
 .nav-dd-item {
   position: relative; overflow: hidden;
   display: block; padding: 12px 16px;
