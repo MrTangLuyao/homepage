@@ -15,7 +15,7 @@
 Per-course download cost (first visit, browser-cached after):
 - SQL: ~8 KB course index + ~5–15 KB per lesson
 - Python: ~6 KB course index + ~3–10 KB per lesson
-- **C: ~25–30 MB** (clang.wasm + libc/libc++ archives) on first lesson or playground entry; subsequent visits free
+- **C: ~25–30 MB** (clang.wasm + libc/libc++ archives) on first entry to any C-family course (`c` core syntax / `c-algo` algorithms) or playground; subsequent visits free. `c` and `c-algo` share the same emception cache.
 
 ---
 
@@ -46,10 +46,13 @@ learn/
     ├── python/
     │   ├── course.js                   ← metadata + lesson index (no schemas)
     │   └── lessons/<NN>-<slug>.js
-    └── c/
-        ├── course.js                   ← metadata + lesson index (no schemas);
-        │                                 'main' (syntax) and 'stdlib' sections
-        └── lessons/<NN>-<slug>.js      ← 44 lessons total (30 syntax + 14 stdlib)
+    ├── c/
+    │   ├── course.js                   ← metadata + lesson index (no schemas);
+    │   │                                 'main' (syntax) and 'stdlib' sections
+    │   └── lessons/<NN>-<slug>.js      ← 44 lessons total (30 syntax + 14 stdlib)
+    └── c-algo/                         ← C Algorithms (Beta), shares emception runtime with c
+        ├── course.js                   ← metadata + lesson index; family: 'c'
+        └── lessons/<NN>-<slug>.js      ← 25 lessons (algorithms + data structures)
 lib/
 ├── design/                             ← visual assets (fonts, M3 tokens, shared CSS)
 ├── resources/                          ← static images (po.webp, etc.)
@@ -118,7 +121,8 @@ window.__LEARN_MANIFEST = {
   courses: [
     {
       slug: 'sql',                              // REQUIRED — matches folder name
-      icon: 'SQL',                              // shown on the card
+      icon: 'SQL',                              // shown on the card (also accepts a { zh, en }
+                                                //   bilingual object, e.g. c-algo: { zh: 'C 算法', en: 'C Algo' })
       title: { zh: '...', en: '...' },
       desc:  { zh: '...', en: '...' },
       level: { zh: '入门', en: 'Beginner' },
@@ -250,7 +254,7 @@ This matters for `starter` (Monaco cursor placement) and `answer` / `expectedOut
 | `slug`            | string          | course.js index       | URL-friendly; used in filename                   |
 | `title`           | bilingual       | course.js index       |                                                  |
 | `chapter`         | bilingual       | course.js index       | Sub-label shown under the lesson title           |
-| `chapterRef`      | string          | lesson file           | Optional — links to a blog post                  |
+| `chapterRef`      | string          | lesson file           | Optional.<br>· `sql` / `python` / `c-algo`: links to `blog.html#<chapterRef>`<br>· `c` (core syntax): ignored — link is hardcoded to runoob's main C tutorial |
 | `difficulty`      | bilingual       | lesson file           | "入门" / "Beginner" etc.                         |
 | `intro`           | bilingual HTML  | lesson file           | Long-form lesson explanation                     |
 | `task`            | bilingual HTML  | lesson file           | What the user must accomplish                    |
@@ -481,10 +485,10 @@ Monaco internally renders its own scrollbar / overflow-guard layers that sometim
 
 ## How to add a new lesson (C)
 
-1. Pick an `id` (next free integer; current C course goes 1–44).
+1. Pick an `id` (next free integer; the `c` core-syntax course is 1–44, `c-algo` is 1–25 — they're independently numbered).
 2. Pick a `slug` (`hello-c`, `pointers`, `malloc-free`, …).
-3. Decide the section: `'main'` for syntax, `'stdlib'` for `<header.h>` lessons.
-4. Create `learn/learn_data/c/lessons/<NN>-<slug>.js`.
+3. Decide the section: `'main'` for syntax, `'stdlib'` for `<header.h>` lessons; `c-algo` uses `'main'` for everything.
+4. Create `learn/learn_data/<course-slug>/lessons/<NN>-<slug>.js` (course-slug is either `c` or `c-algo`).
 5. Append the index entry to `course.lessons` in `course.js`. Bump `lessonsCount` in `manifest.js`.
 
 **C grader rules:**

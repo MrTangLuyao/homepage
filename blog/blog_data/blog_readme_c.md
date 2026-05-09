@@ -262,7 +262,7 @@ python -c "from PIL import Image; Image.open('cover.png').save('cover.webp', 'we
 4. **Cloudflare 缓存 `manifest.js`** —— 由仓库根的 `_headers` 文件处理。规则 `/blog/* → no-cache, must-revalidate` 让所有 `manifest.js` / `post.<lang>.js` 请求总是走"短路重新验证"，用户下一次访问就能看到新内容，不用强刷。如果发布后没看到更新，先看 `_headers`。
 5. **Cloudflare Rocket Loader** 可能干扰脚本执行时序。如果博客在生产环境出现奇怪问题但本地正常，去 Cloudflare dashboard 关掉 Rocket Loader。
 6. **运行时不用 fetch()** —— 所有加载都通过 `<script>`。这是有意为之，也是站点能在 `file://` 跑的原因。
-7. **没自带代码高亮**。文章需要语法高亮的话，加个轻量高亮器（Prism、Shiki），或者就老老实实 `<pre><code>`。
+7. **C 语法高亮已自带** —— `blog/blog-syntax.js`（~150 行自写的小型分词器，零依赖）。`writeBody` 之后自动对所有 `<pre><code>` 跑高亮，配色定义在 `blog.css`（VS Code Dark+ 风格）。要让某段 `<pre><code>` 跳过高亮，加 `class="lang-text"` 或 `class="no-highlight"`。要支持其它语言就在 `blog-syntax.js` 里扩展分词器；C 是这套教程唯一用到的语言所以暂时只做 C。
 8. **日期格式**：仅 ISO 8601（`YYYY-MM-DD`）。其它格式 Luxon 会返回"Invalid DateTime"。
 9. **切语言不重置 tag 过滤** —— 这是设计，`activeTag` 是模块级状态。如果你在不同语言间切换，点一下"All"。
 10. **阅读器骨架用 `requestAnimationFrame` 显形，不是 `IntersectionObserver`**。`route()` 把 `view-reader` 从 `display:none` 切到 `display:block` 后立刻调 `renderReader`，IO 在 layout 重新计算之前就触发，报告 `isIntersecting: false` —— 所以 `.visible` 类永远加不上，整个阅读器停在 `opacity: 0`（白屏）。修法：`reader.innerHTML = skeleton` 之后调 `requestAnimationFrame(() => wrapper.classList.add('visible'))`。rAF 在 layout 稳定后触发，CSS 过渡正常播放。列表卡片仍用 IO 因为它们从稳定 layout 滚入视口——那边没问题。**别把阅读器换回 IO**。
