@@ -9,8 +9,41 @@
 
 window.__BLOG_MANIFEST = {
   version: 3,
-  updated: '2026-05-05',
+  updated: '2026-05-09',
   posts: [
+
+    {
+      slug: "c-algo-tute-3",
+      date: "2026-05-09",
+      title: { "zh": "C 语言算法入门 3", "en": "C Algorithms 3" },
+      excerpt: { "zh": "二叉堆 · 优先队列 · build_heap O(n) · 哈希表 · 链地址 vs 开放寻址 · BMH · 贪心 · 动态规划 · LCS", "en": "Binary heap · Priority queue · O(n) build_heap · Hash table · Chaining vs open addressing · BMH · Greedy · DP · LCS" },
+      cover: "cover.webp",
+      tags: ["c", "algorithms", "code"],
+      readingTime: 36,
+      lang: "both",
+    },
+
+    {
+      slug: "c-algo-tute-2",
+      date: "2026-05-09",
+      title: { "zh": "C 语言算法入门 2", "en": "C Algorithms 2" },
+      excerpt: { "zh": "归并/快排 · 排序下界 · ADT · 数组 vs 链表 · 单/双链表 · 栈 · 队列 · 二叉树 · 4 种遍历 · BST · AVL · KMP", "en": "Merge/quicksort · Sorting lower bound · ADT · Array vs list · Linked lists · Stack · Queue · Binary tree · 4 traversals · BST · AVL · KMP" },
+      cover: "cover.webp",
+      tags: ["c", "algorithms", "code"],
+      readingTime: 40,
+      lang: "both",
+    },
+
+    {
+      slug: "c-algo-tute-1",
+      date: "2026-05-09",
+      title: { "zh": "C 语言算法入门 1", "en": "C Algorithms 1" },
+      excerpt: { "zh": "大 O 记号 · 最好/最坏/平均 · 空间复杂度 · 递归 · 调用栈 · 分治 · 线性/二分搜索 · 冒泡/选择/插入排序", "en": "Big O · Best/worst/avg · Space complexity · Recursion · Call stack · Divide & conquer · Linear/binary search · Bubble/selection/insertion sort" },
+      cover: "cover.webp",
+      tags: ["c", "algorithms", "code"],
+      readingTime: 28,
+      lang: "both",
+    },
 
     {
       slug: "python-tute-1",

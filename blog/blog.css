@@ -83,6 +83,18 @@ body { overscroll-behavior: none; }
   padding: 16px; overflow-x: auto; font-size: 14px; line-height: 1.7;
 }
 .reader-body pre code { color: #e8e8e8; background: none; padding: 0; }
+
+/* ─── C syntax highlighting (paired with blog-syntax.js) ─── */
+/* Palette: VS Code Dark+ inspired, tuned for the #2a2a29 surface. */
+.reader-body pre code .syn-comment      { color: #6a9955; font-style: italic; }
+.reader-body pre code .syn-string       { color: #ce9178; }
+.reader-body pre code .syn-keyword      { color: #569cd6; font-weight: 600; }
+.reader-body pre code .syn-type         { color: #4ec9b0; }
+.reader-body pre code .syn-constant     { color: #4fc1ff; }
+.reader-body pre code .syn-function     { color: #dcdcaa; }
+.reader-body pre code .syn-number       { color: #b5cea8; }
+.reader-body pre code .syn-operator     { color: #d4d4d4; }
+.reader-body pre code .syn-preprocessor { color: #c586c0; }
 .reader-body img {
   max-width: 100%; height: auto; border-radius: 12px;
   margin: 24px auto; display: block; border: 1px solid #3a3a39;

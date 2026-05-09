@@ -210,6 +210,7 @@ async function renderReader(slug) {
     const el = document.getElementById('reader-body');
     if (!el || el.dataset.slug !== slug) return false;
     el.innerHTML = html;
+    if (typeof window.highlightAllCode === 'function') window.highlightAllCode(el);
     return true;
   }
 
