@@ -42,7 +42,7 @@ function renderCourseList() {
     return `
       <a class="course-card ripple-surface fade-in${isComing ? ' course-card-coming' : ''}" href="${href}" style="position: relative;">
         ${resetBtn}
-        <div class="course-card-icon">${c.icon || ''}</div>
+        <div class="course-card-icon">${pickLang(c.icon) || ''}</div>
         <div class="course-card-title">${pickLang(c.title)}</div>
         <div class="course-card-desc">${pickLang(c.desc)}</div>
         <div class="course-card-meta">

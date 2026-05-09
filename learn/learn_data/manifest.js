@@ -41,5 +41,18 @@ window.__LEARN_MANIFEST = {
       lessonsCount: 44,
       coming: false,
     },
+    {
+      slug: 'c-algo',
+      icon: { zh: 'C 算法', en: 'C Algo' },
+      family: 'c',                  // shares the C compiler runtime modal
+      title: { zh: 'C 算法入门 (Beta)', en: 'C Algorithms (Beta)' },
+      desc: {
+        zh: '早期测试，可能包含错误。',
+        en: 'Early access. May contain bugs.',
+      },
+      level: { zh: '进阶', en: 'Intermediate' },
+      lessonsCount: 25,
+      coming: false,
+    },
   ]
 };
