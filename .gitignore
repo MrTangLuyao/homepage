@@ -1,0 +1,13 @@
+# macOS junk
+.DS_Store
+**/.DS_Store
+
+# Editor / scratch
+*.swp
+*.swo
+.idea/
+.vscode/
+
+# Local server logs / scratch
+_diag.html
+_xterm-smoke.html
