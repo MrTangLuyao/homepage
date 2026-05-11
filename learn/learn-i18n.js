@@ -92,6 +92,7 @@ const translations = {
     'c-modal-back': '返回课程列表',
     'c-modal-body-online':
       '<p><strong>注意：</strong>C 语言的相关运行环境在早期实验阶段，可能会遇到各种玄学问题。</p>' +
+      '<p style="margin-top:8px;">C 语言输入依赖 <strong>JSPI</strong> 技术，仅支持 Chrome 内核 137 及以上版本。如版本较旧或非 Chrome 内核浏览器，请使用<strong>预输入模式</strong>。</p>' +
       '<p style="margin-top:14px;">C/C++ 教学需要在浏览器里运行真实的 <strong>clang 编译器</strong>（emception，约 25-30 MB）。</p>' +
       '<ul>' +
       '<li>首次访问需从本站下载约 <strong>25-30 MB</strong> 的编译器与 sysroot</li>' +
@@ -182,6 +183,7 @@ const translations = {
     'c-modal-back': 'Back to courses',
     'c-modal-body-online':
       '<p><strong>Note:</strong> the C runtime is in an early experimental stage and may run into unexpected quirks.</p>' +
+      '<p style="margin-top:8px;">Interactive C input relies on <strong>JSPI</strong> — supported only on Chromium 137+. Older or non-Chromium browsers: use <strong>Pre-input mode</strong>.</p>' +
       '<p style="margin-top:14px;">C/C++ teaching runs a real <strong>clang compiler</strong> in the browser (emception, ~25-30 MB).</p>' +
       '<ul>' +
       '<li>First visit downloads ~<strong>25-30 MB</strong> of compiler + sysroot from this site</li>' +

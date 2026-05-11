@@ -154,7 +154,7 @@ LEARN.course('c', {
       file: 'lessons/27-typedef.js' },
 
     { id: 28, section: 'main', slug: 'scanf-details',
-      title:   { zh: '输入输出', en: 'I/O' },
+      title:   { zh: '交互输入：问个名字', en: 'Interactive input: ask a name' },
       chapter: { zh: 'scanf,printf', en: 'scanf,printf' },
       file: 'lessons/28-scanf-details.js' },
 

@@ -135,6 +135,11 @@ function ensureC(opts = {}) {
       if (!run) return;
       if (msg.type === 'stdout') run.onStdout(msg.text);
       else if (msg.type === 'stderr') run.onStderr(msg.text);
+      else if (msg.type === 'runtime-start') {
+        // Compile finished, program is about to run. Caller may want to
+        // print a divider in the terminal.
+        if (typeof run.onRuntimeStart === 'function') run.onRuntimeStart();
+      }
       else if (msg.type === 'input-request') {
         // The compiled program is blocked on scanf/getchar. Ask the caller
         // for input (via their onInputRequest callback) and post back.
@@ -171,6 +176,10 @@ const _cEngine = {
       _cRuns[id] = {
         onStdout:       opts.onStdout       || (() => {}),
         onStderr:       opts.onStderr       || (() => {}),
+        // Sync callback: invoked right after compile succeeds and before
+        // any program stdout/stderr — handy for printing a "[compiled —
+        // running]" divider that separates compile log from program output.
+        onRuntimeStart: opts.onRuntimeStart,
         // Async callback: must return a Promise<string|null>. Used for
         // interactive scanf — null means EOF, string is one input line.
         onInputRequest: opts.onInputRequest,
@@ -182,6 +191,7 @@ const _cEngine = {
         code:  String(code),
         stdin: String(opts.stdin || ''),
         flags: opts.flags || '-O0',
+        mode:  opts.mode  || 'preinput',     // 'preinput' | 'jspi'
       }, '*');
     });
   },

@@ -654,9 +654,14 @@ body.lesson-mode .lesson-pane-left { border-right: 1px solid var(--border); }
   color: var(--muted) !important;
   padding: 3px 10px !important;
   font-size: 11px !important;
-  border-radius: 3px !important;
+  /* Pill-shaped to match the m3-toggle next to them; bindRipples already
+   * targets .editor-mini-btn, but rounded corners + overflow:hidden are
+   * what make the ripple visibly clip inside the pill. */
+  border-radius: 14px !important;
   cursor: pointer !important;
   font-family: inherit !important;
+  position: relative !important;
+  overflow: hidden !important;
   transition: color 0.15s ease, border-color 0.15s ease !important;
 }
 .editor-pane .editor-mini-btn:hover {
@@ -779,6 +784,91 @@ body.lesson-mode .lesson-pane-left { border-right: 1px solid var(--border); }
   align-self: center !important;
   margin-left: 8px !important;
 }
+
+/* ─── XTERM terminal host ───
+ * Replaces the old DOM-span terminal for Python and C lessons.
+ * xterm.js renders its own canvas/DOM inside; the host just provides
+ * the box. Padding is 0 — xterm draws flush. */
+.terminal.xterm-host {
+  padding: 0 !important;
+  background: #121211 !important;
+  overflow: hidden !important;
+  max-height: none !important;
+  min-height: 200px;
+}
+.terminal.xterm-host .xterm,
+.terminal.xterm-host .xterm-viewport,
+.terminal.xterm-host .xterm-screen {
+  width: 100% !important;
+  height: 100% !important;
+}
+.terminal.xterm-host .xterm-viewport {
+  background-color: #121211 !important;
+}
+/* xterm-fit needs the container to have explicit dimensions before
+ * .fit() runs; absolute-inset inside the output-tab gives it that. */
+.editor-pane .output-tab .terminal.xterm-host {
+  position: absolute !important;
+  inset: 0 !important;
+  margin: 0 !important;
+  border: none !important;
+  border-radius: 0 !important;
+  padding: 8px 6px 4px 8px !important;
+}
+
+/* ─── M3-style toggle button (used for "预输入模式") ───
+ * Lives floating top-right of the code tab next to other mini buttons.
+ * Track + thumb visually distinct from plain mini buttons so users see
+ * the on/off state at a glance. */
+.editor-pane .m3-toggle {
+  display: inline-flex !important;
+  align-items: center !important;
+  gap: 8px !important;
+  background: rgba(30, 30, 30, 0.85) !important;
+  -webkit-backdrop-filter: blur(6px) !important;
+  backdrop-filter: blur(6px) !important;
+  border: 1px solid var(--border) !important;
+  color: var(--muted) !important;
+  padding: 3px 8px 3px 10px !important;
+  font-size: 11px !important;
+  border-radius: 14px !important;
+  cursor: pointer !important;
+  font-family: inherit !important;
+  /* position:relative + overflow:hidden so the ripple span (appended as
+   * a child by bindRipples) clips inside the pill. We also add
+   * `ripple-surface` to the button's class list in the template so
+   * bindRipples picks it up — without that the toggle was the only
+   * top-row button missing ripples. */
+  position: relative !important;
+  overflow: hidden !important;
+  transition: color 0.15s ease, border-color 0.15s ease, background 0.15s ease !important;
+  user-select: none;
+}
+.editor-pane .m3-toggle:hover {
+  color: var(--text) !important;
+  border-color: var(--accent) !important;
+}
+.editor-pane .m3-toggle .m3-track {
+  position: relative;
+  display: inline-block;
+  width: 26px; height: 14px;
+  border-radius: 7px;
+  background: #3a3a39;
+  transition: background 0.18s cubic-bezier(0.4, 0, 0.2, 1);
+  flex: 0 0 auto;
+}
+.editor-pane .m3-toggle .m3-thumb {
+  position: absolute;
+  top: 2px; left: 2px;
+  width: 10px; height: 10px;
+  border-radius: 50%;
+  background: #b3b3b3;
+  transition: transform 0.18s cubic-bezier(0.4, 0, 0.2, 1),
+              background 0.18s ease;
+}
+.editor-pane .m3-toggle.is-on { color: var(--accent) !important; border-color: var(--accent) !important; }
+.editor-pane .m3-toggle.is-on .m3-track { background: var(--accent); }
+.editor-pane .m3-toggle.is-on .m3-thumb { transform: translateX(12px); background: #1e1e1e; }
 
 /* Hint panel on the LEFT (toggled by floating button on editor) */
 .lesson-pane-left .hint-panel {

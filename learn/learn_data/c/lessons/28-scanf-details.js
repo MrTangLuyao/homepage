@@ -5,74 +5,73 @@ LEARN.lesson('c', 28, `
 @@difficulty:en Beginner
 
 @@intro:zh
-<p class="lead">scanf 是 C 标准的格式化输入函数，结构上和 printf 对称 —— 但有几个独有的"陷阱设计"必须搞清。</p>
-<pre><code>int n;
-scanf("%d", &amp;n);    // 读一个 int 进 n
-// 注意：&amp;n 是 n 的地址 — scanf 要写到那里去
-//       这是为什么"读字符串到 char[]"不用 &amp;（数组名已是地址）</code></pre>
-<h3 style="margin:12px 0 6px;font-size:14px;">常用格式说明符</h3>
-<table style="border-collapse:collapse;font-size:13px;">
-<tr><td style="padding:2px 14px 2px 0;"><code>%d</code></td><td>int</td></tr>
-<tr><td style="padding:2px 14px 2px 0;"><code>%f</code></td><td>float（注意：scanf 用 %f 读 float、%lf 读 double，与 printf 不同！）</td></tr>
-<tr><td style="padding:2px 14px 2px 0;"><code>%c</code></td><td>单字符（不会跳过空白）</td></tr>
-<tr><td style="padding:2px 14px 2px 0;"><code>%s</code></td><td>字符串（读到下一个空白为止；<u>不</u>读空格）</td></tr>
-</table>
-<h3 style="margin:12px 0 6px;font-size:14px;">几个关键行为</h3>
+<p class="lead">现在运行时支持 <strong>真·实时输入</strong> 了 —— 程序里写 <code>scanf</code> 时会真的把 wasm 挂起，等你在终端里敲字 + 回车再继续。本课用最经典的 "提示 → 读名字 → 打招呼" 写法演示这件事。</p>
+
+<pre><code>printf("Please enter your name: ");   // 提示词，结尾<u>不</u>加 \\n
+scanf("%63s", name);                   // 读到下一个空白；63 是上限
+printf("Hello, %s!\\n", name);          // 回应</code></pre>
+
+<h3 style="margin:12px 0 6px;font-size:14px;">三个细节</h3>
 <ul>
-<li><strong>空白分隔</strong>：除 %c 外，所有说明符<u>自动跳过前导空白</u>（空格、换行、tab）。<code>"%d %d"</code> 和 <code>"%d%d"</code> 行为相同（都跳空白）。</li>
-<li><strong>%s 不读空格</strong>：所以 <code>scanf("%s", name)</code> 读 "Bob Smith" 只会读到 "Bob"。要读整行用 <code>fgets</code>。</li>
-<li><strong>缓冲区溢出</strong>：<code>%s</code> 不限制读入长度。读进 <code>char buf[10]</code> 但用户输入 100 字符 → 内存破坏。安全写法：<code>scanf("%9s", buf)</code> 限制最多 9 字符（留 1 给 <code>\\0</code>）。</li>
-<li><strong>返回值</strong>：scanf 返回成功匹配的项数。检查这个值能判断输入是否合法。</li>
+<li><strong>提示词不要 <code>\\n</code></strong>：这样光标停在 <code>"Please enter your name: "</code> 后面，看起来才像真终端。加了 <code>\\n</code> 用户输入就会落在下一行，体验差。</li>
+<li><strong>name 不写 <code>&amp;</code></strong>：<code>char name[64]</code> 已经是数组首地址，写 <code>&amp;name</code> 反而是 "指向数组的指针" 类型，scanf 拿到也能用但是 warning，不优雅。</li>
+<li><strong>限长 <code>%63s</code></strong>：缓冲区 64 字节里要给 <code>\\0</code> 留一格，所以最多读 63 字符。不限长 = 缓冲区溢出 = 段错误。</li>
 </ul>
+
+<p style="margin-top:10px;color:var(--muted);font-size:12px;">提交时按"预输入模式"判分 —— testInputs 里预填了 "Alice"。运行时关掉预输入模式可以自己在终端打字试。</p>
 
 @@intro:en
-<p class="lead">scanf is C's standard formatted-input function — structurally symmetric to printf, but with a few unique "trap designs" you must know.</p>
-<pre><code>int n;
-scanf("%d", &amp;n);    // read one int into n
-// Note: &amp;n is n's address — scanf writes there.
-// That's why reading a string into char[] doesn't need &amp; (array name is already an address)</code></pre>
-<h3 style="margin:12px 0 6px;font-size:14px;">Common format specifiers</h3>
-<table style="border-collapse:collapse;font-size:13px;">
-<tr><td style="padding:2px 14px 2px 0;"><code>%d</code></td><td>int</td></tr>
-<tr><td style="padding:2px 14px 2px 0;"><code>%f</code></td><td>float (note: scanf uses %f for float, %lf for double — unlike printf!)</td></tr>
-<tr><td style="padding:2px 14px 2px 0;"><code>%c</code></td><td>single char (does NOT skip whitespace)</td></tr>
-<tr><td style="padding:2px 14px 2px 0;"><code>%s</code></td><td>string (reads until next whitespace; doesn't read spaces)</td></tr>
-</table>
-<h3 style="margin:12px 0 6px;font-size:14px;">Key behaviors</h3>
+<p class="lead">The runtime now supports <strong>real interactive input</strong> — when your program calls <code>scanf</code> the wasm stack is genuinely suspended until you type a line in the terminal. This lesson is the classic "prompt → read name → greet" pattern that demonstrates it.</p>
+
+<pre><code>printf("Please enter your name: ");   // prompt, NO trailing \\n
+scanf("%63s", name);                   // read until next whitespace; cap at 63
+printf("Hello, %s!\\n", name);          // reply</code></pre>
+
+<h3 style="margin:12px 0 6px;font-size:14px;">Three details</h3>
 <ul>
-<li><strong>Whitespace separation</strong>: except %c, every specifier auto-skips leading whitespace. <code>"%d %d"</code> and <code>"%d%d"</code> behave identically.</li>
-<li><strong>%s doesn't read spaces</strong>: <code>scanf("%s", name)</code> reading "Bob Smith" yields "Bob" only. For full lines, use <code>fgets</code>.</li>
-<li><strong>Buffer overflow</strong>: <code>%s</code> doesn't bound length. Reading into <code>char buf[10]</code> with 100 chars input → memory corruption. Safer: <code>scanf("%9s", buf)</code> caps at 9 chars (leaving 1 for <code>\\0</code>).</li>
-<li><strong>Return value</strong>: scanf returns the number of items successfully matched — check it to validate input.</li>
+<li><strong>No <code>\\n</code> in the prompt</strong>: leaves the cursor sitting right after <code>"Please enter your name: "</code> — proper-terminal UX. With <code>\\n</code> the user's input lands on the next line, which looks wrong.</li>
+<li><strong>No <code>&amp;</code> on <code>name</code></strong>: <code>char name[64]</code> is already the array's first address; <code>&amp;name</code> would be a "pointer to array" type — scanf still works but emits a warning. Ugly.</li>
+<li><strong>Bound the read with <code>%63s</code></strong>: leave one byte in the 64-byte buffer for the <code>\\0</code>. Unbounded <code>%s</code> = buffer overflow = segfault.</li>
 </ul>
 
+<p style="margin-top:10px;color:var(--muted);font-size:12px;">Submit grades in "pre-input mode" — testInputs has "Alice" pre-filled. When running, toggle pre-input mode off to type yourself in the terminal.</p>
+
 @@task:zh
-从 stdin 读入 <strong>"Alice 19 92.5"</strong>（一个字符串、一个 int、一个 float），按下面格式输出：
-<pre><code>name: Alice
-age: 19
-score: 92.50</code></pre>
-<p style="margin-top:8px;color:var(--muted);font-size:12px;">本课预填测试输入。</p>
+写一个程序：
+<ol>
+<li>用 <code>printf</code> 输出提示 <code>Please enter your name: </code>（结尾<u>不</u>加 <code>\\n</code>）</li>
+<li>用 <code>scanf("%63s", name)</code> 读一个名字</li>
+<li>用 <code>printf</code> 输出 <code>Hello, &lt;名字&gt;!</code>（结尾加 <code>\\n</code>）</li>
+</ol>
 
 @@task:en
-Read <strong>"Alice 19 92.5"</strong> from stdin (a string, an int, a float). Output:
-<pre><code>name: Alice
-age: 19
-score: 92.50</code></pre>
+Write a program that:
+<ol>
+<li>uses <code>printf</code> to print <code>Please enter your name: </code> (NO trailing <code>\\n</code>)</li>
+<li>uses <code>scanf("%63s", name)</code> to read a name</li>
+<li>uses <code>printf</code> to print <code>Hello, &lt;name&gt;!</code> (with trailing <code>\\n</code>)</li>
+</ol>
 
 @@hint:zh
-一个 scanf 搞定：<code>scanf("%s %d %f", name, &amp;age, &amp;score);</code>。注意 <code>name</code> 不写 &amp;，<code>age</code> / <code>score</code> 写 &amp;。
+三行代码搞定。<strong>提示词不要 \\n</strong>，否则提交时输出会比期望多一个换行 → 不通过。
+<pre><code>printf("Please enter your name: ");
+scanf("%63s", name);
+printf("Hello, %s!\\n", name);</code></pre>
 
 @@hint:en
-One scanf does it: <code>scanf("%s %d %f", name, &amp;age, &amp;score);</code>. Note: no &amp; for <code>name</code>; &amp; for <code>age</code> / <code>score</code>.
+Three lines. <strong>No <code>\\n</code> on the prompt</strong> — otherwise the graded output has one extra newline and fails.
+<pre><code>printf("Please enter your name: ");
+scanf("%63s", name);
+printf("Hello, %s!\\n", name);</code></pre>
 
 @@starter
 #include <stdio.h>
 
 int main(void) {
-    char  name[32];
-    int   age;
-    float score;
-    // scanf 一次读三项，然后三个 printf
+    char name[64];
+    // 1. 打印提示 "Please enter your name: "（不要 \\n）
+    // 2. scanf 读名字（用 %63s 限长）
+    // 3. 打印 "Hello, <名字>!\\n"
 
     return 0;
 }
@@ -81,21 +80,16 @@ int main(void) {
 #include <stdio.h>
 
 int main(void) {
-    char  name[32];
-    int   age;
-    float score;
-    scanf("%s %d %f", name, &age, &score);
-    printf("name: %s\\n", name);
-    printf("age: %d\\n", age);
-    printf("score: %.2f\\n", score);
+    char name[64];
+    printf("Please enter your name: ");
+    scanf("%63s", name);
+    printf("Hello, %s!\\n", name);
     return 0;
 }
 
 @@expectedOutput
-name: Alice
-age: 19
-score: 92.50
+Please enter your name: Hello, Alice!
 
 @@testInputs
-Alice 19 92.5
+Alice
 `);

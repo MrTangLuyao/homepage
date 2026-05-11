@@ -355,9 +355,7 @@ async function renderPythonPlayground(courseSlug) {
         </div>
       </div>
       <div class="tab-pane output-tab" data-tab="output">
-        <div class="terminal" id="py-terminal">
-          <span class="t-muted">${tt('py-ready')}</span>
-        </div>
+        <div class="terminal xterm-host" id="py-terminal"></div>
       </div>
       <div class="editor-foot">
         <div class="tab-strip">
@@ -385,6 +383,23 @@ async function renderPythonPlayground(courseSlug) {
     () => document.getElementById('btn-run')?.click()
   );
 
+  const editor = {
+    get value() { return monacoEd.getValue(); },
+    set value(v) { monacoEd.setValue(v); },
+  };
+
+  /* ── xterm terminal (defensive) ── */
+  let term;
+  try {
+    term = createLessonTerminal(document.getElementById('py-terminal'));
+    term.writeMuted(tt('py-ready') + '\n');
+  } catch (e) {
+    console.error('[py-playground] terminal init failed:', e);
+    term = { write(){}, writeErr(){}, writeMuted(){}, writePass(){}, writeInfo(){},
+             reset(){}, focus(){}, fit(){}, awaitLine(){ return Promise.resolve(''); },
+             isAwaiting(){ return false; }, cancelAwait(){}, dispose(){} };
+  }
+
   /* Tab switching */
   const tabPanes = wrap.querySelectorAll('.tab-pane');
   const tabBtns  = wrap.querySelectorAll('.tab-btn');
@@ -399,55 +414,14 @@ async function renderPythonPlayground(courseSlug) {
           if (r.width > 0 && r.height > 0) monacoEd.layout({ width: r.width, height: r.height });
         }
       });
+    } else if (name === 'output') {
+      requestAnimationFrame(() => term.fit());
     }
   }
   tabBtns.forEach(b => b.addEventListener('click', () => activateTab(b.dataset.tab)));
-
-  const editor = {
-    get value() { return monacoEd.getValue(); },
-    set value(v) { monacoEd.setValue(v); },
-  };
-
-  const termEl = document.getElementById('py-terminal');
-  function termClear() { termEl.innerHTML = ''; }
-  function termAppend(text, cls) {
-    const s = document.createElement('span');
-    s.className = cls || 't-out';
-    s.textContent = text;
-    termEl.appendChild(s);
-    termEl.scrollTop = termEl.scrollHeight;
-  }
   function termRequestInput(prompt) {
-    return new Promise((resolve) => {
-      if (prompt) termAppend(prompt);
-      const line = document.createElement('div');
-      line.className = 't-input-line';
-      const pSpan = document.createElement('span');
-      pSpan.className = 't-prompt';
-      pSpan.textContent = '▶ ';
-      const inp = document.createElement('input');
-      inp.className = 't-input-field';
-      inp.type = 'text';
-      inp.setAttribute('autocomplete', 'off');
-      inp.setAttribute('spellcheck', 'false');
-      line.appendChild(pSpan);
-      line.appendChild(inp);
-      termEl.appendChild(line);
-      termEl.scrollTop = termEl.scrollHeight;
-      inp.focus();
-      inp.addEventListener('keydown', (e) => {
-        if (e.key !== 'Enter') return;
-        const val = inp.value;
-        inp.disabled = true;
-        inp.style.display = 'none';
-        const echo = document.createElement('span');
-        echo.className = 't-echo';
-        echo.textContent = val + '\n';
-        line.appendChild(echo);
-        termEl.scrollTop = termEl.scrollHeight;
-        resolve(val);
-      });
-    });
+    if (prompt) term.write(String(prompt));
+    return term.awaitLine();
   }
 
   function skulptRead(x) {
@@ -466,26 +440,28 @@ async function renderPythonPlayground(courseSlug) {
     if (_running) return;
     activateTab('output');
     setRunning(true);
-    termClear();
+    term.reset();
     const code = editor.value;
     Sk.configure({
-      output: (t) => termAppend(t),
+      output: (t) => term.write(t),
       read: skulptRead,
       inputfun: termRequestInput,
       inputfunTakesPrompt: true,
       __future__: Sk.python3,
-      // Keep the browser responsive during tight loops + hard-kill runaway code.
       yieldLimit: 100,    // yield to the event loop every ~100ms
       execLimit: 10000,   // throw TimeoutError after 10s
     });
     Sk.misceval.asyncToPromise(() =>
       Sk.importMainWithBody('<stdin>', false, code, true)
     ).catch((e) => {
-      termAppend('\n' + e.toString() + '\n', 't-err');
-    }).finally(() => setRunning(false));
+      term.writeErr('\n' + e.toString() + '\n');
+    }).finally(() => {
+      term.cancelAwait();
+      setRunning(false);
+    });
   });
 
-  document.getElementById('pg-py-clear').addEventListener('click', () => { monacoEd.setValue(''); termClear(); });
+  document.getElementById('pg-py-clear').addEventListener('click', () => { monacoEd.setValue(''); term.reset(); });
 }
 
 /* ─── C Playground view ─── */
@@ -547,14 +523,19 @@ async function renderCPlayground(courseSlug) {
       </div>
     </div>
     ${SPLITTER_HTML}
-    <div class="lesson-pane lesson-pane-right editor-pane fade-in">
+    <div class="lesson-pane lesson-pane-right editor-pane fade-in" data-pre-input="${(typeof WebAssembly.Suspending === 'function') ? '0' : '1'}">
       <div class="tab-pane code-tab is-active" data-tab="code">
         <div id="c-editor" class="editor-fill"></div>
         <div class="tab-actions">
+          <button class="m3-toggle ripple-surface ${(typeof WebAssembly.Suspending === 'function') ? '' : 'is-on'}" id="btn-preinput-toggle"
+                  title="${currentLang === 'zh' ? '开启后会显示输入编辑器，stdin 从那里同步读取（适合答案判定 / 老浏览器）' : 'When on, an input editor appears; stdin is read synchronously from it.'}">
+            <span class="m3-track"><span class="m3-thumb"></span></span>
+            <span>${currentLang === 'zh' ? '预输入模式（不推荐）' : 'Pre-input mode (not recommended)'}</span>
+          </button>
           <button class="editor-mini-btn" id="pg-c-clear">${tt('py-clear')}</button>
         </div>
       </div>
-      <div class="tab-pane input-tab" data-tab="input">
+      <div class="tab-pane input-tab" data-tab="input"${(typeof WebAssembly.Suspending === 'function') ? ' hidden' : ''}>
         <textarea id="c-stdin" spellcheck="false"
           placeholder="${currentLang === 'zh'
             ? '示例：scanf(&quot;%d&quot;, &amp;a) → 在这里输入数字。多个输入用换行分隔。'
@@ -562,14 +543,12 @@ async function renderCPlayground(courseSlug) {
 19</textarea>
       </div>
       <div class="tab-pane output-tab" data-tab="output">
-        <div class="terminal" id="c-terminal">
-          <span class="t-muted">${currentLang === 'zh' ? '编译器加载完成后即可运行。' : 'Once the compiler is loaded you can run.'}</span>
-        </div>
+        <div class="terminal xterm-host" id="c-terminal"></div>
       </div>
       <div class="editor-foot">
         <div class="tab-strip">
           <button class="tab-btn is-active" data-tab="code">${currentLang === 'zh' ? '代码' : 'Code'}</button>
-          <button class="tab-btn" data-tab="input">${currentLang === 'zh' ? '输入' : 'Input'}</button>
+          <button class="tab-btn" data-tab="input" id="tab-input-btn"${(typeof WebAssembly.Suspending === 'function') ? ' hidden' : ''}>${currentLang === 'zh' ? '输入' : 'Input'}</button>
           <button class="tab-btn" data-tab="output">${currentLang === 'zh' ? '输出' : 'Output'}</button>
         </div>
         <button class="btn btn-ghost ripple-surface" id="btn-run" disabled>▶  ${tt('btn-run')}</button>
@@ -636,6 +615,20 @@ int main(void) {
     () => document.getElementById('btn-run')?.click()
   );
 
+  // xterm terminal — same component shared with C lessons + Python.
+  // (Defensive: a single null querySelector or xterm hiccup can't be allowed
+  // to break button wiring + ensureC below.)
+  let term;
+  try {
+    term = createLessonTerminal(document.getElementById('c-terminal'));
+    term.writeMuted((currentLang === 'zh' ? '编译器加载完成后即可运行。' : 'Once the compiler is loaded you can run.') + '\n');
+  } catch (e) {
+    console.error('[c-playground] terminal init failed:', e);
+    term = { write(){}, writeErr(){}, writeMuted(){}, writePass(){}, writeInfo(){},
+             reset(){}, focus(){}, fit(){}, awaitLine(){ return Promise.resolve(''); },
+             isAwaiting(){ return false; }, cancelAwait(){}, dispose(){} };
+  }
+
   /* Tab switching */
   const tabPanes = wrap.querySelectorAll('.tab-pane');
   const tabBtns  = wrap.querySelectorAll('.tab-btn');
@@ -650,58 +643,40 @@ int main(void) {
           if (r.width > 0 && r.height > 0) monacoEd.layout({ width: r.width, height: r.height });
         }
       });
+    } else if (name === 'output') {
+      requestAnimationFrame(() => term.fit());
     }
   }
   tabBtns.forEach(b => b.addEventListener('click', () => activateTab(b.dataset.tab)));
 
-  // Terminal helpers
-  const termEl = document.getElementById('c-terminal');
-  function termClear() { termEl.innerHTML = ''; }
-  function termAppend(text, cls) {
-    const s = document.createElement('span');
-    s.className = cls || 't-out';
-    s.textContent = text;
-    termEl.appendChild(s);
-    termEl.scrollTop = termEl.scrollHeight;
+  // ─── 预输入模式 toggle (M3 switch) ───
+  // Default OFF (JSPI live input) when the browser supports JSPI; ON (sync
+  // pre-filled stdin) when it doesn't, so older browsers still get a
+  // working "Run" without manual fiddling.
+  const HAS_JSPI = typeof WebAssembly.Suspending === 'function'
+                && typeof WebAssembly.promising  === 'function';
+  let preInputMode = !HAS_JSPI;
+  const pane     = wrap.querySelector('.editor-pane');
+  const preBtn   = document.getElementById('btn-preinput-toggle');
+  const inputTab = wrap.querySelector('.tab-pane.input-tab');
+  const inputTabBtn = document.getElementById('tab-input-btn');
+  function applyPreInputUI() {
+    pane.setAttribute('data-pre-input', preInputMode ? '1' : '0');
+    preBtn.classList.toggle('is-on', preInputMode);
+    if (preInputMode) {
+      inputTab.hidden = false;
+      if (inputTabBtn) inputTabBtn.hidden = false;
+    } else {
+      inputTab.hidden = true;
+      if (inputTabBtn) inputTabBtn.hidden = true;
+      if (wrap.querySelector('.tab-pane.input-tab.is-active')) activateTab('code');
+    }
   }
-
-  // Interactive input prompt — appears in the terminal when scanf/getchar
-  // blocks. Returns a Promise<string|null>. Enter commits the line; Ctrl+D
-  // sends EOF (null).
-  function termRequestInput() {
-    return new Promise((resolve) => {
-      const line = document.createElement('div');
-      line.className = 't-input-line';
-      const pSpan = document.createElement('span');
-      pSpan.className = 't-prompt';
-      pSpan.textContent = '▶ ';
-      const inp = document.createElement('input');
-      inp.className = 't-input-field';
-      inp.type = 'text';
-      inp.setAttribute('autocomplete', 'off');
-      inp.setAttribute('spellcheck', 'false');
-      line.appendChild(pSpan);
-      line.appendChild(inp);
-      termEl.appendChild(line);
-      termEl.scrollTop = termEl.scrollHeight;
-      // Defer focus so it survives terminal scroll
-      requestAnimationFrame(() => inp.focus());
-      function commit(value) {
-        inp.disabled = true;
-        inp.style.display = 'none';
-        const echo = document.createElement('span');
-        echo.className = 't-echo';
-        echo.textContent = (value == null ? '(EOF)' : value) + '\n';
-        line.appendChild(echo);
-        termEl.scrollTop = termEl.scrollHeight;
-        resolve(value);
-      }
-      inp.addEventListener('keydown', (e) => {
-        if (e.key === 'Enter') { e.preventDefault(); commit(inp.value); }
-        else if (e.key === 'd' && (e.ctrlKey || e.metaKey)) { e.preventDefault(); commit(null); }
-      });
-    });
-  }
+  applyPreInputUI();
+  preBtn.addEventListener('click', () => {
+    preInputMode = !preInputMode;
+    applyPreInputUI();
+  });
 
   // ─── Progress card driver ───
   const card    = document.getElementById('c-load-card');
@@ -765,8 +740,8 @@ int main(void) {
     cEngine = await ensureC({ onProgress: setProgress });
     setProgress({ phase: 'ready' });
     runBtn.disabled = false;
-    termClear();
-    termAppend((currentLang === 'zh' ? '编译器已就绪，点击运行。' : 'Compiler ready — click Run.') + '\n', 't-muted');
+    term.reset();
+    term.writeMuted((currentLang === 'zh' ? '编译器已就绪，点击运行。' : 'Compiler ready — click Run.') + '\n');
   } catch (e) {
     setProgress({ phase: 'error', message: String(e.message || e) });
     return;
@@ -802,35 +777,38 @@ int main(void) {
     if (_running) return;
     activateTab('output');
     setRunBtn('compiling');
-    termClear();
+    term.reset();
 
     const code  = monacoEd.getValue();
     const stdin = document.getElementById('c-stdin').value;
+    const flags = '-O0';
+    term.writeInfo(`$ emcc ${flags} -sSINGLE_FILE=1 -sEXIT_RUNTIME=1 -sFORCE_FILESYSTEM=1 main.c -o main.js\n`);
     try {
       const result = await cEngine.run(code, {
-        stdin,
-        flags: '-O0',
-        onStdout: (t) => termAppend(t, 't-out'),
-        onStderr: (t) => termAppend(t, 't-err'),
-        // Interactive: scanf / getchar block here until user types in terminal.
-        // The pre-filled stdin textarea drains FIRST; this only fires once
-        // those bytes are exhausted.
-        onInputRequest: termRequestInput,
+        stdin: preInputMode ? stdin : '',
+        mode:  preInputMode ? 'preinput' : 'jspi',
+        flags,
+        onStdout: (t) => term.write(t),
+        onStderr: (t) => term.writeErr(t),
+        onRuntimeStart: () => term.writeInfo('\n[compiled — running]\n\n'),
+        // JSPI mode: scanf/getchar suspends wasm; await typed line from xterm.
+        // Pre-input mode: this callback is unused (sync stdin from textarea).
+        onInputRequest: preInputMode ? undefined : () => term.awaitLine().then(s => s + '\n'),
       });
       if (result.error) {
-        termAppend('\n' + result.error + '\n', 't-err');
+        term.writeErr('\n' + result.error + '\n');
       } else {
-        termAppend('\n' + (currentLang === 'zh' ? '程序退出，状态码 ' : 'Process exited, code ') + result.exitCode + '\n',
-                   result.exitCode === 0 ? 't-muted' : 't-err');
+        term.writeInfo('\n[exit ' + result.exitCode + ']\n');
       }
     } catch (e) {
-      termAppend('\n' + String(e.message || e) + '\n', 't-err');
+      term.writeErr('\n' + String(e.message || e) + '\n');
     } finally {
+      term.cancelAwait();
       // Brief "✓ 完成" flash then revert to idle
       setRunBtn('done');
       setTimeout(() => setRunBtn('idle'), 1200);
     }
   });
 
-  document.getElementById('pg-c-clear').addEventListener('click', () => { monacoEd.setValue(''); });
+  document.getElementById('pg-c-clear').addEventListener('click', () => { monacoEd.setValue(''); term.reset(); });
 }

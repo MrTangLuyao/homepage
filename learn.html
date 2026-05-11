@@ -31,7 +31,8 @@
   <link rel="icon" href="lib/resources/po.webp">
   <link rel="stylesheet" href="lib/design/fonts.css">
   <link rel="stylesheet" href="lib/design/louie.css">
-  <link rel="stylesheet" href="learn/learn.css">
+  <link rel="stylesheet" href="learn/learn.css?v=20260512a">
+  <link rel="stylesheet" href="lib/runtime/xterm/xterm.min.css">
   <script src="lib/design/tailwindcss.js"></script>
   <script src="lib/design/tailwind.config.js"></script>
 
@@ -141,12 +142,19 @@
     </div>
   </div>
 
+  <!-- xterm MUST load BEFORE monaco/vs/loader.js. xterm.min.js is a UMD
+       bundle; if it sees a global `define` with `define.amd`, it registers
+       as an AMD module instead of setting window.Terminal. Monaco's loader
+       installs exactly that global `define`. Order: xterm → monaco loader. -->
+  <script src="lib/runtime/xterm/xterm.min.js"></script>
+  <script src="lib/runtime/xterm/xterm-addon-fit.min.js"></script>
   <script src="lib/runtime/sql-asm.js"></script>
   <script src="lib/runtime/monaco/vs/loader.js"></script>
   <script src="learn/learn_data/manifest.js"></script>
   <script src="learn/learn-i18n.js"></script>
   <script src="learn/learn-lesson-parser.js"></script>
   <script src="learn/learn-core.js"></script>
+  <script src="learn/learn-terminal.js"></script>
   <script src="learn/learn-engines.js"></script>
   <script src="learn/learn-views.js"></script>
   <script src="learn/learn-lesson.js"></script>

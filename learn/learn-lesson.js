@@ -107,9 +107,7 @@ async function renderPythonLesson(course, lesson, lessonId, courseSlug) {
         </div>
       </div>
       <div class="tab-pane output-tab" data-tab="output">
-        <div class="terminal" id="py-terminal">
-          <span class="t-muted">${tt('py-ready')}</span>
-        </div>
+        <div class="terminal xterm-host" id="py-terminal"></div>
       </div>
       <div class="editor-foot">
         <div class="tab-strip">
@@ -175,6 +173,20 @@ async function renderPythonLesson(course, lesson, lessonId, courseSlug) {
     set value(v) { monacoEd.setValue(v); },
   };
 
+  /* ── xterm terminal ──
+   * Wrapped in try/catch as a hard barrier so an xterm init mishap can't
+   * cascade into the rest of the lesson UI. Falls back to a no-op stub. */
+  let term;
+  try {
+    term = createLessonTerminal(document.getElementById('py-terminal'));
+    term.writeMuted(tt('py-ready') + '\n');
+  } catch (e) {
+    console.error('[py-lesson] terminal init failed — using no-op stub:', e);
+    term = { write(){}, writeErr(){}, writeMuted(){}, writePass(){}, writeInfo(){},
+             reset(){}, focus(){}, fit(){}, awaitLine(){ return Promise.resolve(''); },
+             isAwaiting(){ return false; }, cancelAwait(){}, dispose(){} };
+  }
+
   /* ── Tab switching (Code / Output) ── */
   const tabPanes = wrap.querySelectorAll('.tab-pane');
   const tabBtns  = wrap.querySelectorAll('.tab-btn');
@@ -189,53 +201,18 @@ async function renderPythonLesson(course, lesson, lessonId, courseSlug) {
           if (r.width > 0 && r.height > 0) monacoEd.layout({ width: r.width, height: r.height });
         }
       });
+    } else if (name === 'output') {
+      requestAnimationFrame(() => { try { term.fit(); } catch (_) {} });
     }
   }
   tabBtns.forEach(b => b.addEventListener('click', () => activateTab(b.dataset.tab)));
 
-  const termEl = document.getElementById('py-terminal');
-
-  function termClear() { termEl.innerHTML = ''; }
-
-  function termAppend(text, cls) {
-    const s = document.createElement('span');
-    s.className = cls || 't-out';
-    s.textContent = text;
-    termEl.appendChild(s);
-    termEl.scrollTop = termEl.scrollHeight;
-  }
-
+  // Adapter: Skulpt's inputfun receives a prompt string and must
+  // return Promise<string>. We print the prompt then await one
+  // typed line from the terminal.
   function termRequestInput(prompt) {
-    return new Promise((resolve) => {
-      if (prompt) termAppend(prompt);
-      const line = document.createElement('div');
-      line.className = 't-input-line';
-      const pSpan = document.createElement('span');
-      pSpan.className = 't-prompt';
-      pSpan.textContent = '▶ ';
-      const inp = document.createElement('input');
-      inp.className = 't-input-field';
-      inp.type = 'text';
-      inp.setAttribute('autocomplete', 'off');
-      inp.setAttribute('spellcheck', 'false');
-      line.appendChild(pSpan);
-      line.appendChild(inp);
-      termEl.appendChild(line);
-      termEl.scrollTop = termEl.scrollHeight;
-      inp.focus();
-      inp.addEventListener('keydown', (e) => {
-        if (e.key !== 'Enter') return;
-        const val = inp.value;
-        inp.disabled = true;
-        inp.style.display = 'none';
-        const echo = document.createElement('span');
-        echo.className = 't-echo';
-        echo.textContent = val + '\n';
-        line.appendChild(echo);
-        termEl.scrollTop = termEl.scrollHeight;
-        resolve(val);
-      });
-    });
+    if (prompt) term.write(String(prompt));
+    return term.awaitLine();
   }
 
   let _running = false;
@@ -258,10 +235,10 @@ async function renderPythonLesson(course, lesson, lessonId, courseSlug) {
     if (_running) return;
     activateTab('output');
     setRunning(true);
-    termClear();
+    term.reset();
     const code = editor.value;
     Sk.configure({
-      output: (t) => termAppend(t),
+      output: (t) => term.write(t),
       read: skulptRead,
       inputfun: termRequestInput,
       inputfunTakesPrompt: true,
@@ -272,8 +249,11 @@ async function renderPythonLesson(course, lesson, lessonId, courseSlug) {
     Sk.misceval.asyncToPromise(() =>
       Sk.importMainWithBody('<stdin>', false, code, true)
     ).catch((e) => {
-      termAppend('\n' + e.toString() + '\n', 't-err');
-    }).finally(() => setRunning(false));
+      term.writeErr('\n' + e.toString() + '\n');
+    }).finally(() => {
+      term.cancelAwait();
+      setRunning(false);
+    });
   }
 
   function runCheck() {
@@ -296,23 +276,23 @@ async function renderPythonLesson(course, lesson, lessonId, courseSlug) {
     Sk.misceval.asyncToPromise(() =>
       Sk.importMainWithBody('<stdin>', false, code, true)
     ).then(() => {
-      termClear();
+      term.reset();
       const expected = lesson.expectedOutput || '';
       if (output.trim() === expected.trim()) {
         markDone(courseSlug, lesson.id);
-        termAppend('✦ ' + tt('msg-pass') + '\n', 't-pass');
-        termAppend('\n' + tt('py-got') + '\n', 't-muted');
-        termAppend(output);
+        term.writePass('✦ ' + tt('msg-pass') + '\n');
+        term.writeMuted('\n' + tt('py-got') + '\n');
+        term.write(output);
       } else {
-        termAppend('✗ ' + tt('result-fail') + '\n\n', 't-err');
-        termAppend(tt('py-expected') + '\n', 't-muted');
-        termAppend(expected || '(empty)\n');
-        termAppend('\n' + tt('py-got') + '\n', 't-muted');
-        termAppend(output || '(empty)\n');
+        term.writeErr('✗ ' + tt('result-fail') + '\n\n');
+        term.writeMuted(tt('py-expected') + '\n');
+        term.write(expected || '(empty)\n');
+        term.writeMuted('\n' + tt('py-got') + '\n');
+        term.write(output || '(empty)\n');
       }
     }).catch((e) => {
-      termClear();
-      termAppend(e.toString() + '\n', 't-err');
+      term.reset();
+      term.writeErr(e.toString() + '\n');
     }).finally(() => setRunning(false));
   }
 
@@ -320,7 +300,7 @@ async function renderPythonLesson(course, lesson, lessonId, courseSlug) {
   document.getElementById('btn-check').addEventListener('click', runCheck);
   document.getElementById('btn-reset').addEventListener('click', () => {
     editor.value = starter;
-    termClear();
+    term.reset();
     activateTab('code');
   });
 
@@ -368,9 +348,17 @@ async function renderCLesson(course, lesson, lessonId, courseSlug, cEngine) {
   const hint    = pickLang(lesson.hint)    || '';
   const starter = pickLang(lesson.starter) || '';
 
-  // Pre-filled stdin shown to the user as a textarea (also used for grading).
+  // Pre-filled stdin shown to the user as a textarea — used for grading
+  // and for the optional "pre-input mode" toggle.
   // testInputs is a list of strings — joined with newlines.
   const defaultStdin = (Array.isArray(lesson.testInputs) ? lesson.testInputs : []).join('\n');
+
+  // Feature-detect JSPI once per page. The toggle defaults OFF (JSPI mode)
+  // when JSPI is available, ON (pre-input) when it isn't, so older
+  // browsers still get a working "Run" out of the box.
+  const HAS_JSPI = typeof WebAssembly.Suspending === 'function'
+                && typeof WebAssembly.promising  === 'function';
+  let preInputMode = !HAS_JSPI;   // mutable — toggle button flips it
 
   // C lessons reuse Python lesson's i18n keys for editor/run/term labels —
   // the labels don't say "Python" anywhere.
@@ -427,28 +415,30 @@ async function renderCLesson(course, lesson, lessonId, courseSlug, cEngine) {
 
     ${SPLITTER_HTML}
 
-    <div class="lesson-pane lesson-pane-right editor-pane fade-in">
+    <div class="lesson-pane lesson-pane-right editor-pane fade-in" data-pre-input="${preInputMode ? '1' : '0'}">
       <div class="tab-pane code-tab is-active" data-tab="code">
         <div id="c-editor" class="editor-fill"></div>
         <div class="tab-actions">
+          <button class="m3-toggle ripple-surface ${preInputMode ? 'is-on' : ''}" id="btn-preinput-toggle"
+                  title="${currentLang === 'zh' ? '开启后会显示输入编辑器，stdin 从那里同步读取（适合答案判定 / 老浏览器）' : 'When on, an input editor appears; stdin is read synchronously from it (use for grading / old browsers).'}">
+            <span class="m3-track"><span class="m3-thumb"></span></span>
+            <span>${currentLang === 'zh' ? '预输入模式（不推荐）' : 'Pre-input mode (not recommended)'}</span>
+          </button>
           <button class="editor-mini-btn" id="btn-reset">${tt('btn-reset')}</button>
           ${hint ? `<button class="editor-mini-btn" id="hint-toggle">${tt('show-hint')}</button>` : ''}
           <button class="editor-mini-btn" id="btn-show-answer">${tt('btn-show-answer')}</button>
         </div>
       </div>
-      ${defaultStdin ? `
-      <div class="tab-pane input-tab" data-tab="input">
+      <div class="tab-pane input-tab" data-tab="input"${preInputMode ? '' : ' hidden'}>
         <textarea id="c-stdin" spellcheck="false">${escapeHtml(defaultStdin)}</textarea>
-      </div>` : ''}
+      </div>
       <div class="tab-pane output-tab" data-tab="output">
-        <div class="terminal" id="c-terminal">
-          <span class="t-muted">${currentLang === 'zh' ? '编译器已就绪，点运行试试。' : 'Compiler ready — click Run.'}</span>
-        </div>
+        <div class="terminal xterm-host" id="c-terminal"></div>
       </div>
       <div class="editor-foot">
         <div class="tab-strip">
           <button class="tab-btn is-active" data-tab="code">${currentLang === 'zh' ? '代码' : 'Code'}</button>
-          ${defaultStdin ? `<button class="tab-btn" data-tab="input">${currentLang === 'zh' ? '输入' : 'Input'}</button>` : ''}
+          <button class="tab-btn" data-tab="input" id="tab-input-btn"${preInputMode ? '' : ' hidden'}>${currentLang === 'zh' ? '输入' : 'Input'}</button>
           <button class="tab-btn" data-tab="output">${currentLang === 'zh' ? '输出' : 'Output'}</button>
         </div>
         <button class="btn btn-ghost ripple-surface" id="btn-run">▶  ${tt('btn-run')}</button>
@@ -512,6 +502,22 @@ async function renderCLesson(course, lesson, lessonId, courseSlug, cEngine) {
     set value(v) { monacoEd.setValue(v); },
   };
 
+  /* ── xterm terminal ──
+   * Wrapped in try/catch as a hard barrier so an xterm initialisation
+   * mishap can't cascade into "all buttons inert / Monaco invisible".
+   * If creation fails, we fall back to a no-op handle and keep going. */
+  let term;
+  try {
+    const termEl = document.getElementById('c-terminal');
+    term = createLessonTerminal(termEl);
+    term.writeMuted(currentLang === 'zh' ? '编译器已就绪，点运行试试。\n' : 'Compiler ready — click Run.\n');
+  } catch (e) {
+    console.error('[c-lesson] terminal init failed — using no-op stub:', e);
+    term = { write(){}, writeErr(){}, writeMuted(){}, writePass(){}, writeInfo(){},
+             reset(){}, focus(){}, fit(){}, awaitLine(){ return Promise.resolve(''); },
+             isAwaiting(){ return false; }, cancelAwait(){}, dispose(){} };
+  }
+
   /* ── Tab switching (Code / Input / Output) ── */
   const tabPanes = wrap.querySelectorAll('.tab-pane');
   const tabBtns  = wrap.querySelectorAll('.tab-btn');
@@ -526,19 +532,39 @@ async function renderCLesson(course, lesson, lessonId, courseSlug, cEngine) {
           if (r.width > 0 && r.height > 0) monacoEd.layout({ width: r.width, height: r.height });
         }
       });
+    } else if (name === 'output') {
+      requestAnimationFrame(() => { try { term.fit(); } catch (_) {} });
     }
   }
   tabBtns.forEach(b => b.addEventListener('click', () => activateTab(b.dataset.tab)));
 
-  /* ── Terminal helpers ── */
-  const termEl = document.getElementById('c-terminal');
-  function termClear() { termEl.innerHTML = ''; }
-  function termAppend(text, cls) {
-    const s = document.createElement('span');
-    s.className = cls || 't-out';
-    s.textContent = text;
-    termEl.appendChild(s);
-    termEl.scrollTop = termEl.scrollHeight;
+  /* ── 预输入模式 toggle (M3 switch) ── */
+  // Same defensive wrap reason as the terminal init: a single null
+  // querySelector can't be allowed to break the rest of the wiring.
+  try {
+    const pane = wrap.querySelector('.editor-pane');
+    const preBtn   = document.getElementById('btn-preinput-toggle');
+    const inputTab = wrap.querySelector('.tab-pane.input-tab');
+    const inputTabBtn = document.getElementById('tab-input-btn');
+    function applyPreInputUI() {
+      if (pane)   pane.setAttribute('data-pre-input', preInputMode ? '1' : '0');
+      if (preBtn) preBtn.classList.toggle('is-on', preInputMode);
+      if (preInputMode) {
+        if (inputTab)    inputTab.hidden = false;
+        if (inputTabBtn) inputTabBtn.hidden = false;
+      } else {
+        if (inputTab)    inputTab.hidden = true;
+        if (inputTabBtn) inputTabBtn.hidden = true;
+        if (wrap.querySelector('.tab-pane.input-tab.is-active')) activateTab('code');
+      }
+    }
+    applyPreInputUI();
+    if (preBtn) preBtn.addEventListener('click', () => {
+      preInputMode = !preInputMode;
+      applyPreInputUI();
+    });
+  } catch (e) {
+    console.error('[c-lesson] preinput toggle setup failed:', e);
   }
 
   /* ── Run + Submit ── */
@@ -556,31 +582,44 @@ async function renderCLesson(course, lesson, lessonId, courseSlug, cEngine) {
     return ta ? ta.value : defaultStdin;
   }
 
+  // ── Run: respects the user's preInputMode toggle.
+  //    - preInputMode ON: send stdin string from textarea, mode='preinput'
+  //    - preInputMode OFF: mode='jspi', stdin comes from terminal typing
   async function runInteractive() {
     if (_running) return;
     activateTab('output');
     setRunning(true);
-    termClear();
+    term.reset();
+    // Echo the compile command up front so users see what's being run —
+    // matches the emception_l demo's UX exactly.
+    const flags = '-O0';
+    term.writeInfo(`$ emcc ${flags} -sSINGLE_FILE=1 -sEXIT_RUNTIME=1 -sFORCE_FILESYSTEM=1 main.c -o main.js\n`);
     try {
       const result = await cEngine.run(editor.value, {
-        stdin: readStdin(),
-        flags: '-O0',
-        onStdout: (t) => termAppend(t, 't-out'),
-        onStderr: (t) => termAppend(t, 't-err'),
+        stdin: preInputMode ? readStdin() : '',
+        mode:  preInputMode ? 'preinput'  : 'jspi',
+        flags,
+        onStdout: (t) => term.write(t),
+        onStderr: (t) => term.writeErr(t),
+        onRuntimeStart: () => term.writeInfo('\n[compiled — running]\n\n'),
+        onInputRequest: preInputMode ? undefined : () => term.awaitLine().then(s => s + '\n'),
       });
       if (result.error) {
-        termAppend('\n' + result.error + '\n', 't-err');
+        term.writeErr('\n' + result.error + '\n');
       } else {
-        termAppend('\n' + (currentLang === 'zh' ? '程序退出，状态码 ' : 'Process exited, code ') + result.exitCode + '\n',
-                   result.exitCode === 0 ? 't-muted' : 't-err');
+        term.writeInfo('\n[exit ' + result.exitCode + ']\n');
       }
     } catch (e) {
-      termAppend('\n' + String(e.message || e) + '\n', 't-err');
+      term.writeErr('\n' + String(e.message || e) + '\n');
     } finally {
+      term.cancelAwait();
       setRunning(false);
     }
   }
 
+  // ── Submit: grading ALWAYS uses pre-input mode (lesson.testInputs)
+  //    regardless of the toggle. Interactive input can't be replayed
+  //    deterministically and would defeat auto-grading.
   async function runCheck() {
     if (_running) return;
     activateTab('output');
@@ -588,33 +627,34 @@ async function renderCLesson(course, lesson, lessonId, courseSlug, cEngine) {
     let captured = '';
     try {
       const result = await cEngine.run(editor.value, {
-        stdin: readStdin(),
+        stdin: defaultStdin,   // always the test inputs for grading
+        mode:  'preinput',
         flags: '-O0',
         onStdout: (t) => { captured += t; },
         onStderr: (t) => { captured += t; },
       });
-      termClear();
+      term.reset();
       if (result.error) {
-        termAppend('✗ ' + (currentLang === 'zh' ? '运行失败：' : 'Run failed: ') + result.error + '\n\n', 't-err');
-        if (captured) termAppend(captured + '\n', 't-err');
+        term.writeErr('✗ ' + (currentLang === 'zh' ? '运行失败：' : 'Run failed: ') + result.error + '\n\n');
+        if (captured) term.writeErr(captured + '\n');
         return;
       }
       const expected = lesson.expectedOutput || '';
       if (captured.trim() === expected.trim()) {
         markDone(courseSlug, lesson.id);
-        termAppend('✦ ' + tt('msg-pass') + '\n', 't-pass');
-        termAppend('\n' + tt('py-got') + '\n', 't-muted');
-        termAppend(captured);
+        term.writePass('✦ ' + tt('msg-pass') + '\n');
+        term.writeMuted('\n' + tt('py-got') + '\n');
+        term.write(captured);
       } else {
-        termAppend('✗ ' + tt('result-fail') + '\n\n', 't-err');
-        termAppend(tt('py-expected') + '\n', 't-muted');
-        termAppend(expected || '(empty)\n');
-        termAppend('\n' + tt('py-got') + '\n', 't-muted');
-        termAppend(captured || '(empty)\n');
+        term.writeErr('✗ ' + tt('result-fail') + '\n\n');
+        term.writeMuted(tt('py-expected') + '\n');
+        term.write(expected || '(empty)\n');
+        term.writeMuted('\n' + tt('py-got') + '\n');
+        term.write(captured || '(empty)\n');
       }
     } catch (e) {
-      termClear();
-      termAppend(String(e.message || e) + '\n', 't-err');
+      term.reset();
+      term.writeErr(String(e.message || e) + '\n');
     } finally {
       setRunning(false);
     }
@@ -624,7 +664,7 @@ async function renderCLesson(course, lesson, lessonId, courseSlug, cEngine) {
   document.getElementById('btn-check').addEventListener('click', runCheck);
   document.getElementById('btn-reset').addEventListener('click', () => {
     editor.value = starter;
-    termClear();
+    term.reset();
     activateTab('code');
   });
 
