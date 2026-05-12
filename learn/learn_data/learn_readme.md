@@ -342,10 +342,38 @@ postmsg-bridge.js
   ├─ inject via <script src=> (so webpack auto-publicPath finds the bundle)
   ├─ wait for window.emception (set by upstream demo bundle)
   ├─ hide upstream demo UI elements
-  └─ accept {type:'run', id, code, stdin?} via postMessage
-       └─ writeFile /working/main.c → emcc → read /working/main.js
-            └─ execute via `new Function('Module', code)(Module)`
-                 with our Module.print/printErr/stdin/onExit hooks
+  └─ accept {type:'run', id, code, stdin?, mode?} via postMessage
+       mode: 'preinput' (default, sync stdin from string) | 'jspi' (real wasm suspend)
+       │
+       ├─ writeFile /working/main.c → emcc → read /working/main.js
+       │  using: emcc -O0 -sSINGLE_FILE=1 -sEXIT_RUNTIME=1 -sFORCE_FILESYSTEM=1
+       │  (note: NO -fexceptions — JS-based EH invoke_* trampolines insert
+       │   JS frames between wasm frames, and JSPI cannot suspend through them)
+       │
+       ├─ temporarily patch WebAssembly.instantiate / instantiateStreaming:
+       │   · replace fd_write / __syscall_write / __syscall_writev (fd 1/2)
+       │     → call onStdout / onStderr directly, BYPASSING emcc's TTY line buffer
+       │     (without this `printf("Name? ")` with no '\n' would sit trapped in
+       │     emcc's internal line buffer until a newline shows up)
+       │   · JSPI mode additionally: wrap fd_read / __syscall_read /
+       │     __syscall_readv / __syscall_pread64 (fd 0) with
+       │     new WebAssembly.Suspending(asyncFn). asyncFn posts 'input-request'
+       │     to the parent and awaits 'input-response'; wasm stack truly parks.
+       │   · JSPI also wraps the entry export (__main_argc_argv / _main)
+       │     with WebAssembly.promising() — without that the Suspending import
+       │     throws "no active suspender".
+       │
+       ├─ execute main.js via `new Function('Module', code)(Module)`
+       │   Module.noInitialRun = useJspi (in JSPI mode we await promisingMain ourselves)
+       │   Module.stdin = () => null  ← defensive: prevents emcc's default TTY
+       │                                fallback from calling window.prompt()
+       │
+       ├─ postMessage back {type:'runtime-start', id} — compile done, program about to run.
+       │   parent prints a cyan "[compiled — running]" divider on receipt.
+       ├─ postMessage back {type:'stdout'|'stderr', id, text} — program output.
+       ├─ JSPI mode: postMessage back {type:'input-request', id} when stdin reads.
+       │   parent reads a line from the xterm and replies {type:'input-response', id, text}.
+       └─ postMessage back {type:'done', id, exitCode, error?} — wrapped up.
 ```
 
 The whole emception demo branch is **mirrored locally** under `lib/runtime/webC/` (~450 MB, 522 files). This is necessary because:
@@ -366,17 +394,16 @@ emcc -O0 -sSINGLE_FILE=1 -sEXIT_RUNTIME=1 -sFORCE_FILESYSTEM=1 main.c -o main.js
 - `-sEXIT_RUNTIME=1` — fire `Module.onExit(status)` when main returns (so we know exit code)
 - `-sFORCE_FILESYSTEM=1` — wire `/dev/stdin` to `Module.stdin` (without it emcc may strip FS init)
 
-### C runtime — known limitations
+### C runtime — past limitations & current status
 
-These are **not bugs in our code** — they're upstream constraints.
+1. ~~**No interactive `scanf`/`getchar`**~~ **Resolved.**
+   We now use **JSPI** (JavaScript Promise Integration) — `WebAssembly.Suspending(asyncFn)` wraps stdin imports (`fd_read` / `__syscall_read*`), `WebAssembly.promising` wraps the entry export. The wasm stack truly suspends at `scanf`, the parent fetches a line from the xterm terminal via postMessage, and after the user presses Enter wasm resumes. No ASYNCIFY anywhere (we tried that early; emception's particular emscripten build corrupted the ASYNCIFY state machine on first call. JSPI uses the browser's native promise integration and has no relation to ASYNCIFY).
+   **Browser requirements**: Chromium 137+ / Safari 26+ / Firefox 144+. Older browsers get a fallback — each C lesson page has a top-right "Pre-input mode (not recommended)" toggle. Default OFF (JSPI); manually ON drains stdin from a textarea synchronously.
+   **Grading always uses pre-input mode** regardless of the user's toggle state — auto-tests need deterministic input.
 
-1. **No interactive `scanf`/`getchar`**. Stdin is **pre-filled** from the textarea before Run; the program reads it synchronously. We tried `-sASYNCIFY=1 -sASYNCIFY_IMPORTS=fd_read`, but emception's specific emscripten build has a bug where ASYNCIFY's state machine corrupts immediately on first `Module.stdin`-via-`handleSleep`. Adding more imports (`proc_exit`, `fd_close`) trips the WASM layout earlier still. Without ASYNCIFY, `Module.stdin` is synchronous, can't pause WASM to wait for input.
-   - **Future fix**: when JSPI (JavaScript Promise Integration) is universally available — Chrome 133+ default, Firefox 132+ behind flag — replace ASYNCIFY with `-sJSPI=1`. JSPI uses native browser promise integration, doesn't have ASYNCIFY's state machine. Code stubs are kept (`onInputRequest` in `learn-engines.js`, `termRequestInput` in `learn-views.js`, `input-request`/`response` postMessage protocol in `postmsg-bridge.js`) — re-enable when JSPI ships.
-
-2. **stdout buffering can reorder output around `scanf`**. Symptom: `printf("Hello"); scanf(...);` may swallow or delay the prompt. Two fixes work:
-   - End every prompt `printf` with `\n` — line-buffered stdout flushes on newline (this is what the default playground demo does)
-   - Or call `fflush(stdout);` explicitly before each `scanf` (works without `\n`, useful for inline prompts like `printf("> ");`)
-   - Likely cause: libc line-buffers stdout when target is a TTY. With FORCE_FILESYSTEM, /dev/stdout is detected as a TTY, triggering buffering that delays our `Module.print` callbacks.
+2. ~~**stdout buffering can reorder output around `scanf`**~~ **Resolved.**
+   We no longer rely on libc line buffering. `postmsg-bridge.js` swaps out `fd_write` / `__syscall_writev` / `__syscall_write` imports (fd 1/2) at runtime for non-suspending JS functions that pipe bytes straight to `onStdout` / `onStderr`, **completely bypassing emcc's TTY line-buffer pipeline**. `printf("Name? ")` with no `\n` shows up instantly.
+   ⇒ Lesson authors no longer need to hack `\n` or `fflush(stdout);` around prompts.
 
 3. **First-time C load is slow on cold cache** (~25–30 MB). Mitigated by:
    - The C-family modal warning users upfront
@@ -384,6 +411,8 @@ These are **not bugs in our code** — they're upstream constraints.
    - Browser HTTP cache + Cloudflare edge cache making subsequent loads instant
 
 4. **`file://` users see a "needs HTTPS" message** instead of the playground/lesson. emception's worker construction needs HTTPS or `http://localhost`.
+
+5. **`-fexceptions` cannot be used.** JS-based C++ EH installs `invoke_*` JS trampolines; JSPI cannot suspend through JS frames (throws `SuspendError: trying to suspend JS frames`). So the compile flags deliberately omit `-fexceptions` — libc++ links its no-exceptions variant. If C++ exceptions are ever needed, switch to `-fwasm-exceptions` (wasm-native EH, no JS frames inserted).
 
 ### C playground — defaults
 
@@ -494,8 +523,8 @@ Monaco internally renders its own scrollbar / overflow-guard layers that sometim
 **C grader rules:**
 
 1. **`expectedOutput` is whitespace-tolerant trim compare** against stdout. Stderr is included so compile errors are visible.
-2. **`testInputs` array is joined by newlines and pre-filled into stdin.** No interactive input — see the runtime limitations above.
-3. **Format every prompt's `printf` with a trailing `\n`**, otherwise libc line-buffering can swallow output.
+2. **`testInputs` array is joined by newlines and pre-filled into stdin.** Grading **always uses pre-input mode** (even when the user's toggle is in JSPI/live mode) so the test is deterministic.
+3. **Prompts do NOT need a trailing `\n`.** The bridge now bypasses emcc's TTY line buffer at runtime, so `printf("Name? ")` shows up immediately. In fact for nicer interactive UX, leave the `\n` off so the cursor stays inline — the resulting graded output is a single line like `Please enter your name: Hello, Alice!`.
 4. **Pin RNG / time-dependent output**. `srand(time(NULL))` will fail grading because output varies; use a fixed seed (`srand(42)`) or check only invariants (`time(NULL) > 0`).
 
 ## How to add a new course
