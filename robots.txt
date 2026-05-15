@@ -4,10 +4,8 @@
 User-agent: *
 Allow: /
 
-# Don't index runtime libraries or raw data folders
+# Don't index runtime libraries
 # (they're served from the same host, but they aren't pages).
 Disallow: /lib/
-Disallow: /blog/blog_data/
-Disallow: /learn/learn_data/
 
 Sitemap: https://louie1.com/sitemap.xml

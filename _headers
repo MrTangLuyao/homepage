@@ -6,33 +6,15 @@
 # Since; server returns 304 when unchanged). So users always see the latest
 # code, but bandwidth is still saved on unchanged files.
 
-# ─── Always revalidate (own pages + own JS/CSS) ───
+# ─── Always revalidate (own pages) ───
 /*.html
-  Cache-Control: no-cache, must-revalidate
-
-/learn/*
-  Cache-Control: no-cache, must-revalidate
-
-/blog/*
   Cache-Control: no-cache, must-revalidate
 
 /index.html
   Cache-Control: no-cache, must-revalidate
 
 # ─── 3rd-party runtimes — content is fixed, cache hard ───
-# Monaco editor (~5 MB chunked, never changes per version)
-/lib/runtime/monaco/*
-  Cache-Control: public, max-age=2592000
-
-# Emception clang mirror (~470 MB, never changes)
-/lib/runtime/webC/*
-  Cache-Control: public, max-age=31536000, immutable
-
-# sql.js / pyodide / other engines
 /lib/runtime/*.js
-  Cache-Control: public, max-age=2592000
-
-/lib/runtime/*.wasm
   Cache-Control: public, max-age=2592000
 
 # ─── Design + assets (rare changes, moderate cache) ───

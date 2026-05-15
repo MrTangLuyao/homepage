@@ -1,10 +1,6 @@
 /* ============================================================
  * lib/design/louie.css
- * Common design tokens & components shared across
- * index.html · blog.html · learn.html
- *
- * Page-specific overrides (body extensions, page layouts,
- * reader prose, etc.) stay inline in each page's <style> block.
+ * Common design tokens & components used by index.html.
  * ============================================================ */
 
 /* ─── Design tokens ─── */

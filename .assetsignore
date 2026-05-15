@@ -13,8 +13,6 @@ wrangler.toml
 # Repo docs / notes (live in the repo for humans, not for end users)
 README.md
 LICENSE
-**/learn_readme.md
-claude*.md
 
 # OS / editor cruft
 .DS_Store

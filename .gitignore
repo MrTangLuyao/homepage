@@ -8,6 +8,3 @@
 .idea/
 .vscode/
 
-# Local server logs / scratch
-_diag.html
-_xterm-smoke.html
