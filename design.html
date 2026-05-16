@@ -1,0 +1,770 @@
+<!DOCTYPE html>
+<html lang="zh-CN" class="scroll-smooth">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+  <title>Louie Design</title>
+
+  <meta name="description" content="louie.design. A quiet look at the homepage. From dawn to dusk.">
+  <meta name="author" content="Louie">
+  <meta name="theme-color" content="#1f1f1e">
+  <link rel="canonical" href="https://louie1.com/design">
+
+  <meta property="og:type" content="website">
+  <meta property="og:site_name" content="Louie Design">
+  <meta property="og:title" content="Louie Design">
+  <meta property="og:description" content="A quiet look at the homepage. From dawn to dusk.">
+  <meta property="og:url" content="https://louie1.com/design">
+  <meta property="og:image" content="https://louie1.com/lib/resources/po.webp">
+  <meta property="og:locale" content="zh_CN">
+  <meta property="og:locale:alternate" content="en_US">
+
+  <meta name="twitter:card" content="summary">
+  <meta name="twitter:title" content="Louie Design">
+  <meta name="twitter:description" content="A quiet look at the homepage.">
+  <meta name="twitter:image" content="https://louie1.com/lib/resources/po.webp">
+
+  <link rel="icon" href="lib/resources/po.webp">
+  <link rel="stylesheet" href="lib/design/fonts.css">
+  <link rel="stylesheet" href="lib/design/louie.css">
+  <script src="lib/design/tailwindcss.js"></script>
+  <script src="lib/design/tailwind.config.js"></script>
+
+  <style>
+    body { -webkit-user-select: none; user-select: none; }
+
+    .nav-divider { width: 1px; height: 24px; background: var(--border); margin: 0 4px; }
+    #menu-btn {
+      display: none; align-items: center; justify-content: center;
+      background: none; border: none; color: var(--text);
+      cursor: pointer; padding: 8px; border-radius: 9999px;
+      position: relative; overflow: hidden;
+      transition: background 0.2s ease;
+    }
+    #menu-btn:hover { background: var(--surface-high); }
+    @media (max-width: 767px) { #menu-btn { display: inline-flex !important; } }
+    #mobile-menu {
+      transition: clip-path 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+      clip-path: circle(0% at top right);
+    }
+    #mobile-menu.open { clip-path: circle(150% at top right); }
+
+    #back-to-wallpaper-btn {
+      position: absolute;
+      left: 50%;
+      top: 50%;
+      transform: translate(-50%, -50%);
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      padding: 9px 18px;
+      border-radius: 9999px;
+      background: rgba(255, 255, 255, 0.10);
+      color: rgba(255, 255, 255, 0.95);
+      border: 1px solid rgba(255, 255, 255, 0.16);
+      backdrop-filter: blur(14px);
+      -webkit-backdrop-filter: blur(14px);
+      font-family: inherit;
+      font-size: 15px;
+      font-weight: 600;
+      letter-spacing: 0.04em;
+      cursor: pointer;
+      opacity: 0;
+      pointer-events: none;
+      transition: opacity 0.4s ease, background 0.2s ease;
+      overflow: hidden;
+      white-space: nowrap;
+    }
+    #back-to-wallpaper-btn.is-visible { opacity: 1; pointer-events: auto; }
+    #back-to-wallpaper-btn:hover { background: rgba(255, 255, 255, 0.20); }
+    #back-to-wallpaper-btn svg { width: 14px; height: 14px; }
+    @media (max-width: 600px) {
+      #back-to-wallpaper-btn { padding: 9px 12px; font-size: 14px; }
+      #back-to-wallpaper-btn .btn-text { display: none; }
+    }
+
+    /* Font floor: no glyph below ~15px */
+    body { font-size: 17px; line-height: 1.8; }
+    .text-xs       { font-size: 14px !important; line-height: 1.6 !important; }
+    .text-sm       { font-size: 16px !important; line-height: 1.75 !important; }
+    .text-base     { font-size: 17px !important; }
+    .text-\[15px\] { font-size: 17px !important; }
+    .text-\[17px\] { font-size: 18px !important; }
+
+    /* Hero: strict left-edge alignment */
+    main { align-items: flex-start; }
+    main h1, main p.hero-sub {
+      margin: 0; padding: 0;
+      text-indent: 0;
+      display: block;
+      letter-spacing: 0;
+      width: 100%;
+    }
+    main h1 {
+      font-size: clamp(72px, 14vw, 180px) !important;
+      line-height: 0.95;
+      font-weight: 800;
+    }
+    main p.hero-sub {
+      font-size: clamp(22px, 3vw, 30px);
+      color: var(--accent-on);
+      font-weight: 400;
+      margin-top: 22px;
+      /* 左缘对齐靠副标文本起首的空格（"曲线救国"），不再用 CSS nudge。 */
+    }
+
+    section h2 { font-size: 32px !important; line-height: 1.2; }
+    section h2 > span:first-child { font-size: 26px !important; }
+
+    .section-line { font-size: 19px; line-height: 1.95; color: var(--text); }
+
+    .swatch {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      overflow: hidden;
+      transition: background-color 0.2s ease, box-shadow 0.2s ease, transform 0.2s ease;
+    }
+    .swatch:hover {
+      background: var(--surface-high);
+      box-shadow: 0 8px 20px rgba(0, 0, 0, 0.28);
+      transform: translateY(-3px);
+    }
+    .swatch .chip { height: 72px; }
+    .swatch .meta { padding: 12px 14px; line-height: 1.5; }
+    .swatch .meta .name { color: var(--text); font-weight: 600; font-size: 15px; }
+    .swatch .meta .hex  { color: var(--muted); font-size: 14px; }
+
+    .specimen {
+      background: var(--bg);
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      padding: 30px 28px;
+      margin-top: 22px;
+    }
+    .specimen.over-desert {
+      background-image: linear-gradient(rgba(0,0,0,0.30), rgba(0,0,0,0.50)), url('lib/resources/th.jpg');
+      background-size: cover;
+      background-position: center;
+      border: none;
+      padding: 64px 32px;
+      text-align: center;
+    }
+    .specimen.over-desert .frost-btn {
+      padding: 14px 36px;
+      border-radius: 9999px;
+      font-weight: 700;
+      font-size: 17px;
+      letter-spacing: 0.04em;
+      color: rgba(255, 255, 255, 0.95);
+      background: rgba(255, 255, 255, 0.10);
+      backdrop-filter: blur(14px);
+      -webkit-backdrop-filter: blur(14px);
+      border: none;
+      cursor: pointer;
+      position: relative; overflow: hidden;
+      transition: background 0.25s ease, color 0.25s ease;
+    }
+    .specimen.over-desert .frost-btn:hover {
+      background: rgba(255, 255, 255, 0.20);
+      color: #fff;
+    }
+
+    /* §09 顶栏 — animated frost loop: clean → frosted → clean */
+    .frost-anim-specimen {
+      margin-top: 22px;
+      padding: 0;
+      border: none;
+      overflow: hidden;
+      border-radius: 12px;
+    }
+    .frost-anim-stage {
+      position: relative;
+      height: 220px;
+      background-image: url('lib/resources/th.jpg');
+      background-size: cover;
+      background-position: center;
+    }
+    .frost-anim-bar {
+      position: absolute;
+      top: 0; left: 0; right: 0;
+      height: 60px;
+      display: flex; align-items: center; justify-content: space-between;
+      padding: 0 22px;
+    }
+    .frost-anim-bar::before {
+      content: "";
+      position: absolute;
+      inset: 0;
+      z-index: 0;
+      pointer-events: none;
+      /* 磨砂层始终保持满模糊，只让 opacity 在 0→1→0 之间淡入淡出。
+         opacity 是 GPU 合成属性，能稳跑 60fps；动 blur 半径要逐帧重算，掉帧。 */
+      background-color: rgba(20, 20, 19, 0.55);
+      backdrop-filter: blur(14px);
+      -webkit-backdrop-filter: blur(14px);
+      opacity: 0;
+      will-change: opacity;
+      animation: frost-fade 7s ease-in-out infinite;
+    }
+    @keyframes frost-fade {
+      0%, 100% { opacity: 0; }
+      50%      { opacity: 1; }
+    }
+    .frost-anim-bar > * { position: relative; z-index: 1; }
+    .frost-anim-brand {
+      display: inline-flex; align-items: center;
+      font-family: inherit;
+      font-size: 18px; font-weight: 700;
+      letter-spacing: 0.05em;
+    }
+    .frost-anim-brand .b-static-text { color: var(--text); }
+    .frost-anim-brand .b-page-text { color: rgba(232, 232, 232, 0.6); font-weight: 500; }
+    .frost-anim-chev {
+      width: 14px; height: 14px;
+      margin-left: 6px;
+      color: rgba(232, 232, 232, 0.6);
+    }
+    .frost-anim-right {
+      display: inline-flex; align-items: center; gap: 12px;
+      color: rgba(232, 232, 232, 0.85);
+    }
+    .frost-anim-github svg { width: 18px; height: 18px; display: block; }
+    .frost-anim-vline {
+      width: 1px; height: 22px;
+      background: rgba(232, 232, 232, 0.2);
+    }
+    .frost-anim-lang {
+      font-size: 15px;
+      letter-spacing: 0.1em;
+      color: var(--accent);
+      font-weight: 500;
+    }
+
+    .thanks-card {
+      padding: 22px 24px;
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 14px;
+      transition: background-color 0.2s ease, box-shadow 0.2s ease, transform 0.2s ease;
+    }
+    .thanks-card:hover {
+      background: var(--surface-high);
+      box-shadow: 0 8px 20px rgba(0, 0, 0, 0.28);
+      transform: translateY(-3px);
+    }
+    .thanks-card .name { font-weight: 700; color: var(--text); font-size: 20px; }
+    .thanks-card .sub  { margin-top: 8px; color: var(--muted); font-size: 16px; line-height: 1.6; }
+
+    .roll-wrap { font-size: 44px; font-weight: 800; color: var(--text); line-height: 1.2; }
+    @media (max-width: 540px) { .roll-wrap { font-size: 32px; } }
+  </style>
+</head>
+<body class="antialiased min-h-screen">
+
+  <div id="bg-wallpaper" aria-hidden="true"></div>
+  <div id="bg-overlay" aria-hidden="true"></div>
+  <div id="nav-bg-strip" aria-hidden="true"></div>
+
+  <nav id="navbar">
+    <div class="nav-brand-wrap" id="brand-dropdown-container">
+      <button id="brand-dropdown-btn" class="ripple-surface" type="button">
+        <span class="b-static">louie</span><span class="b-dot">.</span><span class="b-page">design</span>
+        <svg id="brand-dropdown-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"></polyline></svg>
+      </button>
+      <div id="brand-dropdown-menu">
+        <a href="index.html" class="nav-dd-item ripple-surface"><span style="color:var(--text)">louie</span><span class="b-dot">.</span><span style="color:var(--muted)">home</span></a>
+        <a href="https://blog.louie1.com" class="nav-dd-item ripple-surface"><span style="color:var(--text)">louie</span><span class="b-dot">.</span><span style="color:var(--muted)">blog</span></a>
+        <a href="https://learn.louie1.com" class="nav-dd-item ripple-surface"><span style="color:var(--text)">louie</span><span class="b-dot">.</span><span style="color:var(--muted)">learn</span></a>
+        <a href="design.html" class="nav-dd-item nav-active ripple-surface"><span style="color:var(--text)">louie</span><span class="b-dot">.</span><span style="color:var(--accent);font-weight:600">design</span></a>
+        <a href="95.html" class="nav-dd-item ripple-surface"><span style="color:var(--text)">louie</span><span class="b-dot">.</span><span style="color:var(--muted)">95</span></a>
+      </div>
+    </div>
+
+    <button id="back-to-wallpaper-btn" class="ripple-surface" type="button">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"></polyline></svg>
+      <span class="btn-text" data-i18n="back-to-wallpaper">回到 04 壁纸</span>
+    </button>
+
+    <div class="nav-right">
+      <a id="github-btn" class="ripple-surface" href="https://github.com/MrTangLuyao/homepage" target="_blank" rel="noopener" aria-label="GitHub repository" title="GitHub">
+        <svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M12 .5C5.65.5.5 5.65.5 12c0 5.08 3.29 9.39 7.86 10.91.58.11.79-.25.79-.56 0-.27-.01-1-.02-1.97-3.2.69-3.87-1.54-3.87-1.54-.52-1.32-1.27-1.67-1.27-1.67-1.04-.71.08-.7.08-.7 1.15.08 1.76 1.18 1.76 1.18 1.02 1.75 2.69 1.24 3.34.95.1-.74.4-1.24.72-1.53-2.55-.29-5.23-1.27-5.23-5.66 0-1.25.45-2.27 1.18-3.07-.12-.29-.51-1.46.11-3.04 0 0 .96-.31 3.16 1.17.92-.25 1.91-.38 2.89-.38.98 0 1.97.13 2.89.38 2.2-1.48 3.16-1.17 3.16-1.17.62 1.58.23 2.75.11 3.04.74.8 1.18 1.82 1.18 3.07 0 4.4-2.69 5.36-5.25 5.65.41.35.78 1.04.78 2.1 0 1.52-.01 2.74-.01 3.11 0 .31.21.67.8.55C20.71 21.39 24 17.08 24 12 24 5.65 18.85.5 12 .5z"/></svg>
+      </a>
+      <div class="nav-divider"></div>
+      <button id="lang-toggle" class="ripple-surface" onclick="toggleLang()">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="flex-shrink:0;"><path d="m5 8 6 6"/><path d="m4 14 6-6 2-3"/><path d="M2 5h12"/><path d="M7 2h1"/><path d="m22 22-5-10-5 10"/><path d="M14 18h6"/></svg>
+        <span id="lang-label">EN ⇄ 文</span>
+      </button>
+      <button id="menu-btn" class="ripple-surface">
+        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="3" y1="12" x2="21" y2="12"></line><line x1="3" y1="6" x2="21" y2="6"></line><line x1="3" y1="18" x2="21" y2="18"></line></svg>
+      </button>
+    </div>
+  </nav>
+
+  <div id="mobile-menu" class="fixed top-16 left-0 w-full bg-m3-surfaceContainer border-b border-m3-outlineVariant z-[90] flex flex-col p-3 shadow-xl">
+    <a href="#palette" class="ripple-surface nav-dd-item" style="border-radius:8px; color:var(--text);" data-i18n="sec-palette">色板</a>
+    <a href="#type" class="ripple-surface nav-dd-item" style="border-radius:8px; color:var(--text);" data-i18n="sec-type">字体</a>
+    <a href="#ripple" class="ripple-surface nav-dd-item" style="border-radius:8px; color:var(--text);" data-i18n="sec-ripple">涟漪</a>
+    <a href="#wallpaper" class="ripple-surface nav-dd-item" style="border-radius:8px; color:var(--text);" data-i18n="sec-wallpaper">壁纸</a>
+    <a href="#frost" class="ripple-surface nav-dd-item" style="border-radius:8px; color:var(--text);" data-i18n="sec-frost">磨砂</a>
+    <a href="#hero" class="ripple-surface nav-dd-item" style="border-radius:8px; color:var(--text);">Hero</a>
+    <a href="#card" class="ripple-surface nav-dd-item" style="border-radius:8px; color:var(--text);" data-i18n="sec-card">卡片</a>
+    <a href="#desert" class="ripple-surface nav-dd-item" style="border-radius:8px; color:var(--text);" data-i18n="sec-desert">沙漠</a>
+    <a href="#nav-section" class="ripple-surface nav-dd-item" style="border-radius:8px; color:var(--text);" data-i18n="sec-nav">顶栏</a>
+    <a href="#thanks" class="ripple-surface nav-dd-item" style="border-radius:8px; color:var(--text);" data-i18n="sec-thanks">致谢</a>
+  </div>
+
+  <main class="pt-32 pb-20 px-6 max-w-4xl mx-auto flex flex-col min-h-screen justify-center">
+    <h1 class="text-m3-onSurface"><span data-i18n="hero-title">设计</span></h1>
+    <p class="hero-sub" data-i18n="hero-sub">&nbsp;&nbsp;&nbsp;晨光与暮色之间。</p>
+
+    <a id="scroll-down" class="ripple-surface" href="#palette" aria-label="Scroll to first section">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><polyline points="6 9 12 15 18 9"></polyline></svg>
+    </a>
+  </main>
+
+  <div class="content-surface">
+
+    <section id="palette" class="py-20 px-6 max-w-4xl mx-auto border-t border-m3-outlineVariant">
+      <h2 class="font-bold mb-8 text-m3-onSurface flex items-center gap-4">
+        <span class="text-m3-primary font-mono opacity-80">01.</span> <span data-i18n="sec-palette">色板</span>
+      </h2>
+      <div class="bg-m3-surfaceContainer rounded-m3-xl p-8 m3-card">
+        <p class="section-line" data-i18n="palette-line">取自一张沙漠照片里那截橙红的枯木。其余皆近黑。</p>
+        <div class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-6 gap-3 mt-6">
+          <div class="swatch ripple-surface"><div class="chip" style="background:linear-gradient(90deg,#d97757,#ffb49d);"></div><div class="meta"><div class="name" data-i18n="palette-ember">余烬</div><div class="hex">d97757 → ffb49d</div></div></div>
+          <div class="swatch ripple-surface"><div class="chip" style="background:#1f1f1e;"></div><div class="meta"><div class="name" data-i18n="palette-bg">底色</div><div class="hex">#1f1f1e</div></div></div>
+          <div class="swatch ripple-surface"><div class="chip" style="background:#2a2a29;"></div><div class="meta"><div class="name" data-i18n="palette-surface">纸面</div><div class="hex">#2a2a29</div></div></div>
+          <div class="swatch ripple-surface"><div class="chip" style="background:#333332;"></div><div class="meta"><div class="name" data-i18n="palette-high">抬起</div><div class="hex">#333332</div></div></div>
+          <div class="swatch ripple-surface"><div class="chip" style="background:#e8e8e8;"></div><div class="meta"><div class="name" data-i18n="palette-text">字</div><div class="hex">#e8e8e8</div></div></div>
+          <div class="swatch ripple-surface"><div class="chip" style="background:#a1a1a0;"></div><div class="meta"><div class="name" data-i18n="palette-muted">影</div><div class="hex">#a1a1a0</div></div></div>
+        </div>
+      </div>
+    </section>
+
+    <section id="type" class="py-20 px-6 max-w-4xl mx-auto border-t border-m3-outlineVariant">
+      <h2 class="font-bold mb-8 text-m3-onSurface flex items-center gap-4">
+        <span class="text-m3-primary font-mono opacity-80">02.</span> <span data-i18n="sec-type">字体</span>
+      </h2>
+      <div class="bg-m3-surfaceContainer rounded-m3-xl p-8 m3-card">
+        <p class="section-line" data-i18n="type-line">一套字体，两幅身形。JetBrains Mono 与 HarmonyOS Sans，在同一根度量线上对齐。</p>
+        <div class="specimen">
+          <div style="font-size:38px; font-weight:700; color:var(--text); letter-spacing:0.01em; line-height:1.35;">Hello, 你好</div>
+        </div>
+      </div>
+    </section>
+
+    <section id="ripple" class="py-20 px-6 max-w-4xl mx-auto border-t border-m3-outlineVariant">
+      <h2 class="font-bold mb-8 text-m3-onSurface flex items-center gap-4">
+        <span class="text-m3-primary font-mono opacity-80">03.</span> <span data-i18n="sec-ripple">涟漪</span>
+      </h2>
+      <div class="bg-m3-surfaceContainer rounded-m3-xl p-8 m3-card">
+        <p class="section-line" data-i18n="ripple-line">每一次按下，纸面都漾开一圈回声。试试下面这三枚。</p>
+        <div class="specimen">
+          <div style="display:flex; flex-wrap:wrap; gap:14px; justify-content:flex-start;">
+            <button class="ripple-surface ripple-primary bg-m3-primary text-m3-onPrimary rounded-m3-full px-7 py-3.5 font-bold tracking-wide" style="font-size:16px;" data-i18n="ripple-btn1">主按钮</button>
+            <button class="ripple-surface ripple-surface-variant rounded-m3-full px-7 py-3.5 font-bold tracking-wide" style="font-size:16px; background:var(--surface); color:var(--text);" data-i18n="ripple-btn2">纸面</button>
+            <button class="ripple-surface ripple-surface-variant rounded-m3-full px-7 py-3.5 font-medium" style="font-size:16px; background:transparent; color:var(--muted); border:1px solid var(--border);" data-i18n="ripple-btn3">轻触</button>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section id="wallpaper" class="py-20 px-6 max-w-4xl mx-auto border-t border-m3-outlineVariant">
+      <h2 class="font-bold mb-8 text-m3-onSurface flex items-center gap-4">
+        <span class="text-m3-primary font-mono opacity-80">04.</span> <span data-i18n="sec-wallpaper">壁纸</span>
+      </h2>
+      <div class="bg-m3-surfaceContainer rounded-m3-xl p-8 m3-card">
+        <p class="section-line" data-i18n-html="wallpaper-line">一张沙漠照片，被切成四层叠在一起。你刚刚滚过它。<a href="#top" class="js-back-to-top ripple-surface ripple-surface-variant inline-flex items-center text-m3-primary px-3 py-1 rounded-m3-sm hover:bg-m3-primaryContainer transition-colors ml-1" style="font-size:16px;">回去再看一次</a>。</p>
+      </div>
+    </section>
+
+    <section id="frost" class="py-20 px-6 max-w-4xl mx-auto border-t border-m3-outlineVariant">
+      <h2 class="font-bold mb-8 text-m3-onSurface flex items-center gap-4">
+        <span class="text-m3-primary font-mono opacity-80">05.</span> <span data-i18n="sec-frost">磨砂</span>
+      </h2>
+      <div class="bg-m3-surfaceContainer rounded-m3-xl p-8 m3-card">
+        <p class="section-line" data-i18n="frost-line">磨砂，让你感受朦胧的美</p>
+        <div class="specimen over-desert">
+          <button class="frost-btn ripple-surface ripple-surface-variant" data-i18n="frost-btn">按钮</button>
+        </div>
+      </div>
+    </section>
+
+    <section id="hero" class="py-20 px-6 max-w-4xl mx-auto border-t border-m3-outlineVariant">
+      <h2 class="font-bold mb-8 text-m3-onSurface flex items-center gap-4">
+        <span class="text-m3-primary font-mono opacity-80">06.</span> <span>Hero</span>
+      </h2>
+      <div class="bg-m3-surfaceContainer rounded-m3-xl p-8 m3-card">
+        <p class="section-line" data-i18n="hero-line">标题里的最后一个词，每隔几秒就跌进下一格。脚下还有一枚呼吸的圆盘，邀请你往下走。</p>
+        <div class="specimen">
+          <div class="roll-wrap">
+            <span data-i18n="hero-demo-prefix">我是一个</span> <span style="display:inline-block; overflow:hidden; vertical-align:bottom; line-height:1.2;"><span id="hero-roll-text" style="display:inline-block; background:linear-gradient(90deg,#d97757,#ffb49d); -webkit-background-clip:text; background-clip:text; color:transparent;">设计者。</span></span>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section id="card" class="py-20 px-6 max-w-4xl mx-auto border-t border-m3-outlineVariant">
+      <h2 class="font-bold mb-8 text-m3-onSurface flex items-center gap-4">
+        <span class="text-m3-primary font-mono opacity-80">07.</span> <span data-i18n="sec-card">卡片</span>
+      </h2>
+      <div class="bg-m3-surfaceContainer rounded-m3-xl p-8 m3-card">
+        <p class="section-line" data-i18n="card-line">光标停下，纸便抬起。</p>
+        <div class="specimen" style="background:transparent; border:none; padding:0; margin-top:18px;">
+          <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+            <div class="ripple-surface m3-card bg-m3-surfaceContainer rounded-m3-xl p-6 border border-m3-outlineVariant">
+              <h3 style="font-size:22px; font-weight:700; color:var(--text); margin-bottom:8px;" data-i18n="card-1-title">晨光</h3>
+              <p style="font-size:16px; color:var(--muted); line-height:1.7; margin:0;" data-i18n="card-1-body">悬停我，看我升起来。</p>
+            </div>
+            <div class="ripple-surface m3-card bg-m3-surfaceContainer rounded-m3-xl p-6 border border-m3-outlineVariant">
+              <h3 style="font-size:22px; font-weight:700; color:var(--text); margin-bottom:8px;" data-i18n="card-2-title">暮色</h3>
+              <p style="font-size:16px; color:var(--muted); line-height:1.7; margin:0;" data-i18n="card-2-body">悬停我，也看我升起来。</p>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section id="desert" class="py-20 px-6 max-w-4xl mx-auto border-t border-m3-outlineVariant">
+      <h2 class="font-bold mb-8 text-m3-onSurface flex items-center gap-4">
+        <span class="text-m3-primary font-mono opacity-80">08.</span> <span data-i18n="sec-desert">沙漠</span>
+      </h2>
+      <div class="bg-m3-surfaceContainer rounded-m3-xl p-8 m3-card">
+        <p class="section-line" data-i18n="desert-line">文章结束的时候，沙漠从底下慢慢走回来。再向下滚一点，你会亲眼看到。</p>
+      </div>
+    </section>
+
+    <!-- 09 顶栏 (animated frost loop, no copy) -->
+    <section id="nav-section" class="py-20 px-6 max-w-4xl mx-auto border-t border-m3-outlineVariant">
+      <h2 class="font-bold mb-8 text-m3-onSurface flex items-center gap-4">
+        <span class="text-m3-primary font-mono opacity-80">09.</span> <span data-i18n="sec-nav">顶栏</span>
+      </h2>
+      <div class="bg-m3-surfaceContainer rounded-m3-xl p-8 m3-card">
+        <p class="section-line" data-i18n="nav-line">从干净到磨砂，再回来。</p>
+        <div class="frost-anim-specimen">
+          <div class="frost-anim-stage">
+            <div class="frost-anim-bar">
+              <div class="frost-anim-brand">
+                <span class="b-static-text">louie</span><span class="b-dot">.</span><span class="b-page-text">home</span>
+                <svg class="frost-anim-chev" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"></polyline></svg>
+              </div>
+              <div class="frost-anim-right">
+                <span class="frost-anim-github" aria-hidden="true">
+                  <svg viewBox="0 0 24 24" fill="currentColor"><path d="M12 .5C5.65.5.5 5.65.5 12c0 5.08 3.29 9.39 7.86 10.91.58.11.79-.25.79-.56 0-.27-.01-1-.02-1.97-3.2.69-3.87-1.54-3.87-1.54-.52-1.32-1.27-1.67-1.27-1.67-1.04-.71.08-.7.08-.7 1.15.08 1.76 1.18 1.76 1.18 1.02 1.75 2.69 1.24 3.34.95.1-.74.4-1.24.72-1.53-2.55-.29-5.23-1.27-5.23-5.66 0-1.25.45-2.27 1.18-3.07-.12-.29-.51-1.46.11-3.04 0 0 .96-.31 3.16 1.17.92-.25 1.91-.38 2.89-.38.98 0 1.97.13 2.89.38 2.2-1.48 3.16-1.17 3.16-1.17.62 1.58.23 2.75.11 3.04.74.8 1.18 1.82 1.18 3.07 0 4.4-2.69 5.36-5.25 5.65.41.35.78 1.04.78 2.1 0 1.52-.01 2.74-.01 3.11 0 .31.21.67.8.55C20.71 21.39 24 17.08 24 12 24 5.65 18.85.5 12 .5z"/></svg>
+                </span>
+                <span class="frost-anim-vline"></span>
+                <span class="frost-anim-lang">EN ⇄ 文</span>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section id="thanks" class="py-20 px-6 max-w-4xl mx-auto border-t border-m3-outlineVariant">
+      <h2 class="font-bold mb-8 text-m3-onSurface flex items-center gap-4">
+        <span class="text-m3-primary font-mono opacity-80">§</span> <span data-i18n="sec-thanks">致谢</span>
+      </h2>
+      <div class="bg-m3-surfaceContainer rounded-m3-xl p-8 m3-card">
+        <p class="section-line" data-i18n="thanks-line">louie的网站，离不开</p>
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mt-6">
+          <div class="thanks-card">
+            <div class="name">Tailwind CSS</div>
+            <div class="sub" data-i18n="thanks-tw">万象的原子。</div>
+          </div>
+          <div class="thanks-card">
+            <div class="name">HarmonyOS Sans</div>
+            <div class="sub" data-i18n="thanks-ha">汉字的纸面。</div>
+          </div>
+          <div class="thanks-card">
+            <div class="name">JetBrains Mono</div>
+            <div class="sub" data-i18n="thanks-jb">英文的格子。</div>
+          </div>
+          <div class="thanks-card">
+            <div class="name">Material Design</div>
+            <div class="sub" data-i18n="thanks-md">起点的几何。</div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+  </div>
+
+  <footer class="over-wallpaper text-center py-12 border-t border-m3-outlineVariant bg-m3-surfaceContainer/50">
+    <div class="container mx-auto px-6 max-w-4xl">
+      <p style="font-size:15px; line-height:1.75; color:var(--muted); max-width:60ch; margin:0 auto 14px;" data-i18n-html="bg-credit">
+        背景图 <em>Camel thorn trees, Deadvlei, Namib-Naukluft Park, Namibia</em> &copy; Inge Johnsson / Alamy Stock Photo，转自 Bing 每日壁纸（2025-08-03）。版权归原作者所有。
+      </p>
+      <div style="font-size:14px; color:var(--muted); letter-spacing:0.25em;">
+        <span id="footer-year"></span> Louie
+      </div>
+    </div>
+  </footer>
+
+  <script>
+    function createRipple(event) {
+      const button = event.currentTarget;
+      const circle = document.createElement("span");
+      const diameter = Math.max(button.clientWidth, button.clientHeight);
+      const radius = diameter / 2;
+      const rect = button.getBoundingClientRect();
+      circle.style.width = circle.style.height = `${diameter}px`;
+      circle.style.left = `${event.clientX - rect.left - radius}px`;
+      circle.style.top = `${event.clientY - rect.top - radius}px`;
+      circle.classList.add("ripple");
+      const existing = button.querySelector('.ripple');
+      if (existing) existing.remove();
+      button.appendChild(circle);
+    }
+    function bindRipples() {
+      document.querySelectorAll('.ripple-surface').forEach(el => {
+        if (el.dataset.rippleBound) return;
+        el.dataset.rippleBound = '1';
+        el.addEventListener('touchstart', (e) => {
+          el._lastTouch = Date.now();
+          createRipple({ currentTarget: el, clientX: e.touches[0].clientX, clientY: e.touches[0].clientY });
+        }, { passive: true });
+        el.addEventListener('mousedown', (e) => {
+          if (Date.now() - (el._lastTouch || 0) < 500) return;
+          createRipple(e);
+        });
+      });
+    }
+    bindRipples();
+
+    const brandBtn = document.getElementById('brand-dropdown-btn');
+    const brandMenu = document.getElementById('brand-dropdown-menu');
+    const brandIcon = document.getElementById('brand-dropdown-icon');
+    brandBtn.addEventListener('click', (e) => {
+      e.stopPropagation();
+      const isOpen = brandMenu.classList.contains('is-open');
+      if (isOpen) {
+        brandMenu.classList.remove('is-open');
+        brandIcon.style.transform = 'rotate(0deg)';
+      } else {
+        brandMenu.classList.add('is-open');
+        brandIcon.style.transform = 'rotate(180deg)';
+      }
+    });
+    document.addEventListener('click', (e) => {
+      if (!brandBtn.contains(e.target) && !brandMenu.contains(e.target)) {
+        brandMenu.classList.remove('is-open');
+        brandIcon.style.transform = 'rotate(0deg)';
+      }
+    });
+
+    const menuBtn = document.getElementById('menu-btn');
+    const mobileMenu = document.getElementById('mobile-menu');
+    menuBtn.addEventListener('click', () => mobileMenu.classList.toggle('open'));
+    mobileMenu.addEventListener('click', () => mobileMenu.classList.remove('open'));
+
+    (function () {
+      const backBtn = document.getElementById('back-to-wallpaper-btn');
+      const wallpaperEl = document.getElementById('wallpaper');
+      if (!backBtn || !wallpaperEl) return;
+
+      document.querySelectorAll('.js-back-to-top').forEach(link => {
+        link.addEventListener('click', (e) => {
+          e.preventDefault();
+          window.scrollTo({ top: 0, behavior: 'smooth' });
+          requestAnimationFrame(() => backBtn.classList.add('is-visible'));
+        });
+      });
+
+      backBtn.addEventListener('click', () => {
+        wallpaperEl.scrollIntoView({ behavior: 'smooth', block: 'start' });
+      });
+
+      new IntersectionObserver((entries) => {
+        entries.forEach(entry => {
+          if (entry.isIntersecting) backBtn.classList.remove('is-visible');
+        });
+      }, { threshold: 0.35 }).observe(wallpaperEl);
+    })();
+
+    const translations = {
+      zh: {
+        'hero-title': '设计',
+        'hero-sub': '   晨光与暮色之间。',
+        'back-to-wallpaper': '回到 04 壁纸',
+
+        'sec-palette': '色板',
+        'palette-line': '取自一张沙漠照片里那截橙红的枯木。其余皆近黑。',
+        'palette-ember': '余烬',
+        'palette-bg': '底色',
+        'palette-surface': '纸面',
+        'palette-high': '抬起',
+        'palette-text': '字',
+        'palette-muted': '影',
+
+        'sec-type': '字体',
+        'type-line': '一套字体，两幅身形。JetBrains Mono 与 HarmonyOS Sans，在同一根度量线上对齐。',
+
+        'sec-ripple': '涟漪',
+        'ripple-line': '每一次按下，纸面都漾开一圈回声。试试下面这三枚。',
+        'ripple-btn1': '主按钮',
+        'ripple-btn2': '纸面',
+        'ripple-btn3': '轻触',
+
+        'sec-wallpaper': '壁纸',
+        'wallpaper-line': '一张沙漠照片，被切成四层叠在一起。你刚刚滚过它。<a href="#top" class="js-back-to-top ripple-surface ripple-surface-variant inline-flex items-center text-m3-primary px-3 py-1 rounded-m3-sm hover:bg-m3-primaryContainer transition-colors ml-1" style="font-size:16px;">回去再看一次</a>。',
+
+        'sec-frost': '磨砂',
+        'frost-line': '磨砂，让你感受朦胧的美',
+        'frost-btn': '按钮',
+
+        'hero-line': '标题里的最后一个词，每隔几秒就跌进下一格。脚下还有一枚呼吸的圆盘，邀请你往下走。',
+        'hero-demo-prefix': '我是一个',
+
+        'sec-card': '卡片',
+        'card-line': '光标停下，纸便抬起。',
+        'card-1-title': '晨光',
+        'card-1-body': '悬停我，看我升起来。',
+        'card-2-title': '暮色',
+        'card-2-body': '悬停我，也看我升起来。',
+
+        'sec-desert': '沙漠',
+        'desert-line': '文章结束的时候，沙漠从底下慢慢走回来。再向下滚一点，你会亲眼看到。',
+
+        'sec-nav': '顶栏',
+        'nav-line': '从干净到磨砂，再回来。',
+
+        'sec-thanks': '致谢',
+        'thanks-line': 'louie的网站，离不开',
+        'thanks-tw': '万象的原子。',
+        'thanks-ha': '汉字的纸面。',
+        'thanks-jb': '英文的格子。',
+        'thanks-md': '起点的几何。',
+
+        'bg-credit': '背景图 <em>Camel thorn trees, Deadvlei, Namib-Naukluft Park, Namibia</em> &copy; Inge Johnsson / Alamy Stock Photo，转自 Bing 每日壁纸（2025-08-03）。版权归原作者所有。'
+      },
+      en: {
+        'hero-title': 'Design',
+        'hero-sub': 'Dawn to dusk.',
+        'back-to-wallpaper': 'Back to §04',
+
+        'sec-palette': 'Palette',
+        'palette-line': 'Sampled from a single piece of ember-colored wood in the desert. Everything else, near-black.',
+        'palette-ember': 'Ember',
+        'palette-bg': 'Base',
+        'palette-surface': 'Paper',
+        'palette-high': 'Raised',
+        'palette-text': 'Ink',
+        'palette-muted': 'Shade',
+
+        'sec-type': 'Type',
+        'type-line': 'One typeface, two figures. JetBrains Mono and HarmonyOS Sans, aligned on a single baseline.',
+
+        'sec-ripple': 'Ripple',
+        'ripple-line': 'Every press answers with a small wave. Try the three below.',
+        'ripple-btn1': 'Primary',
+        'ripple-btn2': 'Paper',
+        'ripple-btn3': 'Soft',
+
+        'sec-wallpaper': 'Wallpaper',
+        'wallpaper-line': 'A desert photograph, sliced into four layers. You just scrolled through it. <a href="#top" class="js-back-to-top ripple-surface ripple-surface-variant inline-flex items-center text-m3-primary px-3 py-1 rounded-m3-sm hover:bg-m3-primaryContainer transition-colors ml-1" style="font-size:16px;">Go back and see it</a>.',
+
+        'sec-frost': 'Frost',
+        'frost-line': 'Take white down, layer a blur, and the button shows the background through it.',
+        'frost-btn': 'Button',
+
+        'hero-line': 'The last word of the headline falls into its next self every few seconds. Beneath it, a small disc breathes, an invitation downward.',
+        'hero-demo-prefix': 'I am a',
+
+        'sec-card': 'Card',
+        'card-line': 'When the cursor stops, the paper lifts three pixels.',
+        'card-1-title': 'Dawn',
+        'card-1-body': 'Hover me. Watch me lift.',
+        'card-2-title': 'Dusk',
+        'card-2-body': 'Hover me too.',
+
+        'sec-desert': 'Desert',
+        'desert-line': 'When the article ends, the desert walks back in from below. Scroll past this and you will see it happen.',
+
+        'sec-nav': 'Top Bar',
+        'nav-line': 'Clean to frosted, and back.',
+
+        'sec-thanks': 'Thanks',
+        'thanks-line': 'louie sites cannot do without',
+        'thanks-tw': 'atoms of everything.',
+        'thanks-ha': 'paper for Chinese.',
+        'thanks-jb': 'boxes for English.',
+        'thanks-md': 'geometry of origin.',
+
+        'bg-credit': 'Background: <em>Camel thorn trees, Deadvlei, Namib-Naukluft Park, Namibia</em> &copy; Inge Johnsson / Alamy Stock Photo, via Bing daily wallpaper (3 Aug 2025). All rights reserved by the photographer.'
+      }
+    };
+
+    let currentLang = navigator.language.toLowerCase().includes('zh') ? 'zh' : 'en';
+
+    function applyLang(lang) {
+      const t = translations[lang];
+      document.querySelectorAll('[data-i18n]').forEach(el => {
+        const k = el.getAttribute('data-i18n');
+        if (t[k] != null) el.textContent = t[k];
+      });
+      document.querySelectorAll('[data-i18n-html]').forEach(el => {
+        const k = el.getAttribute('data-i18n-html');
+        if (t[k] != null) el.innerHTML = t[k];
+      });
+      const lbl = document.getElementById('lang-label');
+      if (lbl) lbl.textContent = lang === 'zh' ? '文 ⇄ EN' : 'EN ⇄ 文';
+      document.documentElement.lang = lang === 'zh' ? 'zh-CN' : 'en';
+      bindRipples();
+    }
+    function toggleLang() {
+      currentLang = currentLang === 'zh' ? 'en' : 'zh';
+      applyLang(currentLang);
+    }
+    applyLang(currentLang);
+    document.getElementById('footer-year').textContent = '© ' + new Date().getFullYear();
+
+    const rollWords = {
+      zh: ['设计者。', '读者。', '影子。', '句子。'],
+      en: ['designer.', 'reader.', 'shadow.', 'sentence.']
+    };
+    const rollEl = document.getElementById('hero-roll-text');
+    let rollIdx = 0;
+    function rollNext() {
+      const words = rollWords[currentLang] || rollWords.en;
+      rollEl.style.transition = 'transform 0.35s cubic-bezier(0.4,0,1,1), opacity 0.28s ease';
+      rollEl.style.transform = 'translateY(-115%)';
+      rollEl.style.opacity = '0';
+      setTimeout(() => {
+        rollIdx = (rollIdx + 1) % words.length;
+        rollEl.textContent = words[rollIdx];
+        rollEl.style.transition = 'none';
+        rollEl.style.transform = 'translateY(115%)';
+        rollEl.style.opacity = '0';
+        requestAnimationFrame(() => requestAnimationFrame(() => {
+          rollEl.style.transition = 'transform 0.42s cubic-bezier(0,0,0.2,1), opacity 0.35s ease';
+          rollEl.style.transform = 'translateY(0)';
+          rollEl.style.opacity = '1';
+        }));
+      }, 370);
+    }
+    setInterval(rollNext, 3000);
+
+    (function () {
+      const hero = document.querySelector('main');
+      if (!hero) return;
+      const root = document.documentElement;
+      let ticking = false;
+      function update() {
+        ticking = false;
+        const range = Math.max(1, hero.offsetHeight - 64);
+        const raw = window.scrollY / range;
+        const p = Math.min(1, Math.max(0, (raw - 0.5) * 2));
+        root.style.setProperty('--frost-progress', p.toFixed(3));
+      }
+      function onScroll() {
+        if (!ticking) { ticking = true; requestAnimationFrame(update); }
+      }
+      window.addEventListener('scroll', onScroll, { passive: true });
+      window.addEventListener('resize', update);
+      update();
+    })();
+  </script>
+</body>
+</html>
