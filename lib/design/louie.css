@@ -22,23 +22,54 @@ html { background-color: var(--bg); }
 body {
   font-family: 'JetBrains Mono', 'HarmonyOS Sans', 'PingFang SC', 'Microsoft YaHei', sans-serif !important;
   background-color: var(--bg);
+  color: var(--text);
+  -webkit-tap-highlight-color: transparent;
+}
+
+/* ─── Fixed wallpaper layer beneath all content.
+   Implemented as a position:fixed div rather than a body background, because
+   iOS Safari renders `background-attachment: fixed` at the image's natural
+   size in the top-left corner and scrolls it with the page. ─── */
+#bg-wallpaper {
+  position: fixed;
+  inset: 0;
+  z-index: 0;
+  pointer-events: none;
   background-image: url('../resources/th.jpg');
   background-size: cover;
   background-position: center;
-  background-attachment: fixed;
   background-repeat: no-repeat;
-  color: var(--text);
-  -webkit-tap-highlight-color: transparent;
 }
 
 /* ─── Fixed dark dim layered over the wallpaper, beneath all content ─── */
 #bg-overlay {
   position: fixed;
-  top: 0; left: 0;
-  width: 100%; height: 100vh;
+  inset: 0;
   z-index: 0;
   pointer-events: none;
   background: linear-gradient(180deg, rgba(0, 0, 0, 0.45) 0%, rgba(0, 0, 0, 0.65) 100%);
+}
+
+/* ─── Wallpaper strip clipped to the navbar.
+   Uses the same inset:0 + cover sizing as #bg-wallpaper so the image lines up
+   exactly with the underlying wallpaper; clip-path keeps only the top 64px
+   visible. Sits above the solid .content-surface (z-index 1) but below the
+   navbar (z-index 9999). Its dim gradient mirrors #bg-overlay's so the strip
+   pixel-matches the underlying wallpaper while the navbar is transparent.
+   Opacity is driven by --frost-progress so the strip fades in gradually as
+   the user scrolls through the hero. ─── */
+:root { --frost-progress: 0; }
+
+#nav-bg-strip {
+  position: fixed;
+  inset: 0;
+  z-index: 50;
+  pointer-events: none;
+  clip-path: inset(0 0 calc(100% - 64px) 0);
+  background:
+    linear-gradient(180deg, rgba(0, 0, 0, 0.15) 0%, rgba(0, 0, 0, 0.25) 100%),
+    url('../resources/th.jpg') center / cover no-repeat;
+  opacity: var(--frost-progress);
 }
 
 /* Ensure foreground stacking sits above #bg-overlay.
@@ -54,6 +85,22 @@ main, .content-surface { position: relative; z-index: 1; }
   z-index: 1;
 }
 
+/* ─── Frosted surface — translucent dark fill with blur, used by elements
+   that sit directly over the hero wallpaper (scroll-down chevron, hero CTAs). */
+.frosted-cta {
+  color: rgba(255, 255, 255, 0.95);
+  background: rgba(255, 255, 255, 0.10);
+  backdrop-filter: blur(14px);
+  -webkit-backdrop-filter: blur(14px);
+  text-decoration: none;
+  transition: color 0.25s ease, background 0.25s ease;
+}
+.frosted-cta:hover {
+  color: #fff;
+  background: rgba(255, 255, 255, 0.20);
+}
+
+
 /* ─── Hero scroll-down hint — gently bobbing chevron at the bottom of main ─── */
 #scroll-down {
   position: absolute;
@@ -67,18 +114,16 @@ main, .content-surface { position: relative; z-index: 1; }
   justify-content: center;
   border-radius: 50%;
   color: rgba(255, 255, 255, 0.78);
-  border: 1px solid rgba(255, 255, 255, 0.32);
-  background: rgba(0, 0, 0, 0.15);
-  backdrop-filter: blur(6px);
-  -webkit-backdrop-filter: blur(6px);
+  background: rgba(255, 255, 255, 0.10);
+  backdrop-filter: blur(14px);
+  -webkit-backdrop-filter: blur(14px);
   animation: bob 2s ease-in-out infinite;
-  transition: color 0.25s ease, border-color 0.25s ease, background 0.25s ease;
+  transition: color 0.25s ease, background 0.25s ease;
   text-decoration: none;
 }
 #scroll-down:hover {
   color: #fff;
-  border-color: rgba(255, 255, 255, 0.7);
-  background: rgba(255, 255, 255, 0.12);
+  background: rgba(255, 255, 255, 0.20);
 }
 #scroll-down svg { width: 18px; height: 18px; }
 @keyframes bob {
@@ -124,22 +169,27 @@ footer.over-wallpaper::before {
   transform: translateY(-3px);
 }
 
-/* ─── Navbar ─── */
+/* ─── Navbar — frost intensity ramps with --frost-progress (driven by scroll)
+   so the dark tint and blur build smoothly from 0 at the hero top to peak
+   right as About reaches the navbar. The dark tint + backdrop-filter live on
+   the ::before pseudo, NOT on #navbar itself: putting backdrop-filter on the
+   navbar would create a backdrop root and break child elements' own
+   backdrop-filter (e.g. .nav-link hover frost). ─── */
 #navbar {
   position: fixed; top: 0; left: 0; right: 0; z-index: 9999;
   display: flex; align-items: center; justify-content: space-between;
   height: 64px; padding: 0 24px;
   background: transparent;
-  backdrop-filter: none; -webkit-backdrop-filter: none;
-  border-bottom: 1px solid transparent;
-  transition: background-color 0.25s ease, backdrop-filter 0.25s ease,
-              -webkit-backdrop-filter 0.25s ease, border-bottom-color 0.25s ease;
 }
-#navbar.scrolled {
-  background: rgba(31, 31, 30, 0.95);
-  backdrop-filter: blur(8px);
-  -webkit-backdrop-filter: blur(8px);
-  border-bottom: 1px solid var(--border);
+#navbar::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  z-index: -1;
+  pointer-events: none;
+  background-color: rgba(20, 20, 19, calc(0.45 * var(--frost-progress)));
+  backdrop-filter: blur(calc(14px * var(--frost-progress)));
+  -webkit-backdrop-filter: blur(calc(14px * var(--frost-progress)));
 }
 
 .nav-brand-wrap { position: relative; }
@@ -151,9 +201,14 @@ footer.over-wallpaper::before {
   border: none; background: transparent;
   font-family: inherit; font-size: 18px; font-weight: 700;
   cursor: pointer; letter-spacing: 0.05em;
-  transition: background 0.2s ease;
+  transition: background 0.2s ease,
+              backdrop-filter 0.2s ease, -webkit-backdrop-filter 0.2s ease;
 }
-#brand-dropdown-btn:hover { background: var(--accent-dim); }
+#brand-dropdown-btn:hover {
+  background: rgba(255, 255, 255, 0.10);
+  backdrop-filter: blur(14px);
+  -webkit-backdrop-filter: blur(14px);
+}
 #brand-dropdown-btn .b-static { color: var(--text); }
 #brand-dropdown-btn .b-page { color: rgba(232, 232, 232, 0.6); font-weight: 500; }
 
@@ -189,33 +244,41 @@ footer.over-wallpaper::before {
 .nav-divider { width: 1px; height: 24px; background: var(--border); margin: 0 4px; flex-shrink: 0; }
 
 #lang-toggle {
-  background: none; border: 1px solid var(--outline);
+  background: transparent; border: none;
   color: var(--accent); font-family: inherit; font-size: 13.5px; font-weight: 500;
   padding: 9px 18px; border-radius: 9999px; cursor: pointer; letter-spacing: 0.1em;
   position: relative; overflow: hidden;
   display: inline-flex; align-items: center; gap: 6px;
   height: 40px; box-sizing: border-box;
-  transition: background 0.2s ease, border-color 0.2s ease;
+  transition: background 0.2s ease, color 0.2s ease,
+              backdrop-filter 0.2s ease, -webkit-backdrop-filter 0.2s ease;
 }
-#lang-toggle:hover { background: var(--accent-dim); border-color: rgba(217, 119, 87, 0.5); }
+#lang-toggle:hover {
+  background: rgba(255, 255, 255, 0.10);
+  backdrop-filter: blur(14px);
+  -webkit-backdrop-filter: blur(14px);
+  color: var(--text);
+}
 
 /* Circular M3-style icon button (GitHub link).
  * Same height as the brand button on the left so the navbar reads as one
- * unified row. State layer on hover provides M3 feel. */
+ * unified row. */
 #github-btn {
   display: inline-flex; align-items: center; justify-content: center;
   width: 40px; height: 40px; border-radius: 50%;
-  background: transparent; border: 1px solid var(--outline);
+  background: transparent; border: none;
   color: var(--muted);
   text-decoration: none;
   cursor: pointer;
   position: relative; overflow: hidden;
-  transition: background 0.2s ease, color 0.2s ease, border-color 0.2s ease;
+  transition: background 0.2s ease, color 0.2s ease,
+              backdrop-filter 0.2s ease, -webkit-backdrop-filter 0.2s ease;
 }
 #github-btn:hover {
-  background: var(--accent-dim);
-  color: var(--accent);
-  border-color: rgba(217, 119, 87, 0.5);
+  background: rgba(255, 255, 255, 0.10);
+  backdrop-filter: blur(14px);
+  -webkit-backdrop-filter: blur(14px);
+  color: var(--text);
 }
 #github-btn svg { width: 18px; height: 18px; display: block; }
 

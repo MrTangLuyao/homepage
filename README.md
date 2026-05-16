@@ -19,8 +19,6 @@
 │   ├── design/      ← 共享 CSS、字体、Tailwind、M3 设计 tokens
 │   ├── runtime/     ← 第三方 JS（luxon）
 │   └── resources/   ← 图片
-├── _headers         ← Cloudflare 缓存规则
-├── wrangler.toml    ← Cloudflare Static Assets 部署配置
 ├── robots.txt, sitemap.xml
 └── README.md
 ```
@@ -50,8 +48,6 @@ Source code for my personal homepage.
 │   ├── design/      ← shared CSS, fonts, Tailwind, M3 tokens
 │   ├── runtime/     ← third-party JS (luxon)
 │   └── resources/   ← images
-├── _headers         ← Cloudflare cache rules
-├── wrangler.toml    ← Cloudflare Static Assets deploy config
 ├── robots.txt, sitemap.xml
 └── README.md
 ```

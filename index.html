@@ -72,9 +72,15 @@
       padding: 8px 12px; border-radius: 9999px;
       font-size: 14px; font-weight: 500; color: var(--muted);
       text-decoration: none;
-      transition: color 0.2s ease, background 0.2s ease;
+      transition: color 0.2s ease, background 0.2s ease,
+                  backdrop-filter 0.2s ease, -webkit-backdrop-filter 0.2s ease;
     }
-    .nav-link:hover { color: var(--text); background: var(--surface-high); }
+    .nav-link:hover {
+      color: var(--text);
+      background: rgba(255, 255, 255, 0.10);
+      backdrop-filter: blur(14px);
+      -webkit-backdrop-filter: blur(14px);
+    }
     .nav-divider { width: 1px; height: 24px; background: var(--border); margin: 0 4px; }
     #menu-btn {
       display: none; align-items: center; justify-content: center;
@@ -97,8 +103,17 @@
 </head>
 <body class="antialiased min-h-screen">
 
-  <!-- ─── Fixed dim layered over the body wallpaper ─── -->
+  <!-- ─── Fixed wallpaper + dim layered beneath all content.
+       The wallpaper lives on its own position:fixed element instead of as a
+       body background, because iOS Safari renders `background-attachment:fixed`
+       at the image's natural size in the top-left and scrolls it with the page. -->
+  <div id="bg-wallpaper" aria-hidden="true"></div>
   <div id="bg-overlay" aria-hidden="true"></div>
+  <!-- Wallpaper clipped to the navbar strip. Sits above .content-surface so
+       the frosted navbar can blur it even when the middle sections hide the
+       main wallpaper. Aligned to #bg-wallpaper so it overlaps invisibly when
+       the navbar is transparent over the hero. -->
+  <div id="nav-bg-strip" aria-hidden="true"></div>
 
   <nav id="navbar">
     <div class="nav-brand-wrap" id="brand-dropdown-container">
@@ -153,7 +168,7 @@
       <a href="https://blog.louie1.com" class="ripple-surface ripple-primary bg-m3-primary text-m3-onPrimary rounded-m3-full px-8 py-3.5 font-bold tracking-wide shadow-sm hover:shadow-md transition-shadow">
         <span data-i18n="hero-blog-btn">View my Blog</span>
       </a>
-      <a href="mailto:louieluyaotang@gmail.com" class="ripple-surface ripple-surface-variant border border-m3-outline text-m3-onSurface hover:bg-m3-surfaceContainerHigh rounded-m3-full px-8 py-3.5 font-bold tracking-wide transition-colors">
+      <a href="mailto:louieluyaotang@gmail.com" class="frosted-cta ripple-surface ripple-surface-variant rounded-m3-full px-8 py-3.5 font-bold tracking-wide">
         <span data-i18n="hero-email-btn">Email Me</span>
       </a>
     </div>
@@ -312,7 +327,7 @@
         <div class="text-sm text-m3-onSurfaceVariant tracking-wide">Copyright (c) Huawei Device Co., Ltd.</div>
       </div>
     </div>
-    <p class="mt-6 text-sm text-m3-onSurfaceVariant/60" data-i18n-html="m3-note">本站视觉设计参考了 <a href="https://m3.material.io" target="_blank" rel="noopener" class="ripple-surface ripple-surface-variant inline-flex items-center text-m3-primary px-2 py-0.5 rounded-m3-sm hover:bg-m3-primaryContainer transition-colors">Material Design 3</a> 规范，并非使用其官方组件库。</p>
+    <p class="mt-6 text-sm text-m3-onSurfaceVariant/60" data-i18n-html="m3-note">本站视觉设计参考了 <a href="https://m3.material.io" target="_blank" rel="noopener" class="ripple-surface ripple-surface-variant inline-flex items-center text-m3-primary px-2 py-0.5 rounded-m3-sm hover:bg-m3-primaryContainer transition-colors">Material Design 3</a> 规范，但并未使用其官方组件库。</p>
   </section>
 
   </div>
@@ -412,7 +427,7 @@
         'contact-desc': '我的收件箱始终敞开。无论是有项目合作、技术交流，还是简单地打个招呼，我都会尽量回复。',
         'footer-title': "What's Next?",
         'bg-credit': '背景图 <em>Camel thorn trees, Deadvlei, Namib-Naukluft Park, Namibia</em> &copy; Inge Johnsson / Alamy Stock Photo · 转载自 Bing 每日壁纸（2025-08-03）。版权归原作者所有。',
-        'm3-note': '本站视觉设计参考了 <a href="https://m3.material.io" target="_blank" rel="noopener" class="ripple-surface ripple-surface-variant inline-flex items-center text-m3-primary px-2 py-0.5 rounded-m3-sm hover:bg-m3-primaryContainer transition-colors">Material Design 3</a> 规范，并非使用其官方组件库。'
+        'm3-note': '本站视觉设计参考了 <a href="https://m3.material.io" target="_blank" rel="noopener" class="ripple-surface ripple-surface-variant inline-flex items-center text-m3-primary px-2 py-0.5 rounded-m3-sm hover:bg-m3-primaryContainer transition-colors">Material Design 3</a> 规范，但并未使用其官方组件库。'
       },
       en: {
         'hero-greeting': 'hello, world!',
@@ -486,20 +501,30 @@
 
     setInterval(rollNext, 2800);
 
-    // Transparent navbar over the hero wallpaper; solid look once the
-    // hero scrolls past the navbar (i.e. you've entered the About area).
+    // Drive a --frost-progress CSS variable (0 → 1) from scroll position so
+    // the navbar dark tint, backdrop blur, and #nav-bg-strip opacity all ramp
+    // smoothly from the hero top, peaking right as the hero's bottom meets
+    // the navbar (i.e. About reaches the top of the viewport).
     (function () {
-      const navbar = document.getElementById('navbar');
       const hero = document.querySelector('main');
-      if (!navbar || !hero) return;
-      // rootMargin pulls the intersection line down by the navbar height,
-      // so .scrolled flips precisely when the hero bottom meets the navbar.
-      const io = new IntersectionObserver((entries) => {
-        for (const entry of entries) {
-          navbar.classList.toggle('scrolled', !entry.isIntersecting);
-        }
-      }, { rootMargin: '-64px 0px 0px 0px', threshold: 0 });
-      io.observe(hero);
+      if (!hero) return;
+      const root = document.documentElement;
+      let ticking = false;
+      function update() {
+        ticking = false;
+        const range = Math.max(1, hero.offsetHeight - 64);
+        // Hold off frost until the hero is halfway off-screen, then ramp
+        // to full by the time About reaches the navbar.
+        const raw = window.scrollY / range;
+        const p = Math.min(1, Math.max(0, (raw - 0.5) * 2));
+        root.style.setProperty('--frost-progress', p.toFixed(3));
+      }
+      function onScroll() {
+        if (!ticking) { ticking = true; requestAnimationFrame(update); }
+      }
+      window.addEventListener('scroll', onScroll, { passive: true });
+      window.addEventListener('resize', update);
+      update();
     })();
   </script>
 </body>
