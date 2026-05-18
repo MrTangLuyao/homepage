@@ -29,10 +29,17 @@ body {
 /* ─── Fixed wallpaper layer beneath all content.
    Implemented as a position:fixed div rather than a body background, because
    iOS Safari renders `background-attachment: fixed` at the image's natural
-   size in the top-left corner and scrolls it with the page. ─── */
+   size in the top-left corner and scrolls it with the page.
+   Height is pinned to 100lvh (large viewport) so the element's box doesn't
+   resize when iOS Safari collapses its bottom bar — otherwise `cover` would
+   recompute and the wallpaper crop would visibly jump on scroll. ─── */
 #bg-wallpaper {
   position: fixed;
-  inset: 0;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 100vh;
+  height: 100lvh;
   z-index: 0;
   pointer-events: none;
   background-image: url('../resources/th.jpg');
@@ -44,7 +51,11 @@ body {
 /* ─── Fixed dark dim layered over the wallpaper, beneath all content ─── */
 #bg-overlay {
   position: fixed;
-  inset: 0;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 100vh;
+  height: 100lvh;
   z-index: 0;
   pointer-events: none;
   background: linear-gradient(180deg, rgba(0, 0, 0, 0.45) 0%, rgba(0, 0, 0, 0.65) 100%);
@@ -62,7 +73,11 @@ body {
 
 #nav-bg-strip {
   position: fixed;
-  inset: 0;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 100vh;
+  height: 100lvh;
   z-index: 50;
   pointer-events: none;
   clip-path: inset(0 0 calc(100% - 64px) 0);
