@@ -1,8 +1,11 @@
-# CORS: let every louie.* site (and anyone) load the search SDK + indexes
+# CORS: let every louie.* site (and anyone) load the search SDK + indexes.
+# no-cache ≠ never cache: the browser keeps a copy but must revalidate
+# (304 when unchanged) — so SDK updates take effect immediately on every
+# site instead of lingering for the max-age window per cache partition.
 /lib/search/*
   Access-Control-Allow-Origin: *
-  Cache-Control: public, max-age=3600
+  Cache-Control: no-cache, must-revalidate
 
 /search/*
   Access-Control-Allow-Origin: *
-  Cache-Control: public, max-age=600
+  Cache-Control: no-cache, must-revalidate
