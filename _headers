@@ -1,0 +1,8 @@
+# CORS: let every louie.* site (and anyone) load the search SDK + indexes
+/lib/search/*
+  Access-Control-Allow-Origin: *
+  Cache-Control: public, max-age=3600
+
+/search/*
+  Access-Control-Allow-Origin: *
+  Cache-Control: public, max-age=600

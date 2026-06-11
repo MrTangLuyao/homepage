@@ -32,6 +32,7 @@
   <link rel="stylesheet" href="lib/design/louie.css">
   <script src="lib/design/tailwindcss.js"></script>
   <script src="lib/design/tailwind.config.js"></script>
+  <script defer src="lib/search/louie-search.js"></script>
 
   <!-- ─── Structured data (Person + WebSite) ─── -->
   <script type="application/ld+json">
@@ -99,6 +100,24 @@
       clip-path: circle(0% at top right);
     }
     #mobile-menu.open { clip-path: circle(150% at top right); }
+
+    /* Search button — mirrors #github-btn (louie.css) */
+    #search-btn {
+      display: inline-flex; align-items: center; justify-content: center;
+      width: 40px; height: 40px; border-radius: 50%;
+      background: transparent; border: none;
+      color: var(--muted); cursor: pointer;
+      position: relative; overflow: hidden;
+      transition: background 0.2s ease, color 0.2s ease,
+                  backdrop-filter 0.2s ease, -webkit-backdrop-filter 0.2s ease;
+    }
+    #search-btn:hover {
+      background: rgba(255, 255, 255, 0.10);
+      backdrop-filter: blur(14px);
+      -webkit-backdrop-filter: blur(14px);
+      color: var(--text);
+    }
+    #search-btn svg { width: 18px; height: 18px; display: block; }
   </style>
 </head>
 <body class="antialiased min-h-screen">
@@ -138,6 +157,10 @@
         <a href="#licenses" class="nav-link ripple-surface">Licenses</a>
         <div class="nav-divider"></div>
       </nav>
+      <button id="search-btn" class="ripple-surface" type="button" onclick="LouieSearch.open()" aria-label="Search">
+        <!-- Lucide `search` (ISC) -->
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m21 21-4.34-4.34"/><circle cx="11" cy="11" r="8"/></svg>
+      </button>
       <a id="github-btn" class="ripple-surface" href="https://github.com/MrTangLuyao/homepage" target="_blank" rel="noopener" aria-label="GitHub repository" title="GitHub">
         <svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M12 .5C5.65.5.5 5.65.5 12c0 5.08 3.29 9.39 7.86 10.91.58.11.79-.25.79-.56 0-.27-.01-1-.02-1.97-3.2.69-3.87-1.54-3.87-1.54-.52-1.32-1.27-1.67-1.27-1.67-1.04-.71.08-.7.08-.7 1.15.08 1.76 1.18 1.76 1.18 1.02 1.75 2.69 1.24 3.34.95.1-.74.4-1.24.72-1.53-2.55-.29-5.23-1.27-5.23-5.66 0-1.25.45-2.27 1.18-3.07-.12-.29-.51-1.46.11-3.04 0 0 .96-.31 3.16 1.17.92-.25 1.91-.38 2.89-.38.98 0 1.97.13 2.89.38 2.2-1.48 3.16-1.17 3.16-1.17.62 1.58.23 2.75.11 3.04.74.8 1.18 1.82 1.18 3.07 0 4.4-2.69 5.36-5.25 5.65.41.35.78 1.04.78 2.1 0 1.52-.01 2.74-.01 3.11 0 .31.21.67.8.55C20.71 21.39 24 17.08 24 12 24 5.65 18.85.5 12 .5z"/></svg>
       </a>
@@ -161,7 +184,7 @@
   </div>
 
   <main class="pt-32 pb-20 px-6 max-w-4xl mx-auto flex flex-col items-start min-h-screen justify-center">
-    <p class="text-m3-primary font-bold tracking-widest uppercase mb-6 text-sm flex items-center gap-4 before:w-8 before:h-[2px] before:bg-m3-primary" data-i18n="hero-greeting">hello, world!</p>
+    <p class="text-m3-primary font-bold tracking-widest uppercase mb-6 text-sm flex items-center gap-4 before:w-8 before:h-[2px] before:bg-m3-primary" style="cursor:pointer" onclick="LouieSearch.open()" data-i18n="hero-greeting">试试 ⌘ + K 搜索</p>
     <h1 class="text-5xl md:text-7xl font-extrabold leading-tight text-m3-onSurface">
       Hi, I'm <br/><span style="display:inline-block; overflow:hidden; line-height:1.2;"><span id="hero-roll-text" style="display:inline-block; background:linear-gradient(90deg,#d97757,#ffb49d); -webkit-background-clip:text; background-clip:text; color:transparent;">Louie</span></span>
     </h1>
@@ -303,6 +326,10 @@
         <div class="font-bold text-m3-onSurface text-lg mb-2">HarmonyOS Sans</div>
         <div class="text-sm text-m3-onSurfaceVariant tracking-wide">Copyright (c) Huawei Device Co., Ltd.</div>
       </div>
+      <div class="p-6 bg-m3-surfaceContainer rounded-m3-xl border border-m3-outlineVariant">
+        <div class="font-bold text-m3-onSurface text-lg mb-2">Lucide</div>
+        <div class="text-sm text-m3-onSurfaceVariant tracking-wide">ISC License | Copyright (c) Lucide Contributors</div>
+      </div>
     </div>
     <p class="mt-6 text-sm text-m3-onSurfaceVariant/60" data-i18n-html="m3-note">本站视觉设计参考了 <a href="https://m3.material.io" target="_blank" rel="noopener" class="ripple-surface ripple-surface-variant inline-flex items-center text-m3-primary px-2 py-0.5 rounded-m3-sm hover:bg-m3-primaryContainer transition-colors">Material Design 3</a> 规范，但并未使用其官方组件库。</p>
   </section>
@@ -385,9 +412,10 @@
     menuBtn.addEventListener('click', () => mobileMenu.classList.toggle('open'));
     mobileMenu.addEventListener('click', () => mobileMenu.classList.remove('open'));
 
+    const MODK = /Mac|iPhone|iPad/.test(navigator.platform) ? '⌘' : 'Ctrl';
     const translations = {
       zh: {
-        'hero-greeting': '你好, 陌生人!',
+        'hero-greeting': `试试 ${MODK} + K 搜索`,
         'hero-design-btn': '　设计　',
         'hero-blog-btn': '我的博客',
         'section-about': 'About',
@@ -408,7 +436,7 @@
         'm3-note': '本站视觉设计参考了 <a href="https://m3.material.io" target="_blank" rel="noopener" class="ripple-surface ripple-surface-variant inline-flex items-center text-m3-primary px-2 py-0.5 rounded-m3-sm hover:bg-m3-primaryContainer transition-colors">Material Design 3</a> 规范，但并未使用其官方组件库。'
       },
       en: {
-        'hero-greeting': 'hello, world!',
+        'hero-greeting': `try ${MODK} + K to search`,
         'hero-design-btn': '  Design  ',
         'hero-blog-btn': 'View my Blog',
         'section-about': 'About',
@@ -451,10 +479,23 @@
     function toggleLang() {
       currentLang = currentLang === 'zh' ? 'en' : 'zh';
       applyLang(currentLang);
+      if (window.LouieSearch) LouieSearch.setLang(currentLang);
     }
 
     applyLang(currentLang);
     document.getElementById('footer-year').textContent = '© ' + new Date().getFullYear();
+    document.getElementById('search-btn').title = 'Search (' + MODK + ' K)';
+
+    // The page owns the language: push it into the search overlay at load
+    // (fixes stale-localStorage mismatch) and route the overlay's own
+    // language action back through toggleLang so both always agree.
+    window.addEventListener('DOMContentLoaded', () => {
+      if (!window.LouieSearch) return;
+      LouieSearch.setLang(currentLang);
+      LouieSearch.configure({
+        onLangSwitch: (next) => { if (next !== currentLang) toggleLang(); }
+      });
+    });
 
     const words = ['Louie', 'Developer', 'Creator', 'AI Enjoyer', 'CS Student'];
     const rollEl = document.getElementById('hero-roll-text');

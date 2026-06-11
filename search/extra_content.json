@@ -1,0 +1,15 @@
+{
+  "version": 1,
+  "_comment": "Hand-curated extra entries for the louie. search engine. Schema: items[] of { title, sub?, hint?, url, newTab?, icon?, group?, kw? }. title/sub/hint/group accept either a plain string or { \"zh\": \"...\", \"en\": \"...\" }. icon: one of folder/code/clock/chat/dna/github/tv/book/link/post/stack/info/mail/file/lang/heart. kw: extra space-separated search keywords.",
+  "items": [
+    {
+      "title": { "zh": "Jetlag Commander", "en": "Jetlag Commander" },
+      "sub": { "zh": "出发前先把时差调好", "en": "Beat jetlag before you fly" },
+      "hint": "jetlag.louie1.com",
+      "url": "https://jetlag.louie1.com",
+      "icon": "clock",
+      "group": { "zh": "更多", "en": "More" },
+      "kw": "时差 jetlag 飞行 travel"
+    }
+  ]
+}
