@@ -100,24 +100,6 @@
       clip-path: circle(0% at top right);
     }
     #mobile-menu.open { clip-path: circle(150% at top right); }
-
-    /* Search button — mirrors #github-btn (louie.css) */
-    #search-btn {
-      display: inline-flex; align-items: center; justify-content: center;
-      width: 40px; height: 40px; border-radius: 50%;
-      background: transparent; border: none;
-      color: var(--muted); cursor: pointer;
-      position: relative; overflow: hidden;
-      transition: background 0.2s ease, color 0.2s ease,
-                  backdrop-filter 0.2s ease, -webkit-backdrop-filter 0.2s ease;
-    }
-    #search-btn:hover {
-      background: rgba(255, 255, 255, 0.10);
-      backdrop-filter: blur(14px);
-      -webkit-backdrop-filter: blur(14px);
-      color: var(--text);
-    }
-    #search-btn svg { width: 18px; height: 18px; display: block; }
   </style>
 </head>
 <body class="antialiased min-h-screen">

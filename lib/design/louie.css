@@ -275,10 +275,10 @@ footer.over-wallpaper::before {
   color: var(--text);
 }
 
-/* Circular M3-style icon button (GitHub link).
+/* Circular M3-style icon buttons (GitHub link, louie. search).
  * Same height as the brand button on the left so the navbar reads as one
  * unified row. */
-#github-btn {
+#github-btn, #search-btn {
   display: inline-flex; align-items: center; justify-content: center;
   width: 40px; height: 40px; border-radius: 50%;
   background: transparent; border: none;
@@ -289,13 +289,13 @@ footer.over-wallpaper::before {
   transition: background 0.2s ease, color 0.2s ease,
               backdrop-filter 0.2s ease, -webkit-backdrop-filter 0.2s ease;
 }
-#github-btn:hover {
+#github-btn:hover, #search-btn:hover {
   background: rgba(255, 255, 255, 0.10);
   backdrop-filter: blur(14px);
   -webkit-backdrop-filter: blur(14px);
   color: var(--text);
 }
-#github-btn svg { width: 18px; height: 18px; display: block; }
+#github-btn svg, #search-btn svg { width: 18px; height: 18px; display: block; }
 
 /* On mobile, collapse the language toggle into a circular icon button that
  * mirrors #github-btn — drop the "EN ⇄ 文" label and keep only the icon. */
