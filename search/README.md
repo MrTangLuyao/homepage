@@ -15,7 +15,7 @@ Shadow DOM 内，不会影响宿主页面。
 |---|---|
 | 内置条目 | louie.* 站点、项目、社交链接（随 SDK 发布） |
 | 博客文章 | 运行时拉取 `blog.louie1.com` 的 `head_librarian.json` 与各合集 `librarian.json` —— **博客更新后无需任何操作**，搜索结果自动同步（会话内缓存 30 分钟） |
-| learn 课程 | 运行时读取 `learn.louie1.com` 的 `learn/learn_data/manifest.js`（在 learn 站内直接复用已加载的 `window.__LEARN_MANIFEST`）——课程清单更新同样自动同步 |
+| learn 课程 + 全部课时 | 运行时拉取 `learn.louie1.com` 的 `learn/learn_data/search_broadcast.json`（learn 仓库 `node tools/build-search-broadcast.mjs` 生成的"广播"索引，含 4 门课全部课时与练习场）。改完课程跑一次脚本即可全网可搜；广播文件缺失时自动回退到 `manifest.js` 只列课程 |
 | `search/extra_content.json` | 手动追加的条目，想加什么进搜索就写在这里 |
 
 ## extra_content.json 格式
