@@ -69,7 +69,15 @@ body {
    pixel-matches the underlying wallpaper while the navbar is transparent.
    Opacity is driven by --frost-progress so the strip fades in gradually as
    the user scrolls through the hero. ─── */
-:root { --frost-progress: 0; }
+:root {
+  --frost-progress: 0;
+  --content-transition-progress: 0;
+  --content-transition-start: 100%;
+  --content-transition-soft: 100%;
+  --content-transition-deep: 100%;
+  --scroll-hint-progress: 1;
+  --content-transition-height: clamp(180px, 22vh, 260px);
+}
 
 #nav-bg-strip {
   position: fixed;
@@ -91,13 +99,80 @@ body {
    NOTE: do NOT include #navbar / #mobile-menu here — their position
    is already `fixed` and overriding it to `relative` breaks the
    layout (mobile-menu would take flow space on desktop). */
-main, .content-surface { position: relative; z-index: 1; }
+main { position: relative; z-index: 2; }
+.content-surface { position: relative; z-index: 1; }
 
 /* ─── Middle article sections — solid surface covering the wallpaper ─── */
 .content-surface {
   background-color: var(--bg);
   position: relative;
   z-index: 1;
+}
+
+/* Blend the hero wallpaper into the solid article surface. The masked
+   backdrop blur grows in with the dark gradient, avoiding a hard seam while
+   keeping the document flow and section spacing unchanged. */
+.content-surface::before {
+  content: "";
+  position: absolute;
+  z-index: -1;
+  left: 0;
+  right: 0;
+  top: calc(-1 * var(--content-transition-height));
+  height: var(--content-transition-height);
+  pointer-events: none;
+  background: linear-gradient(180deg,
+              rgba(31, 31, 30, 0) 0%,
+              rgba(31, 31, 30, 0) var(--content-transition-start),
+              rgba(31, 31, 30, 0.16) var(--content-transition-soft),
+              rgba(31, 31, 30, 0.62) var(--content-transition-deep),
+              var(--bg) 100%);
+  backdrop-filter: blur(calc(14px * var(--content-transition-progress)));
+  -webkit-backdrop-filter: blur(calc(14px * var(--content-transition-progress)));
+  mask-image: radial-gradient(ellipse 95% 125% at 50% 118%,
+              black 0%,
+              black 58%,
+              rgba(0, 0, 0, 0.78) 72%,
+              rgba(0, 0, 0, 0.35) 86%,
+              transparent 100%);
+  -webkit-mask-image: radial-gradient(ellipse 95% 125% at 50% 118%,
+              black 0%,
+              black 58%,
+              rgba(0, 0, 0, 0.78) 72%,
+              rgba(0, 0, 0, 0.35) 86%,
+              transparent 100%);
+}
+
+/* Mirror the same softened glass transition below the article surface so the
+   solid background dissolves back into the wallpaper before the footer. */
+.content-surface::after {
+  content: "";
+  position: absolute;
+  z-index: -1;
+  left: 0;
+  right: 0;
+  bottom: calc(-1 * var(--content-transition-height));
+  height: var(--content-transition-height);
+  pointer-events: none;
+  background: linear-gradient(180deg,
+              var(--bg) 0%,
+              rgba(31, 31, 30, 0.78) 30%,
+              rgba(31, 31, 30, 0.32) 70%,
+              rgba(31, 31, 30, 0) 100%);
+  backdrop-filter: blur(14px);
+  -webkit-backdrop-filter: blur(14px);
+  mask-image: radial-gradient(ellipse 95% 115% at 50% -25%,
+              black 0%,
+              black 58%,
+              rgba(0, 0, 0, 0.78) 72%,
+              rgba(0, 0, 0, 0.35) 86%,
+              transparent 100%);
+  -webkit-mask-image: radial-gradient(ellipse 95% 115% at 50% -25%,
+              black 0%,
+              black 58%,
+              rgba(0, 0, 0, 0.78) 72%,
+              rgba(0, 0, 0, 0.35) 86%,
+              transparent 100%);
 }
 
 /* ─── Frosted surface — translucent dark fill with blur, used by elements
@@ -133,8 +208,14 @@ main, .content-surface { position: relative; z-index: 1; }
   backdrop-filter: blur(14px);
   -webkit-backdrop-filter: blur(14px);
   animation: bob 2s ease-in-out infinite;
-  transition: color 0.25s ease, background 0.25s ease;
+  opacity: var(--scroll-hint-progress);
+  transition: opacity 0.12s linear, color 0.25s ease, background 0.25s ease;
   text-decoration: none;
+  will-change: opacity;
+}
+#scroll-down.is-hidden {
+  pointer-events: none;
+  animation-play-state: paused;
 }
 #scroll-down:hover {
   color: #fff;
@@ -150,6 +231,10 @@ main, .content-surface { position: relative; z-index: 1; }
 footer.over-wallpaper {
   background: transparent !important;
   border-top: none !important;
+  min-height: calc(var(--content-transition-height) + 18rem);
+  padding-block: 2.5rem !important;
+  display: flex;
+  align-items: center;
   position: relative;
   isolation: isolate;
 }
@@ -260,7 +345,7 @@ footer.over-wallpaper::before {
 
 #lang-toggle {
   background: transparent; border: none;
-  color: var(--accent); font-family: inherit; font-size: 13.5px; font-weight: 500;
+  color: var(--muted); font-family: inherit; font-size: 13.5px; font-weight: 500;
   padding: 9px 18px; border-radius: 9999px; cursor: pointer; letter-spacing: 0.1em;
   position: relative; overflow: hidden;
   display: inline-flex; align-items: center; gap: 6px;
