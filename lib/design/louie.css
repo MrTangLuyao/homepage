@@ -262,11 +262,10 @@ footer.over-wallpaper::before {
 @keyframes ripple { to { transform: scale(4); opacity: 0; } }
 
 /* ─── M3 Card ─── */
-.m3-card { transition: background-color 0.2s ease, box-shadow 0.2s ease, transform 0.2s ease; }
+.m3-card { transition: background-color 0.2s ease, box-shadow 0.2s ease; }
 .m3-card:hover {
   background-color: var(--surface-high);
   box-shadow: 0 8px 20px rgba(0, 0, 0, 0.28);
-  transform: translateY(-3px);
 }
 
 /* ─── Navbar — frost intensity ramps with --frost-progress (driven by scroll)
