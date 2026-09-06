@@ -499,8 +499,10 @@
     const words = ['Louie', 'Developer', 'Creator', 'AI Enjoyer', 'CS Student'];
     const rollEl = document.getElementById('hero-roll-text');
     let idx = 0;
+    rollEl.classList.add('hero-spectrum');
 
     function rollNext() {
+      rollEl.classList.remove('hero-spectrum');
       rollEl.style.transition = 'transform 0.35s cubic-bezier(0.4,0,1,1), opacity 0.28s ease';
       rollEl.style.transform = 'translateY(-115%)';
       rollEl.style.opacity = '0';
@@ -514,6 +516,7 @@
           rollEl.style.transition = 'transform 0.42s cubic-bezier(0,0,0.2,1), opacity 0.35s ease';
           rollEl.style.transform = 'translateY(0)';
           rollEl.style.opacity = '1';
+          rollEl.classList.add('hero-spectrum');
         }));
       }, 370);
     }

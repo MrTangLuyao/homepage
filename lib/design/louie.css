@@ -17,8 +17,12 @@
   --accent-on-rgb: 255 180 157;
   --accent-dim-alpha: 0.15;
   --nav-hover: rgba(255, 255, 255, 0.10);
-  --hero-start: #d97757;
-  --hero-end: #ffb49d;
+  --hero-rest: #eedbc7;
+  --hero-copper: #d79678;
+  --hero-gold: #e7bc79;
+  --hero-role-paint: var(--spectrum-paint);
+  --hero-role-size: 400% 100%;
+  --hero-role-animation: hero-spectrum-pass 1.6s cubic-bezier(.4,0,.2,1) .42s both;
   --bg: #1f1f1e;
   --surface: #2a2a29;
   --surface-high: #333332;
@@ -29,6 +33,8 @@
   --accent: #d97757;
   --accent-dim: rgba(217, 119, 87, 0.15);
   --accent-on: #ffb49d;
+  --card-border: var(--outline);
+  --search-shadow: 0 20px 56px rgba(0,0,0,.48);
 }
 
 /* ─── Body base ─── */
@@ -194,6 +200,7 @@ main { position: relative; z-index: 2; }
 .frosted-cta {
   color: rgba(255, 255, 255, 0.95);
   background: rgba(255, 255, 255, 0.10);
+  box-shadow: inset 0 0 0 1px rgba(232, 232, 232, .22), 0 3px 8px rgba(0,0,0,.16);
   backdrop-filter: blur(14px);
   -webkit-backdrop-filter: blur(14px);
   text-decoration: none;
@@ -203,6 +210,12 @@ main { position: relative; z-index: 2; }
   color: #fff;
   background: rgba(255, 255, 255, 0.20);
 }
+
+main .ripple-primary {
+  background-color: var(--accent); color: #fff;
+  box-shadow: inset 0 0 0 1px rgba(255,255,255,.16), 0 3px 10px rgba(0,0,0,.22);
+}
+main .ripple-primary:hover { box-shadow: inset 0 0 0 1px rgba(255,255,255,.24), 0 4px 14px rgba(0,0,0,.28); }
 
 
 /* ─── Hero scroll-down hint — gently bobbing chevron at the bottom of main ─── */
@@ -219,6 +232,7 @@ main { position: relative; z-index: 2; }
   border-radius: 50%;
   color: rgba(255, 255, 255, 0.78);
   background: rgba(255, 255, 255, 0.10);
+  box-shadow: inset 0 0 0 1px rgba(232, 232, 232, .22);
   backdrop-filter: blur(14px);
   -webkit-backdrop-filter: blur(14px);
   animation: bob 2s ease-in-out infinite;
@@ -276,10 +290,16 @@ footer.over-wallpaper::before {
 @keyframes ripple { to { transform: scale(4); opacity: 0; } }
 
 /* ─── M3 Card ─── */
-.m3-card { transition: background-color 0.2s ease, box-shadow 0.2s ease; }
+.m3-card {
+  box-shadow: 0 3px 12px rgba(0,0,0,.14), inset 0 1px 0 rgba(232,232,232,.035);
+  transition: background-color 0.2s ease, box-shadow 0.2s ease, border-color 0.2s ease;
+}
+.content-surface .m3-card { border-color: var(--card-border); }
+#about .m3-card { outline: 1px solid var(--card-border); outline-offset: -1px; }
 .m3-card:hover {
   background-color: var(--surface-high);
-  box-shadow: 0 8px 20px rgba(0, 0, 0, 0.28);
+  border-color: var(--muted);
+  box-shadow: 0 4px 14px rgba(0,0,0,.24);
 }
 
 /* ─── Navbar — frost intensity ramps with --frost-progress (driven by scroll)
@@ -406,9 +426,24 @@ footer.over-wallpaper::before {
   #lang-toggle svg { width: 18px; height: 18px; }
 }
 
+:root {
+  /* A quiet resting color frames one copper/gold pass in either theme. */
+  --spectrum-paint: linear-gradient(105deg,
+    var(--hero-rest) 25%, var(--hero-copper) 43%, var(--hero-gold) 57%, var(--hero-rest) 75%);
+}
 #hero-roll-text {
-  background: linear-gradient(90deg, var(--hero-start), var(--hero-end));
+  background-image: var(--hero-role-paint);
+  background-size: var(--hero-role-size, 100% 100%);
+  background-position: 100% 50%;
   -webkit-background-clip: text; background-clip: text; color: transparent;
+}
+#hero-roll-text.hero-spectrum { animation: var(--hero-role-animation, none); }
+@keyframes hero-spectrum-pass {
+  from { background-position: 100% 50%; }
+  to { background-position: 0% 50%; }
+}
+@media (prefers-reduced-motion: reduce) {
+  #hero-roll-text.hero-spectrum { animation: none; }
 }
 /* System preference is the default; explicit choices take priority. */
 @media (prefers-color-scheme: light) {
@@ -421,10 +456,14 @@ footer.over-wallpaper::before {
   --accent-rgb: 137 87 24; --accent-on-rgb: 106 65 16;
   --bg: #efebe3; --surface: #ffffff; --surface-high: #faf5eb;
   --border: #ccc2b2; --outline: #8b7a5f; --text: #2a2722; --muted: #564f44;
+  --card-border: var(--border);
   --accent: #895718; --accent-on: #6a4110;
   --accent-dim: rgba(202, 151, 61, .16); --accent-dim-alpha: .16;
   --nav-hover: rgba(169, 112, 34, .10);
-  --hero-start: #2a2722; --hero-end: #2a2722;
+  --hero-rest: #453b34; --hero-copper: #9b6045; --hero-gold: #9c753a;
+  --hero-role-paint: var(--spectrum-paint);
+  --hero-role-size: 400% 100%;
+  --hero-role-animation: hero-spectrum-pass 1.6s cubic-bezier(.4,0,.2,1) .42s both;
   --search-shadow: 0 20px 56px rgba(42,39,34,.24);
 }
 :root:not([data-theme]) #bg-wallpaper,
@@ -440,7 +479,6 @@ footer.over-wallpaper::before {
 :root:not([data-theme]) .content-surface::before,
 :root:not([data-theme]) .content-surface::after { content: none; }
 :root:not([data-theme]) main h1 { color: var(--text); }
-:root:not([data-theme]) #hero-roll-text { background: none; color: var(--text); }
 :root:not([data-theme]) main [data-i18n="hero-greeting"] { color: #75501e; }
 :root:not([data-theme]) main [data-i18n="hero-greeting"]::before { background-color: #b17a25; }
 :root:not([data-theme]) main .ripple-primary { background-color: #e1ad4f; color: #302313; box-shadow: inset 0 0 0 1px #b5802c, 0 3px 8px rgba(93,65,21,.13); }
@@ -484,10 +522,14 @@ footer.over-wallpaper::before {
   --accent-rgb: 137 87 24; --accent-on-rgb: 106 65 16;
   --bg: #efebe3; --surface: #ffffff; --surface-high: #faf5eb;
   --border: #ccc2b2; --outline: #8b7a5f; --text: #2a2722; --muted: #564f44;
+  --card-border: var(--border);
   --accent: #895718; --accent-on: #6a4110;
   --accent-dim: rgba(202, 151, 61, .16); --accent-dim-alpha: .16;
   --nav-hover: rgba(169, 112, 34, .10);
-  --hero-start: #2a2722; --hero-end: #2a2722;
+  --hero-rest: #453b34; --hero-copper: #9b6045; --hero-gold: #9c753a;
+  --hero-role-paint: var(--spectrum-paint);
+  --hero-role-size: 400% 100%;
+  --hero-role-animation: hero-spectrum-pass 1.6s cubic-bezier(.4,0,.2,1) .42s both;
   --search-shadow: 0 20px 56px rgba(42,39,34,.24);
 }
 :root[data-theme="light"] #bg-wallpaper,
@@ -503,7 +545,6 @@ footer.over-wallpaper::before {
 :root[data-theme="light"] .content-surface::before,
 :root[data-theme="light"] .content-surface::after { content: none; }
 :root[data-theme="light"] main h1 { color: var(--text); }
-:root[data-theme="light"] #hero-roll-text { background: none; color: var(--text); }
 :root[data-theme="light"] main [data-i18n="hero-greeting"] { color: #75501e; }
 :root[data-theme="light"] main [data-i18n="hero-greeting"]::before { background-color: #b17a25; }
 :root[data-theme="light"] main .ripple-primary { background-color: #e1ad4f; color: #302313; box-shadow: inset 0 0 0 1px #b5802c, 0 3px 8px rgba(93,65,21,.13); }
