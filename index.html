@@ -97,10 +97,14 @@
       #menu-btn { display: inline-flex !important; }
     }
     #mobile-menu {
-      transition: clip-path 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+      visibility: hidden; pointer-events: none;
+      transition: clip-path 0.3s cubic-bezier(0.4, 0, 0.2, 1), visibility 0s 0.3s;
       clip-path: circle(0% at top right);
     }
-    #mobile-menu.open { clip-path: circle(150% at top right); }
+    #mobile-menu.open {
+      visibility: visible; pointer-events: auto; transition-delay: 0s;
+      clip-path: circle(150% at top right);
+    }
   </style>
 </head>
 <body class="antialiased min-h-screen">
@@ -156,7 +160,7 @@
         <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="flex-shrink:0;"><path d="m5 8 6 6"/><path d="m4 14 6-6 2-3"/><path d="M2 5h12"/><path d="M7 2h1"/><path d="m22 22-5-10-5 10"/><path d="M14 18h6"/></svg>
         <span id="lang-label">EN ⇄ 文</span>
       </button>
-      <button id="menu-btn" class="ripple-surface">
+      <button id="menu-btn" class="ripple-surface" type="button" aria-label="Menu" aria-controls="mobile-menu" aria-expanded="false">
         <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="3" y1="12" x2="21" y2="12"></line><line x1="3" y1="6" x2="21" y2="6"></line><line x1="3" y1="18" x2="21" y2="18"></line></svg>
       </button>
     </div>
@@ -168,6 +172,10 @@
     <a href="#social" class="ripple-surface nav-dd-item" style="border-radius:8px; color:var(--text);">Social</a>
     <a href="#links" class="ripple-surface nav-dd-item" style="border-radius:8px; color:var(--text);">Friends</a>
     <a href="#licenses" class="ripple-surface nav-dd-item" style="border-radius:8px; color:var(--text);">Licenses</a>
+    <a id="mobile-github" href="https://github.com/MrTangLuyao/homepage" target="_blank" rel="noopener" class="ripple-surface nav-dd-item">
+      <span>GitHub</span>
+      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M7 17 17 7M7 7h10v10"/></svg>
+    </a>
   </div>
 
   <main class="pt-32 pb-20 px-6 max-w-4xl mx-auto flex flex-col items-start min-h-screen justify-center">
@@ -177,7 +185,7 @@
     </h1>
     <div class="grid grid-cols-2 gap-4 mt-12 w-full max-w-xs">
       <a href="https://blog.louie1.com" class="ripple-surface ripple-primary bg-m3-primary text-m3-onPrimary rounded-m3-full w-full px-5 py-3.5 flex items-center justify-center font-bold tracking-wide whitespace-nowrap shadow-sm hover:shadow-md transition-shadow">
-        <span data-i18n="hero-blog-btn">View my Blog</span>
+        <span data-i18n="hero-blog-btn">Blog</span>
       </a>
       <a href="https://learn.louie1.com" class="frosted-cta ripple-surface ripple-surface-variant rounded-m3-full w-full px-5 py-3.5 flex items-center justify-center font-bold tracking-wide whitespace-nowrap">
         <span data-i18n="hero-learn-btn">Learn</span>
@@ -406,8 +414,12 @@
 
     const menuBtn = document.getElementById('menu-btn');
     const mobileMenu = document.getElementById('mobile-menu');
-    menuBtn.addEventListener('click', () => mobileMenu.classList.toggle('open'));
-    mobileMenu.addEventListener('click', () => mobileMenu.classList.remove('open'));
+    function setMobileMenu(open) {
+      mobileMenu.classList.toggle('open', open);
+      menuBtn.setAttribute('aria-expanded', String(open));
+    }
+    menuBtn.addEventListener('click', () => setMobileMenu(!mobileMenu.classList.contains('open')));
+    mobileMenu.addEventListener('click', () => setMobileMenu(false));
 
     const MODK = /Mac|iPhone|iPad/.test(navigator.platform) ? '⌘' : 'Ctrl';
     const translations = {
@@ -436,7 +448,7 @@
       en: {
         'hero-greeting': `try ${MODK} + K to search`,
         'hero-learn-btn': 'Learn',
-        'hero-blog-btn': 'View my Blog',
+        'hero-blog-btn': 'Blog',
         'section-about': 'About',
         'section-projects': 'Projects',
         'section-social': 'Social',
@@ -471,6 +483,8 @@
       });
       const langLabel = document.getElementById('lang-label');
       if (langLabel) langLabel.textContent = lang === 'zh' ? '文 ⇄ EN' : 'EN ⇄ 文';
+      document.getElementById('lang-toggle').setAttribute('aria-label', lang === 'zh' ? '切换为英文' : 'Switch to Chinese');
+      menuBtn.setAttribute('aria-label', lang === 'zh' ? '菜单' : 'Menu');
       document.documentElement.lang = lang === 'zh' ? 'zh-CN' : 'en';
       bindRipples();
     }

@@ -264,6 +264,8 @@ footer.over-wallpaper {
   display: flex;
   align-items: center;
   position: relative;
+  /* Keep footer text above the preceding surface's blurred transition. */
+  z-index: 2;
   isolation: isolate;
 }
 footer.over-wallpaper::before {
@@ -608,9 +610,24 @@ footer.over-wallpaper::before {
   #navbar { padding-inline: 8px; }
   #brand-dropdown-btn { padding-inline: 6px; font-size: 16px; }
   #brand-dropdown-btn .b-page { display: none; }
-  .nav-right { gap: 2px; }
-  .nav-right > .nav-divider { margin-inline: 2px; }
-  #search-btn, #github-btn, #theme-btn, #lang-toggle { width: 36px; }
+}
+
+/* Give the frequent mobile actions full touch targets; GitHub lives in the menu. */
+#mobile-github { display: none; }
+@media (max-width: 767px) {
+  #github-btn, .nav-right > .nav-divider { display: none; }
+  .nav-right { gap: 2px; flex-shrink: 0; }
+  #brand-dropdown-btn { min-height: 44px; }
+  #search-btn, #theme-btn, #lang-toggle, #menu-btn {
+    width: 44px; height: 44px; flex: 0 0 44px; padding: 0;
+  }
+  #search-btn svg, #theme-btn svg, #lang-toggle svg, #menu-btn svg {
+    width: 20px; height: 20px;
+  }
+  #mobile-github {
+    display: flex; align-items: center; justify-content: space-between;
+    margin-top: 6px; border-top: 1px solid var(--border);
+  }
 }
 
 /* Keep ten-character roles and the English CTA within small phone gutters. */
