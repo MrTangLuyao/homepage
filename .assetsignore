@@ -14,6 +14,9 @@ wrangler.toml
 README.md
 LICENSE
 
+# j.louie1.com is its own Cloudflare project (root dir: j/), not part of louie1.com
+j/
+
 # OS / editor cruft
 .DS_Store
 Thumbs.db

@@ -9,12 +9,14 @@
 ## 页面
 - **[主页 (index.html)](index.html)** — 个人介绍 + 项目展示
 - **[95 (95.html)](95.html)** — Windows 95 风彩蛋页
+- **[j.louie1.com (j/)](j/index.html)** — 快速跳转页：纯 HTML、零 JS。短链接写在 [`j/_redirects`](j/_redirects)：`/g` GitHub · `/b` 博客 · `/bili` 哔哩哔哩 · `/r` 小红书
 
 ## 目录结构
 
 ```
 .
 ├── index.html, 95.html   ← 入口页面
+├── j/           ← j.louie1.com（单独的 Cloudflare 项目，根目录设为 j/）
 ├── lib/
 │   ├── design/      ← 共享 CSS、字体、Tailwind、M3 设计 tokens
 │   ├── runtime/     ← 第三方 JS（luxon）
@@ -38,12 +40,14 @@ Source code for my personal homepage.
 ## Pages
 - **[Homepage](index.html)** — personal introduction and project showcase
 - **[95](95.html)** — Windows-95-style easter egg
+- **[j.louie1.com (j/)](j/index.html)** — quick-links page, plain HTML with zero JS. Short links live in [`j/_redirects`](j/_redirects): `/g` GitHub · `/b` blog · `/bili` Bilibili · `/r` Xiaohongshu
 
 ## Layout
 
 ```
 .
 ├── index.html, 95.html   ← entry points
+├── j/           ← j.louie1.com (its own Cloudflare project, root dir j/)
 ├── lib/
 │   ├── design/      ← shared CSS, fonts, Tailwind, M3 tokens
 │   ├── runtime/     ← third-party JS (luxon)

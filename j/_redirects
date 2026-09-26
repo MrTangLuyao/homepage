@@ -1,0 +1,6 @@
+# j.louie1.com short links (Cloudflare _redirects).
+# 302 on purpose: browsers don't cache it forever, so a target can be changed later.
+/g     https://github.com/mrtangluyao        302
+/b     https://blog.louie1.com               302
+/bili  https://space.bilibili.com/501015028  302
+/r     https://xhslink.com/m/7yaJ9ssWxsW     302
