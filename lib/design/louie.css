@@ -510,13 +510,6 @@ footer.over-wallpaper::before {
   font-weight: 800; line-height: 1.1; letter-spacing: -.035em;
   color: var(--text);
 }
-.mf-line.mf-by {
-  margin-top: .5em;
-  padding-left: .5em;
-  font-size: clamp(1.05rem, 1.4vw + .65rem, 1.4rem);
-  font-weight: 500; letter-spacing: .02em;
-  color: rgb(var(--text-rgb) / .82);
-}
 /* "One", underlined by 一: a single stroke written left to right. */
 .mf-one { position: relative; }
 .mf-one::after {
