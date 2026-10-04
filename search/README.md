@@ -69,7 +69,7 @@ LouieSearch.configure({
 
 ## 浮层内置操作（默认列表底部「操作」分组）
 
-- 切换语言 · English / 中文
+- 切换语言：English / 中文
 - 查看本站源码（GitHub）
 - 通过 `configure({ localItems })` 可追加自定义操作
 

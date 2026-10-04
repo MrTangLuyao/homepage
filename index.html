@@ -1,20 +1,20 @@
 <!DOCTYPE html>
-<html lang="zh-CN" class="scroll-smooth">
+<html lang="zh-CN" class="scroll-smooth" data-theme="dark">
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
-  <title>Louie's Homepage</title>
+  <title>Be the One. by Louie</title>
 
   <!-- ─── SEO ─── -->
   <meta name="description" content="Louie's personal site — developer, learner, AI enjoyer. Projects, a bilingual blog, and an interactive coding playground for SQL and Python.">
   <meta name="author" content="Louie">
-  <meta name="theme-color" content="#ffffff">
+  <meta name="theme-color" content="#1f1f1e">
   <link rel="canonical" href="https://louie1.com/">
 
   <!-- ─── Open Graph (Facebook / LinkedIn / WeChat / Slack / Discord) ─── -->
   <meta property="og:type" content="website">
   <meta property="og:site_name" content="Louie">
-  <meta property="og:title" content="Louie's Homepage">
+  <meta property="og:title" content="Be the One. by Louie">
   <meta property="og:description" content="Developer, learner, AI enjoyer. Projects, a bilingual blog, and an interactive coding playground.">
   <meta property="og:url" content="https://louie1.com/">
   <meta property="og:image" content="https://louie1.com/lib/resources/po.webp">
@@ -23,12 +23,16 @@
 
   <!-- ─── Twitter Card ─── -->
   <meta name="twitter:card" content="summary">
-  <meta name="twitter:title" content="Louie's Homepage">
+  <meta name="twitter:title" content="Be the One. by Louie">
   <meta name="twitter:description" content="Developer, learner, AI enjoyer.">
   <meta name="twitter:image" content="https://louie1.com/lib/resources/po.webp">
 
   <link rel="icon" href="lib/resources/po.webp">
+  <!-- Flag JS early so scroll-reveal lines start hidden without a flash. -->
+  <script>document.documentElement.classList.add('js');</script>
   <script src="lib/design/theme.js"></script>
+  <!-- Picks today's theme (if any) and loads its folder before first paint. -->
+  <script src="lib/daily/daily.js"></script>
   <link rel="stylesheet" href="lib/design/fonts.css">
   <link rel="stylesheet" href="lib/design/louie.css">
   <script src="lib/design/tailwindcss.js"></script>
@@ -179,10 +183,10 @@
   </div>
 
   <main class="pt-32 pb-20 px-6 max-w-4xl mx-auto flex flex-col items-start min-h-screen justify-center">
-    <p class="text-m3-primary font-bold tracking-widest uppercase mb-6 text-sm flex items-center gap-4 before:w-8 before:h-[2px] before:bg-m3-primary" style="cursor:pointer" onclick="LouieSearch.open()" data-i18n="hero-greeting">试试 ⌘ + K 搜索</p>
-    <h1 class="text-5xl md:text-7xl font-extrabold leading-tight text-m3-onSurface">
-      Hi, I'm <br/><span style="display:inline-block; overflow:hidden; line-height:1.2;"><span id="hero-roll-text" style="display:inline-block;">Louie</span></span>
+    <h1 class="hero-title">
+      <span class="ht-lead">Be the</span><br class="ht-br"> <span class="ht-one"><span class="hero-one">One</span><span class="one-dot">.</span></span>
     </h1>
+    <p class="hero-sub">by Louie.</p>
     <div class="grid grid-cols-2 gap-4 mt-12 w-full max-w-xs">
       <a href="https://blog.louie1.com" class="ripple-surface ripple-primary bg-m3-primary text-m3-onPrimary rounded-m3-full w-full px-5 py-3.5 flex items-center justify-center font-bold tracking-wide whitespace-nowrap shadow-sm hover:shadow-md transition-shadow">
         <span data-i18n="hero-blog-btn">Blog</span>
@@ -191,15 +195,29 @@
         <span data-i18n="hero-learn-btn">Learn</span>
       </a>
     </div>
+    <!-- Today's theme (lib/daily) leaves one quiet line here. -->
+    <p id="daily-note" class="daily-note"></p>
 
-    <a id="scroll-down" class="ripple-surface" href="#about" aria-label="Scroll to about section">
+    <a id="scroll-down" class="ripple-surface" href="#manifesto" aria-label="Scroll to manifesto">
       <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><polyline points="6 9 12 15 18 9"></polyline></svg>
     </a>
   </main>
 
   <div class="content-surface">
 
-  <section id="about" class="py-20 px-6 max-w-4xl mx-auto">
+  <section id="manifesto" class="pt-[5.5rem] pb-24 px-6 max-w-4xl mx-auto">
+    <div class="mf-body">
+      <p class="mf-line mf-open" data-i18n="mf-open">致那唯一的一个。</p>
+      <!-- The day's lines (lib/daily/<name>/theme.js) go between the opening and the end. -->
+      <div id="daily-lines"></div>
+      <p class="mf-line mf-gap" data-i18n-html="mf-end-1">这个世界从不缺「之一」，</p>
+      <p class="mf-line mf-strong" data-i18n-html="mf-end-2">它一直在等「<em>唯一</em>」。</p>
+      <p class="mf-line mf-close">Be the <span class="mf-one">One</span><span class="one-dot">.</span></p>
+      <p class="mf-line mf-by">by Louie.</p>
+    </div>
+  </section>
+
+  <section id="about" class="py-20 px-6 max-w-4xl mx-auto border-t border-m3-outlineVariant">
     <h2 class="text-2xl font-bold mb-8 text-m3-onSurface flex items-center gap-4">
       <span class="text-m3-primary font-mono opacity-80">01.</span> <span data-i18n="section-about">About</span>
     </h2>
@@ -357,7 +375,7 @@
       <p class="max-w-md mx-auto mb-6 text-[15px] leading-relaxed text-m3-onSurfaceVariant" data-i18n="contact-desc">我的收件箱始终敞开。无论是有项目合作、技术交流，还是简单地打个招呼，我都会尽量回复。</p>
 
       <p class="max-w-2xl mx-auto mb-4 text-xs leading-relaxed text-m3-onSurfaceVariant/70" data-i18n-html="bg-credit">
-        背景图 <em>Camel thorn trees, Deadvlei, Namib-Naukluft Park, Namibia</em> &copy; Inge Johnsson / Alamy Stock Photo · 转载自 Bing 每日壁纸（2025-08-03）。版权归原作者所有。
+        背景图 <em>Camel thorn trees, Deadvlei, Namib-Naukluft Park, Namibia</em> &copy; Inge Johnsson / Alamy Stock Photo，转载自 Bing 每日壁纸（2025-08-03）。版权归原作者所有。
       </p>
 
       <div class="text-xs text-m3-onSurfaceVariant tracking-widest uppercase font-mono">
@@ -434,9 +452,11 @@
     const MODK = /Mac|iPhone|iPad/.test(navigator.platform) ? '⌘' : 'Ctrl';
     const translations = {
       zh: {
-        'hero-greeting': `试试 ${MODK} + K 搜索`,
         'hero-learn-btn': 'Learn',
         'hero-blog-btn': '我的博客',
+        'mf-open': '致那唯一的一个。',
+        'mf-end-1': '这个世界从不缺「之一」，',
+        'mf-end-2': '它一直在等「<em>唯一</em>」。',
         'section-about': 'About',
         'section-projects': 'Projects',
         'section-social': 'Social',
@@ -456,13 +476,15 @@
         'links-jimmyxue-name': 'JimmyXue 的主页',
         'contact-desc': '我的收件箱始终敞开。无论是有项目合作、技术交流，还是简单地打个招呼，我都会尽量回复。',
         'footer-title': "What's Next?",
-        'bg-credit': '背景图 <em>Camel thorn trees, Deadvlei, Namib-Naukluft Park, Namibia</em> &copy; Inge Johnsson / Alamy Stock Photo · 转载自 Bing 每日壁纸（2025-08-03）。版权归原作者所有。',
+        'bg-credit': '背景图 <em>Camel thorn trees, Deadvlei, Namib-Naukluft Park, Namibia</em> &copy; Inge Johnsson / Alamy Stock Photo，转载自 Bing 每日壁纸（2025-08-03）。版权归原作者所有。',
         'm3-note': '本站视觉设计参考了 <a href="https://m3.material.io" target="_blank" rel="noopener" class="ripple-surface ripple-surface-variant inline-flex items-center text-m3-primary px-2 py-0.5 rounded-m3-sm hover:bg-m3-primaryContainer transition-colors">Material Design 3</a> 规范，但并未使用其官方组件库。'
       },
       en: {
-        'hero-greeting': `try ${MODK} + K to search`,
         'hero-learn-btn': 'Learn',
         'hero-blog-btn': 'Blog',
+        'mf-open': 'Here’s to the one.',
+        'mf-end-1': 'The world has plenty of “one of many.”',
+        'mf-end-2': 'It’s waiting for <em>the one</em>.',
         'section-about': 'About',
         'section-projects': 'Projects',
         'section-social': 'Social',
@@ -482,7 +504,7 @@
         'links-jimmyxue-name': "JimmyXue's Homepage",
         'contact-desc': "My inbox is always open. Whether it's a collaboration proposal, a tech chat, or just a hello — I'll do my best to reply.",
         'footer-title': "What's Next?",
-        'bg-credit': 'Background: <em>Camel thorn trees, Deadvlei, Namib-Naukluft Park, Namibia</em> &copy; Inge Johnsson / Alamy Stock Photo &middot; via Bing daily wallpaper (3 Aug 2025). All rights reserved by the photographer.',
+        'bg-credit': 'Background: <em>Camel thorn trees, Deadvlei, Namib-Naukluft Park, Namibia</em> &copy; Inge Johnsson / Alamy Stock Photo, via Bing daily wallpaper (3 Aug 2025). All rights reserved by the photographer.',
         'm3-note': 'Visual design inspired by the <a href="https://m3.material.io" target="_blank" rel="noopener" class="ripple-surface ripple-surface-variant inline-flex items-center text-m3-primary px-2 py-0.5 rounded-m3-sm hover:bg-m3-primaryContainer transition-colors">Material Design 3</a> spec — not using the official component library.'
       }
     };
@@ -499,6 +521,7 @@
         const key = el.getAttribute('data-i18n-html');
         if (t[key]) el.innerHTML = t[key];
       });
+      if (window.LouieDaily) LouieDaily.render(lang);
       const langLabel = document.getElementById('lang-label');
       if (langLabel) langLabel.textContent = lang === 'zh' ? '文 ⇄ EN' : 'EN ⇄ 文';
       document.getElementById('lang-toggle').setAttribute('aria-label', lang === 'zh' ? '切换为英文' : 'Switch to Chinese');
@@ -528,32 +551,27 @@
       });
     });
 
-    const words = ['Louie', 'Developer', 'Creator', 'AI Enjoyer', 'CS Student'];
-    const rollEl = document.getElementById('hero-roll-text');
-    let idx = 0;
-    rollEl.classList.add('hero-spectrum');
-
-    function rollNext() {
-      rollEl.classList.remove('hero-spectrum');
-      rollEl.style.transition = 'transform 0.35s cubic-bezier(0.4,0,1,1), opacity 0.28s ease';
-      rollEl.style.transform = 'translateY(-115%)';
-      rollEl.style.opacity = '0';
-      setTimeout(() => {
-        idx = (idx + 1) % words.length;
-        rollEl.textContent = words[idx];
-        rollEl.style.transition = 'none';
-        rollEl.style.transform = 'translateY(115%)';
-        rollEl.style.opacity = '0';
-        requestAnimationFrame(() => requestAnimationFrame(() => {
-          rollEl.style.transition = 'transform 0.42s cubic-bezier(0,0,0.2,1), opacity 0.35s ease';
-          rollEl.style.transform = 'translateY(0)';
-          rollEl.style.opacity = '1';
-          rollEl.classList.add('hero-spectrum');
-        }));
-      }, 370);
-    }
-
-    setInterval(rollNext, 2800);
+    // Manifesto: reveal one line at a time as it scrolls in (the day's lines
+    // are already in place from applyLang). Lines entering together are
+    // staggered top-to-bottom so they still read in order.
+    (function () {
+      const lines = document.querySelectorAll('.mf-line');
+      if (!('IntersectionObserver' in window) ||
+          window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
+        lines.forEach(el => el.classList.add('is-in'));
+        return;
+      }
+      const io = new IntersectionObserver(entries => {
+        entries.filter(e => e.isIntersecting)
+          .sort((a, b) => a.boundingClientRect.top - b.boundingClientRect.top)
+          .forEach((e, n) => {
+            e.target.style.transitionDelay = `${n * 140}ms`;
+            e.target.classList.add('is-in');
+            io.unobserve(e.target);
+          });
+      }, { threshold: 0.35, rootMargin: '0px 0px -8% 0px' });
+      lines.forEach(el => io.observe(el));
+    })();
 
     // Drive a --frost-progress CSS variable (0 → 1) from scroll position so
     // the navbar dark tint, backdrop blur, and #nav-bg-strip opacity all ramp

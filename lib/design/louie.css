@@ -18,6 +18,7 @@
   --accent-dim-alpha: 0.15;
   --nav-hover: rgba(255, 255, 255, 0.10);
   --hero-role-paint: linear-gradient(90deg, #d97757, #ffb49d);
+  --one-glow: rgba(217, 119, 87, .30);
   --bg: #1f1f1e;
   --surface: #2a2a29;
   --surface-high: #333332;
@@ -55,9 +56,10 @@ body {
   height: 100lvh;
   z-index: 0;
   pointer-events: none;
-  background-image: url('../resources/th.jpg');
+  /* A daily theme (lib/daily) may swap the cover through these vars. */
+  background-image: var(--cover-dark, url('../resources/th.jpg'));
   background-size: cover;
-  background-position: center;
+  background-position: var(--cover-pos, center);
   background-repeat: no-repeat;
 }
 
@@ -104,7 +106,7 @@ body {
   clip-path: inset(0 0 calc(100% - 64px) 0);
   background:
     linear-gradient(180deg, rgba(0, 0, 0, 0.15) 0%, rgba(0, 0, 0, 0.25) 100%),
-    url('../resources/th.jpg') center / cover no-repeat;
+    var(--cover-dark, url('../resources/th.jpg')) var(--cover-pos, center) / cover no-repeat;
   opacity: var(--frost-progress);
 }
 
@@ -412,20 +414,229 @@ footer.over-wallpaper::before {
   --spectrum-paint: linear-gradient(105deg,
     var(--hero-rest) 25%, var(--hero-copper) 43%, var(--hero-gold) 57%, var(--hero-rest) 75%);
 }
-#hero-roll-text {
+@keyframes hero-spectrum-pass {
+  from { background-position: 100% 50%; }
+  to { background-position: 0% 50%; }
+}
+
+/* ============================================================
+ * Be the One.
+ * One idea runs through the page: one among many. One word lit,
+ * and everything else stepping back around it.
+ * ============================================================ */
+
+/* ─── Hero: "Be the One. by Louie." ─── */
+.hero-title {
+  margin: 0;
+  font-size: 3.75rem; font-weight: 800;
+  line-height: 1.02; letter-spacing: -.035em;
+  color: var(--text);
+}
+@media (min-width: 640px) { .hero-title { font-size: 4.5rem; } .ht-br { display: none; } }
+@media (min-width: 768px) { .hero-title { font-size: 6rem; } }
+.hero-title .ht-lead,
+.hero-title .ht-one { display: inline-block; }
+.ht-one { position: relative; isolation: isolate; }
+/* A soft spotlight that settles on the one word that matters. */
+.ht-one::before {
+  content: "";
+  position: absolute; z-index: -1;
+  inset: -45% -35%;
+  pointer-events: none;
+  background: radial-gradient(closest-side, var(--one-glow), transparent);
+}
+.hero-one, .mf-one {
+  display: inline-block;
+  /* Room for the last glyph so tight tracking never clips the paint. */
+  padding-inline: .06em; margin-inline: -.06em;
   background-image: var(--hero-role-paint);
   background-size: var(--hero-role-size, 100% 100%);
   background-position: 100% 50%;
   -webkit-background-clip: text; background-clip: text; color: transparent;
 }
-#hero-roll-text.hero-spectrum { animation: var(--hero-role-animation, none); }
-@keyframes hero-spectrum-pass {
-  from { background-position: 100% 50%; }
-  to { background-position: 0% 50%; }
+.one-dot { color: var(--accent); }
+
+/* "by Louie." — the signature line under the headline. */
+.hero-sub {
+  margin: 1.5rem 0 0;
+  /* Nudged in so it lines up with the stem of the big "B" above. */
+  padding-left: .5em;
+  font-size: clamp(1.05rem, 1.4vw + .65rem, 1.4rem);
+  font-weight: 500; letter-spacing: .02em;
+  color: rgb(var(--text-rgb) / .82);
 }
+
+/* Today's theme (lib/daily) leaves one quiet line under the buttons. */
+.daily-note {
+  display: none;
+  align-items: center; gap: 12px;
+  margin-top: 2.25rem;
+  font-size: 12.5px; letter-spacing: .06em;
+  color: rgb(var(--text-rgb) / .68);
+}
+.daily-note::before {
+  content: ""; width: 20px; height: 1px; flex-shrink: 0;
+  background: currentColor; opacity: .7;
+}
+.daily-note:not(:empty) { display: inline-flex; }
+
+.js .ht-lead  { animation: one-rise .9s cubic-bezier(.2,.7,.2,1) .15s both; }
+.js .ht-one   { animation: one-rise 1s cubic-bezier(.2,.7,.2,1) .45s both; }
+.js .ht-one::before { animation: one-fade-in 1.8s ease 1s both; }
+/* Dark keeps the static coral paint; light makes one copper/gold pass. */
+.js .hero-one { animation: var(--hero-role-animation, none); }
+.js .hero-sub { animation: one-fade-up .9s ease 1.1s both; }
+.js .daily-note { animation: one-fade-up .9s ease 1.6s both; }
+@keyframes one-rise {
+  from { opacity: 0; transform: translateY(.35em); filter: blur(10px); }
+  to   { opacity: 1; transform: none; filter: blur(0); }
+}
+@keyframes one-fade-up { from { opacity: 0; transform: translateY(10px); } }
+@keyframes one-fade-in { from { opacity: 0; } }
+
+/* ─── 00. Manifesto. The opening and the end are fixed; the day's
+   lines (lib/daily) go between them. ─── */
+.mf-body { max-width: 46rem; }
+.mf-line {
+  margin: .45em 0 0;
+  font-size: clamp(1.125rem, 1.1vw + .85rem, 1.55rem);
+  line-height: 1.65;
+  color: var(--muted);
+}
+.mf-line.mf-open {
+  margin: 0 0 .55em;
+  font-size: clamp(2rem, 3.2vw + 1rem, 3.25rem);
+  font-weight: 800; line-height: 1.2; letter-spacing: -.02em;
+  color: var(--text);
+}
+.mf-line.mf-gap { margin-top: 1.5em; }
+.mf-line.mf-strong { color: var(--text); font-weight: 700; }
+.mf-line em { font-style: normal; color: var(--accent); }
+/* The name sits right under the words it signs. */
+.mf-line.mf-cite {
+  margin-top: .35em;
+  font-size: .875rem; letter-spacing: .06em;
+  color: rgb(var(--muted-rgb) / .85);
+}
+.mf-line.mf-close {
+  margin-top: 1.2em;
+  font-size: clamp(3rem, 7vw + 1rem, 5.5rem);
+  font-weight: 800; line-height: 1.1; letter-spacing: -.035em;
+  color: var(--text);
+}
+.mf-line.mf-by {
+  margin-top: .5em;
+  padding-left: .5em;
+  font-size: clamp(1.05rem, 1.4vw + .65rem, 1.4rem);
+  font-weight: 500; letter-spacing: .02em;
+  color: rgb(var(--text-rgb) / .82);
+}
+/* "One", underlined by 一: a single stroke written left to right. */
+.mf-one { position: relative; }
+.mf-one::after {
+  content: "";
+  position: absolute; left: .08em; right: .08em; bottom: -.02em;
+  height: max(4px, .07em); border-radius: 999px;
+  background: linear-gradient(90deg, var(--accent), var(--accent-on));
+  transform: scaleX(0); transform-origin: left center;
+  transition: transform 1.1s cubic-bezier(.2,.7,.2,1) .55s;
+}
+.mf-close.is-in .mf-one::after,
+html:not(.js) .mf-one::after { transform: scaleX(1); }
+.mf-close.is-in .mf-one { animation: var(--hero-role-animation, none); }
+
+/* Lines rise in one at a time; the page adds .is-in and the stagger. */
+.js .mf-line {
+  opacity: 0; transform: translateY(18px);
+  transition: opacity .8s ease, transform .9s cubic-bezier(.2,.7,.2,1);
+}
+.js .mf-line.is-in { opacity: 1; transform: none; }
+
+/* ─── Spotlight: hover one card and the rest step back ─── */
+@media (hover: hover) and (pointer: fine) {
+  :is(#projects, #social, #links) .grid > * {
+    transition: opacity .35s ease, filter .35s ease,
+                transform .35s cubic-bezier(.2,.7,.2,1),
+                background-color .2s ease, box-shadow .2s ease, border-color .2s ease;
+  }
+  :is(#projects, #social, #links) .grid:has(> :hover) > :not(:hover) {
+    opacity: .42; filter: grayscale(.7);
+  }
+  :is(#projects, #social, #links) .grid > :hover { transform: translateY(-3px); }
+}
+
+/* ─── Portrait covers (lib/daily): a person instead of a landscape.
+   Wide screens: the photo stands full-height on the right, below the
+   navbar, clear of the headline. Tall screens: it sits at the top,
+   centred, and the hero moves down beneath it. Its edges dissolve into
+   the page: ::before holds the photo, ::after paints the fade over the
+   same box in the page's own ground colour, so no frame or seam shows. ─── */
+:root[data-cover="portrait"] { --cover-tall-h: 40vh; }
+:root[data-cover="portrait"] #bg-wallpaper {
+  --fade: var(--cover-ground, #0a0a0a);
+  background-color: var(--fade);
+}
+:root[data-cover="portrait"][data-theme="light"] #bg-wallpaper { --fade: var(--bg); }
+:root[data-cover="portrait"] #bg-wallpaper::before,
+:root[data-cover="portrait"] #bg-wallpaper::after {
+  content: "";
+  position: absolute; top: 4rem; right: 0;
+  height: calc(100% - 4rem);
+  aspect-ratio: var(--cover-ratio, 2 / 3);
+}
+:root[data-cover="portrait"] #bg-wallpaper::before {
+  background: var(--cover-photo) center top / cover no-repeat;
+  /* Keep the photo's edge pixels under the fade's solid band; on fractional
+     pixel boundaries they would otherwise bleed through as a hairline. */
+  clip-path: inset(3px);
+}
+:root[data-cover="portrait"] #bg-wallpaper::after {
+  background:
+    linear-gradient(to right, var(--fade) 2%, transparent 34%),
+    linear-gradient(to bottom, var(--fade) 1%, transparent 7%, transparent 70%, var(--fade) 99%);
+}
+:root[data-cover-mono] #bg-wallpaper::before { filter: grayscale(1) contrast(1.08); }
+:root[data-cover="portrait"] #bg-overlay {
+  background: linear-gradient(90deg, rgba(0,0,0,.55) 0%, rgba(0,0,0,.35) 55%, rgba(0,0,0,.18) 100%);
+}
+:root[data-cover="portrait"][data-theme="light"] #bg-overlay {
+  background: linear-gradient(90deg,
+    rgba(242,236,225,.97) 0%, rgba(242,236,225,.9) 45%,
+    rgba(242,236,225,.25) 72%, rgba(242,236,225,.08) 100%);
+}
+@media (max-aspect-ratio: 1 / 1) {
+  :root[data-cover="portrait"] #bg-wallpaper::before,
+  :root[data-cover="portrait"] #bg-wallpaper::after {
+    right: auto; left: 50%; transform: translateX(-50%);
+    height: var(--cover-tall-h);
+  }
+  :root[data-cover="portrait"] #bg-wallpaper::after {
+    background:
+      linear-gradient(to bottom, var(--fade) 1%, transparent 11%, transparent 55%, var(--fade) 99%),
+      linear-gradient(to right, var(--fade) 2%, transparent 24%, transparent 76%, var(--fade) 98%);
+  }
+  :root[data-cover="portrait"] #bg-overlay {
+    background: linear-gradient(180deg, rgba(0,0,0,.12) 0%, rgba(0,0,0,.22) 40%, rgba(0,0,0,.6) 100%);
+  }
+  :root[data-cover="portrait"][data-theme="light"] #bg-overlay {
+    background: linear-gradient(180deg,
+      rgba(242,236,225,.05) 0%, rgba(242,236,225,.2) 30%,
+      rgba(242,236,225,.92) calc(4rem + var(--cover-tall-h)), rgba(242,236,225,.96) 100%);
+  }
+  :root[data-cover="portrait"] main {
+    justify-content: flex-start;
+    padding-top: calc(3rem + var(--cover-tall-h));
+    padding-bottom: 10rem;
+  }
+}
+
 @media (prefers-reduced-motion: reduce) {
-  #hero-roll-text.hero-spectrum { animation: none; }
+  .js .ht-lead, .js .ht-one, .js .ht-one::before, .js .hero-one,
+  .js .hero-sub, .js .daily-note,
+  .mf-close.is-in .mf-one { animation: none; }
+  .js .mf-line, .mf-one::after { transition: none; }
 }
+
 /* System preference is the default; explicit choices take priority. */
 @media (prefers-color-scheme: light) {
 
@@ -440,7 +651,8 @@ footer.over-wallpaper::before {
   --accent: #895718; --accent-on: #6a4110;
   --accent-dim: rgba(202, 151, 61, .16); --accent-dim-alpha: .16;
   --nav-hover: rgba(169, 112, 34, .10);
-  --hero-rest: #453b34; --hero-copper: #9b6045; --hero-gold: #9c753a;
+  --hero-rest: #6b4428; --hero-copper: #b0603a; --hero-gold: #b5832e;
+  --one-glow: rgba(225, 173, 79, .26);
   --hero-role-paint: var(--spectrum-paint);
   --hero-role-size: 400% 100%;
   --hero-role-animation: hero-spectrum-pass 1.6s cubic-bezier(.4,0,.2,1) .42s both;
@@ -448,6 +660,7 @@ footer.over-wallpaper::before {
 }
 :root:not([data-theme]) #bg-wallpaper,
 :root:not([data-theme]) #bg-overlay { display: block; }
+:root:not([data-theme]) #bg-wallpaper { background-image: var(--cover-light, url('../resources/th.jpg')); }
 :root:not([data-theme]) #bg-overlay {
   background: linear-gradient(90deg,
     rgba(242,236,225,.97) 0%, rgba(242,236,225,.94) 28%,
@@ -459,8 +672,6 @@ footer.over-wallpaper::before {
 :root:not([data-theme]) .content-surface::before,
 :root:not([data-theme]) .content-surface::after { content: none; }
 :root:not([data-theme]) main h1 { color: var(--text); }
-:root:not([data-theme]) main [data-i18n="hero-greeting"] { color: #75501e; }
-:root:not([data-theme]) main [data-i18n="hero-greeting"]::before { background-color: #b17a25; }
 :root:not([data-theme]) main .ripple-primary { background-color: #e1ad4f; color: #302313; box-shadow: inset 0 0 0 1px #b5802c, 0 3px 8px rgba(93,65,21,.13); }
 :root:not([data-theme]) main .ripple-primary:hover { background-color: #d7a042; }
 :root:not([data-theme]) .frosted-cta { background: rgba(255,255,255,.88); color: #403729; box-shadow: inset 0 0 0 1px #b4a68f, 0 3px 8px rgba(65,53,33,.08); }
@@ -505,7 +716,8 @@ footer.over-wallpaper::before {
   --accent: #895718; --accent-on: #6a4110;
   --accent-dim: rgba(202, 151, 61, .16); --accent-dim-alpha: .16;
   --nav-hover: rgba(169, 112, 34, .10);
-  --hero-rest: #453b34; --hero-copper: #9b6045; --hero-gold: #9c753a;
+  --hero-rest: #6b4428; --hero-copper: #b0603a; --hero-gold: #b5832e;
+  --one-glow: rgba(225, 173, 79, .26);
   --hero-role-paint: var(--spectrum-paint);
   --hero-role-size: 400% 100%;
   --hero-role-animation: hero-spectrum-pass 1.6s cubic-bezier(.4,0,.2,1) .42s both;
@@ -513,6 +725,7 @@ footer.over-wallpaper::before {
 }
 :root[data-theme="light"] #bg-wallpaper,
 :root[data-theme="light"] #bg-overlay { display: block; }
+:root[data-theme="light"] #bg-wallpaper { background-image: var(--cover-light, url('../resources/th.jpg')); }
 :root[data-theme="light"] #bg-overlay {
   background: linear-gradient(90deg,
     rgba(242,236,225,.97) 0%, rgba(242,236,225,.94) 28%,
@@ -524,8 +737,6 @@ footer.over-wallpaper::before {
 :root[data-theme="light"] .content-surface::before,
 :root[data-theme="light"] .content-surface::after { content: none; }
 :root[data-theme="light"] main h1 { color: var(--text); }
-:root[data-theme="light"] main [data-i18n="hero-greeting"] { color: #75501e; }
-:root[data-theme="light"] main [data-i18n="hero-greeting"]::before { background-color: #b17a25; }
 :root[data-theme="light"] main .ripple-primary { background-color: #e1ad4f; color: #302313; box-shadow: inset 0 0 0 1px #b5802c, 0 3px 8px rgba(93,65,21,.13); }
 :root[data-theme="light"] main .ripple-primary:hover { background-color: #d7a042; }
 :root[data-theme="light"] .frosted-cta { background: rgba(255,255,255,.88); color: #403729; box-shadow: inset 0 0 0 1px #b4a68f, 0 3px 8px rgba(65,53,33,.08); }
@@ -607,8 +818,8 @@ footer.over-wallpaper::before {
   }
 }
 
-/* Keep ten-character roles and the English CTA within small phone gutters. */
+/* Keep the headline and the English CTA within small phone gutters. */
 @media (max-width: 359px) {
-  main > h1.text-5xl { font-size: 2.625rem; }
+  main > h1.hero-title { font-size: 3.25rem; }
   main .ripple-primary, main .frosted-cta { font-size: 14px; padding-inline: 12px; }
 }
