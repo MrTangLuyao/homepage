@@ -865,7 +865,11 @@ html:not(.js) .mf-one::after { transform: scaleX(1); }
 @media (max-width: 480px) {
   #navbar { padding-inline: 8px; }
   #brand-dropdown-btn { padding-inline: 6px; font-size: 16px; }
-  #brand-dropdown-btn .b-page { display: none; }
+}
+@media (max-width: 359px) {
+  #brand-dropdown-btn { letter-spacing: 0; }
+  #brand-dropdown-icon { margin-left: 2px; }
+  .nav-right { gap: 0 !important; }
 }
 
 /* Give the frequent mobile actions full touch targets; GitHub lives in the menu. */
