@@ -87,11 +87,8 @@ body {
 :root {
   --frost-progress: 0;
   --content-transition-progress: 0;
-  --content-transition-start: 100%;
-  --content-transition-soft: 100%;
-  --content-transition-deep: 100%;
   --scroll-hint-progress: 1;
-  --content-transition-height: clamp(180px, 22vh, 260px);
+  --content-transition-height: clamp(200px, 26vh, 300px);
 }
 
 #nav-bg-strip {
@@ -124,70 +121,54 @@ main { position: relative; z-index: 2; }
   z-index: 1;
 }
 
-/* Blend the hero wallpaper into the solid article surface. The masked
-   backdrop blur grows in with the dark gradient, avoiding a hard seam while
-   keeping the document flow and section spacing unchanged. */
-.content-surface::before {
-  content: "";
-  position: absolute;
-  z-index: -1;
-  left: 0;
-  right: 0;
-  top: calc(-1 * var(--content-transition-height));
-  height: var(--content-transition-height);
-  pointer-events: none;
-  background: linear-gradient(180deg,
-              rgba(31, 31, 30, 0) 0%,
-              rgba(31, 31, 30, 0) var(--content-transition-start),
-              rgba(31, 31, 30, 0.16) var(--content-transition-soft),
-              rgba(31, 31, 30, 0.62) var(--content-transition-deep),
-              var(--bg) 100%);
-  backdrop-filter: blur(calc(14px * var(--content-transition-progress)));
-  -webkit-backdrop-filter: blur(calc(14px * var(--content-transition-progress)));
-  mask-image: radial-gradient(ellipse 95% 125% at 50% 118%,
-              black 0%,
-              black 58%,
-              rgba(0, 0, 0, 0.78) 72%,
-              rgba(0, 0, 0, 0.35) 86%,
-              transparent 100%);
-  -webkit-mask-image: radial-gradient(ellipse 95% 125% at 50% 118%,
-              black 0%,
-              black 58%,
-              rgba(0, 0, 0, 0.78) 72%,
-              rgba(0, 0, 0, 0.35) 86%,
-              transparent 100%);
+/* Blend the hero into the solid article surface, and back out before the
+   footer. Two things change together across the whole width:
+   - the page colour eases in along a smooth many-stop curve (no bands),
+   - an even blur fades in along a gentler curve beneath it.
+   The top transition stays invisible at rest and fades in as a whole as
+   soon as the user scrolls (--content-transition-progress, set by the page). */
+:root {
+  --transition-fill:
+    rgb(var(--bg-rgb) / 0) 0%,     rgb(var(--bg-rgb) / .013) 8%,
+    rgb(var(--bg-rgb) / .049) 15%, rgb(var(--bg-rgb) / .104) 22%,
+    rgb(var(--bg-rgb) / .175) 29%, rgb(var(--bg-rgb) / .259) 35%,
+    rgb(var(--bg-rgb) / .352) 41%, rgb(var(--bg-rgb) / .45) 47%,
+    rgb(var(--bg-rgb) / .55) 53%,  rgb(var(--bg-rgb) / .648) 59%,
+    rgb(var(--bg-rgb) / .741) 65%, rgb(var(--bg-rgb) / .825) 71%,
+    rgb(var(--bg-rgb) / .896) 78%, rgb(var(--bg-rgb) / .951) 85%,
+    rgb(var(--bg-rgb) / .987) 92%, rgb(var(--bg-rgb)) 100%;
+  --transition-overlap: 16px;
+  --transition-blur:
+    transparent 0%, rgb(0 0 0 / .18) 12%, rgb(0 0 0 / .45) 26%,
+    rgb(0 0 0 / .75) 40%, rgb(0 0 0 / .93) 52%, #000 62%;
 }
-
-/* Mirror the same softened glass transition below the article surface so the
-   solid background dissolves back into the wallpaper before the footer. */
+.content-surface::before,
 .content-surface::after {
   content: "";
   position: absolute;
   z-index: -1;
   left: 0;
   right: 0;
-  bottom: calc(-1 * var(--content-transition-height));
-  height: var(--content-transition-height);
+  /* Reach into the article and fade out there: the blurred layer's own edge
+     can leave a hairline on fractional pixel positions, and inside the
+     article that edge sits over the same solid colour, out of sight. */
+  height: calc(var(--content-transition-height) + var(--transition-overlap));
   pointer-events: none;
-  background: linear-gradient(180deg,
-              var(--bg) 0%,
-              rgba(31, 31, 30, 0.78) 30%,
-              rgba(31, 31, 30, 0.32) 70%,
-              rgba(31, 31, 30, 0) 100%);
   backdrop-filter: blur(14px);
   -webkit-backdrop-filter: blur(14px);
-  mask-image: radial-gradient(ellipse 95% 115% at 50% -25%,
-              black 0%,
-              black 58%,
-              rgba(0, 0, 0, 0.78) 72%,
-              rgba(0, 0, 0, 0.35) 86%,
-              transparent 100%);
-  -webkit-mask-image: radial-gradient(ellipse 95% 115% at 50% -25%,
-              black 0%,
-              black 58%,
-              rgba(0, 0, 0, 0.78) 72%,
-              rgba(0, 0, 0, 0.35) 86%,
-              transparent 100%);
+}
+.content-surface::before {
+  top: calc(-1 * var(--content-transition-height));
+  background: linear-gradient(180deg, var(--transition-fill));
+  -webkit-mask-image: linear-gradient(180deg, var(--transition-blur), #000 calc(100% - var(--transition-overlap)), transparent 100%);
+  mask-image: linear-gradient(180deg, var(--transition-blur), #000 calc(100% - var(--transition-overlap)), transparent 100%);
+  opacity: var(--content-transition-progress);
+}
+.content-surface::after {
+  bottom: calc(-1 * var(--content-transition-height));
+  background: linear-gradient(0deg, var(--transition-fill));
+  -webkit-mask-image: linear-gradient(0deg, var(--transition-blur), #000 calc(100% - var(--transition-overlap)), transparent 100%);
+  mask-image: linear-gradient(0deg, var(--transition-blur), #000 calc(100% - var(--transition-overlap)), transparent 100%);
 }
 
 /* ─── Frosted surface — translucent dark fill with blur, used by elements
