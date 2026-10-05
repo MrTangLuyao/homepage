@@ -665,7 +665,7 @@ html:not(.js) .mf-one::after { transform: scaleX(1); }
   background: var(--bg); filter: grayscale(1);
   transition: filter .25s ease;
 }
-.dp-card:hover .dp-thumb { filter: none; }
+.dp-card:hover .dp-thumb, .dp-thumb.dp-color { filter: none; }
 .dp-blank {
   display: flex; align-items: center; justify-content: center;
   font-size: 2.5rem; font-weight: 800; color: var(--muted); filter: none;
