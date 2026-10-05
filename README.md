@@ -26,7 +26,7 @@
 
 ## 每日主题
 
-平时的主页是原版首屏加上宣言区；大约每三天有一个主题日，纪念一位人物，首屏换成 “Be the One.” 和这个人的封面。每个主题是 `lib/daily/<人名>/` 下的 `theme.js`（人物、年份、名言）和 `portrait.jpg`（封面，来自 Wikimedia Commons 的自由授权图片）；日期写在 `lib/daily/daily.js` 的 `CALENDAR` 里。小标题、周年数、署名和图片授权说明都由 `daily.js` 自动生成。在网址后加 `?day=MM-DD` 可以预览任意一天。
+平时的主页是原版首屏加上宣言区；大约每三天有一个主题日，纪念一位人物，首屏换成 “Be the One.” 和这个人的封面。每个主题是 `lib/daily/<人名>/` 下的 `theme.js`（人物、年份、名言）、`portrait.jpg`（封面，来自 Wikimedia Commons 的自由授权图片）和 `thumb.jpg`（选择器里的小图）；日期写在 `lib/daily/daily.js` 的 `CALENDAR` 里。小标题、周年数、署名和图片授权说明都由 `daily.js` 自动生成。首屏的「每日主题」按钮（`lib/daily/picker.js`）像 Google Doodles 档案馆一样列出全年所有主题，点一位就能看到那一天的主页；也可以直接在网址后加 `?day=MM-DD`。
 
 整站零编译、零后端、零 `fetch()`——所有资源都通过 `<script>` / `<link>` 标签加载，本地双击 `*.html` 即可直接预览。
 
@@ -60,6 +60,6 @@ Source code for my personal homepage.
 
 ## Daily themes
 
-On ordinary days the homepage is the original hero plus the manifesto; about one day in three is a themed day that remembers someone, with a "Be the One." hero and their cover. Each theme is `lib/daily/<name>/` with `theme.js` (person, years, quotes) and `portrait.jpg` (a freely licensed cover from Wikimedia Commons); its date lives in `CALENDAR` in `lib/daily/daily.js`, which also writes the note, anniversary, signature and image credit. Add `?day=MM-DD` to the URL to preview any day.
+On ordinary days the homepage is the original hero plus the manifesto; about one day in three is a themed day that remembers someone, with a "Be the One." hero and their cover. Each theme is `lib/daily/<name>/` with `theme.js` (person, years, quotes), `portrait.jpg` (a freely licensed cover from Wikimedia Commons) and `thumb.jpg` (its picker thumbnail); its date lives in `CALENDAR` in `lib/daily/daily.js`, which also writes the note, anniversary, signature and image credit. The hero's "Themes" button (`lib/daily/picker.js`) lists every themed day, Google-Doodles style; pick one to see the homepage on that day, or add `?day=MM-DD` to the URL.
 
 Zero build step, zero backend, no `fetch()` — everything loads via `<script>` / `<link>` tags so the site also works when opened directly via `file://`.

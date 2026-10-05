@@ -33,6 +33,7 @@
   <script src="lib/design/theme.js"></script>
   <!-- Picks today's theme (if any) and loads its folder before first paint. -->
   <script src="lib/daily/daily.js"></script>
+  <script defer src="lib/daily/picker.js"></script>
   <link rel="stylesheet" href="lib/design/fonts.css">
   <link rel="stylesheet" href="lib/design/louie.css">
   <script src="lib/design/tailwindcss.js"></script>
@@ -197,9 +198,10 @@
       <a href="https://blog.louie1.com" class="ripple-surface ripple-primary bg-m3-primary text-m3-onPrimary rounded-m3-full w-full px-5 py-3.5 flex items-center justify-center font-bold tracking-wide whitespace-nowrap shadow-sm hover:shadow-md transition-shadow">
         <span data-i18n="hero-blog-btn">Blog</span>
       </a>
-      <a href="https://learn.louie1.com" class="frosted-cta ripple-surface ripple-surface-variant rounded-m3-full w-full px-5 py-3.5 flex items-center justify-center font-bold tracking-wide whitespace-nowrap">
-        <span data-i18n="hero-learn-btn">Learn</span>
-      </a>
+      <!-- Opens the daily theme picker (lib/daily/picker.js). -->
+      <button type="button" id="daily-picker-btn" class="frosted-cta ripple-surface ripple-surface-variant rounded-m3-full w-full px-5 py-3.5 flex items-center justify-center font-bold tracking-wide whitespace-nowrap" aria-haspopup="dialog">
+        <span data-i18n="hero-themes-btn">每日主题</span>
+      </button>
     </div>
     <!-- Today's theme (lib/daily) leaves one quiet line here. -->
     <p id="daily-note" class="daily-note"></p>
@@ -458,7 +460,7 @@
     const translations = {
       zh: {
         'hero-greeting': `试试 ${MODK} + K 搜索`,
-        'hero-learn-btn': 'Learn',
+        'hero-themes-btn': '每日主题',
         'hero-blog-btn': '我的博客',
         'mf-open': '致那唯一的一个。',
         'mf-end-1': '这个世界从不缺「之一」，',
@@ -487,7 +489,7 @@
       },
       en: {
         'hero-greeting': `try ${MODK} + K to search`,
-        'hero-learn-btn': 'Learn',
+        'hero-themes-btn': 'Themes',
         'hero-blog-btn': 'Blog',
         'mf-open': 'Here’s to the one.',
         'mf-end-1': 'The world has plenty of “one of many.”',
