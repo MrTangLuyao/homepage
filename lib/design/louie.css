@@ -414,9 +414,19 @@ footer.over-wallpaper::before {
   --spectrum-paint: linear-gradient(105deg,
     var(--hero-rest) 25%, var(--hero-copper) 43%, var(--hero-gold) 57%, var(--hero-rest) 75%);
 }
+#hero-roll-text {
+  background-image: var(--hero-role-paint);
+  background-size: var(--hero-role-size, 100% 100%);
+  background-position: 100% 50%;
+  -webkit-background-clip: text; background-clip: text; color: transparent;
+}
+#hero-roll-text.hero-spectrum { animation: var(--hero-role-animation, none); }
 @keyframes hero-spectrum-pass {
   from { background-position: 100% 50%; }
   to { background-position: 0% 50%; }
+}
+@media (prefers-reduced-motion: reduce) {
+  #hero-roll-text.hero-spectrum { animation: none; }
 }
 
 /* ============================================================
@@ -424,6 +434,11 @@ footer.over-wallpaper::before {
  * One idea runs through the page: one among many. One word lit,
  * and everything else stepping back around it.
  * ============================================================ */
+
+/* Default days keep the original hero; a themed day (lib/daily) swaps
+   it for "Be the One." — daily.js sets data-daily before first paint. */
+:root[data-daily] .hero-default,
+:root:not([data-daily]) .hero-themed { display: none; }
 
 /* ─── Hero: "Be the One. by Louie." ─── */
 .hero-title {
@@ -451,7 +466,9 @@ footer.over-wallpaper::before {
   padding-inline: .06em; margin-inline: -.06em;
   background-image: var(--hero-role-paint);
   background-size: var(--hero-role-size, 100% 100%);
-  background-position: 100% 50%;
+  /* Dark paints the static coral gradient; in light this lands on the
+     copper/gold middle of the spectrum, so "One" always reads as lit. */
+  background-position: 50% 50%;
   -webkit-background-clip: text; background-clip: text; color: transparent;
 }
 .one-dot { color: var(--accent); }
@@ -522,7 +539,6 @@ footer.over-wallpaper::before {
 }
 .mf-close.is-in .mf-one::after,
 html:not(.js) .mf-one::after { transform: scaleX(1); }
-.mf-close.is-in .mf-one { animation: var(--hero-role-animation, none); }
 
 /* Lines rise in one at a time; the page adds .is-in and the stagger. */
 .js .mf-line {
@@ -610,7 +626,6 @@ html:not(.js) .mf-one::after { transform: scaleX(1); }
 }
 
 @media (prefers-reduced-motion: reduce) {
-  .mf-close.is-in .mf-one { animation: none; }
   .js .mf-line, .mf-one::after { transition: none; }
 }
 
@@ -628,7 +643,7 @@ html:not(.js) .mf-one::after { transform: scaleX(1); }
   --accent: #895718; --accent-on: #6a4110;
   --accent-dim: rgba(202, 151, 61, .16); --accent-dim-alpha: .16;
   --nav-hover: rgba(169, 112, 34, .10);
-  --hero-rest: #6b4428; --hero-copper: #b0603a; --hero-gold: #b5832e;
+  --hero-rest: #453b34; --hero-copper: #9b6045; --hero-gold: #9c753a;
   --one-glow: rgba(225, 173, 79, .26);
   --hero-role-paint: var(--spectrum-paint);
   --hero-role-size: 400% 100%;
@@ -649,6 +664,8 @@ html:not(.js) .mf-one::after { transform: scaleX(1); }
 :root:not([data-theme]) .content-surface::before,
 :root:not([data-theme]) .content-surface::after { content: none; }
 :root:not([data-theme]) main h1 { color: var(--text); }
+:root:not([data-theme]) main [data-i18n="hero-greeting"] { color: #75501e; }
+:root:not([data-theme]) main [data-i18n="hero-greeting"]::before { background-color: #b17a25; }
 :root:not([data-theme]) main .ripple-primary { background-color: #e1ad4f; color: #302313; box-shadow: inset 0 0 0 1px #b5802c, 0 3px 8px rgba(93,65,21,.13); }
 :root:not([data-theme]) main .ripple-primary:hover { background-color: #d7a042; }
 :root:not([data-theme]) .frosted-cta { background: rgba(255,255,255,.88); color: #403729; box-shadow: inset 0 0 0 1px #b4a68f, 0 3px 8px rgba(65,53,33,.08); }
@@ -693,7 +710,7 @@ html:not(.js) .mf-one::after { transform: scaleX(1); }
   --accent: #895718; --accent-on: #6a4110;
   --accent-dim: rgba(202, 151, 61, .16); --accent-dim-alpha: .16;
   --nav-hover: rgba(169, 112, 34, .10);
-  --hero-rest: #6b4428; --hero-copper: #b0603a; --hero-gold: #b5832e;
+  --hero-rest: #453b34; --hero-copper: #9b6045; --hero-gold: #9c753a;
   --one-glow: rgba(225, 173, 79, .26);
   --hero-role-paint: var(--spectrum-paint);
   --hero-role-size: 400% 100%;
@@ -714,6 +731,8 @@ html:not(.js) .mf-one::after { transform: scaleX(1); }
 :root[data-theme="light"] .content-surface::before,
 :root[data-theme="light"] .content-surface::after { content: none; }
 :root[data-theme="light"] main h1 { color: var(--text); }
+:root[data-theme="light"] main [data-i18n="hero-greeting"] { color: #75501e; }
+:root[data-theme="light"] main [data-i18n="hero-greeting"]::before { background-color: #b17a25; }
 :root[data-theme="light"] main .ripple-primary { background-color: #e1ad4f; color: #302313; box-shadow: inset 0 0 0 1px #b5802c, 0 3px 8px rgba(93,65,21,.13); }
 :root[data-theme="light"] main .ripple-primary:hover { background-color: #d7a042; }
 :root[data-theme="light"] .frosted-cta { background: rgba(255,255,255,.88); color: #403729; box-shadow: inset 0 0 0 1px #b4a68f, 0 3px 8px rgba(65,53,33,.08); }
@@ -797,6 +816,7 @@ html:not(.js) .mf-one::after { transform: scaleX(1); }
 
 /* Keep the headline and the English CTA within small phone gutters. */
 @media (max-width: 359px) {
+  main > h1.text-5xl { font-size: 2.625rem; }
   main > h1.hero-title { font-size: 3.25rem; }
   main .ripple-primary, main .frosted-cta { font-size: 14px; padding-inline: 12px; }
 }

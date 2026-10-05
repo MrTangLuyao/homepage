@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
-  <title>Be the One. by Louie</title>
+  <title>Louie's Homepage</title>
 
   <!-- ─── SEO ─── -->
   <meta name="description" content="Louie's personal site — developer, learner, AI enjoyer. Projects, a bilingual blog, and an interactive coding playground for SQL and Python.">
@@ -14,7 +14,7 @@
   <!-- ─── Open Graph (Facebook / LinkedIn / WeChat / Slack / Discord) ─── -->
   <meta property="og:type" content="website">
   <meta property="og:site_name" content="Louie">
-  <meta property="og:title" content="Be the One. by Louie">
+  <meta property="og:title" content="Louie's Homepage">
   <meta property="og:description" content="Developer, learner, AI enjoyer. Projects, a bilingual blog, and an interactive coding playground.">
   <meta property="og:url" content="https://louie1.com/">
   <meta property="og:image" content="https://louie1.com/lib/resources/po.webp">
@@ -23,7 +23,7 @@
 
   <!-- ─── Twitter Card ─── -->
   <meta name="twitter:card" content="summary">
-  <meta name="twitter:title" content="Be the One. by Louie">
+  <meta name="twitter:title" content="Louie's Homepage">
   <meta name="twitter:description" content="Developer, learner, AI enjoyer.">
   <meta name="twitter:image" content="https://louie1.com/lib/resources/po.webp">
 
@@ -183,10 +183,16 @@
   </div>
 
   <main class="pt-32 pb-20 px-6 max-w-4xl mx-auto flex flex-col items-start min-h-screen justify-center">
-    <h1 class="hero-title">
+    <!-- Default days: the original hero. -->
+    <p class="hero-default text-m3-primary font-bold tracking-widest uppercase mb-6 text-sm flex items-center gap-4 before:w-8 before:h-[2px] before:bg-m3-primary" style="cursor:pointer" onclick="LouieSearch.open()" data-i18n="hero-greeting">试试 ⌘ + K 搜索</p>
+    <h1 class="hero-default text-5xl md:text-7xl font-extrabold leading-tight text-m3-onSurface">
+      Hi, I'm <br/><span style="display:inline-block; overflow:hidden; line-height:1.2;"><span id="hero-roll-text" style="display:inline-block;">Louie</span></span>
+    </h1>
+    <!-- Themed days (lib/daily): "Be the One." -->
+    <h1 class="hero-themed hero-title">
       <span class="ht-lead">Be the</span><br class="ht-br"> <span class="ht-one"><span class="hero-one">One</span><span class="one-dot">.</span></span>
     </h1>
-    <p class="hero-sub">by Louie.</p>
+    <p class="hero-themed hero-sub">by Louie.</p>
     <div class="grid grid-cols-2 gap-4 mt-12 w-full max-w-xs">
       <a href="https://blog.louie1.com" class="ripple-surface ripple-primary bg-m3-primary text-m3-onPrimary rounded-m3-full w-full px-5 py-3.5 flex items-center justify-center font-bold tracking-wide whitespace-nowrap shadow-sm hover:shadow-md transition-shadow">
         <span data-i18n="hero-blog-btn">Blog</span>
@@ -451,6 +457,7 @@
     const MODK = /Mac|iPhone|iPad/.test(navigator.platform) ? '⌘' : 'Ctrl';
     const translations = {
       zh: {
+        'hero-greeting': `试试 ${MODK} + K 搜索`,
         'hero-learn-btn': 'Learn',
         'hero-blog-btn': '我的博客',
         'mf-open': '致那唯一的一个。',
@@ -479,6 +486,7 @@
         'm3-note': '本站视觉设计参考了 <a href="https://m3.material.io" target="_blank" rel="noopener" class="ripple-surface ripple-surface-variant inline-flex items-center text-m3-primary px-2 py-0.5 rounded-m3-sm hover:bg-m3-primaryContainer transition-colors">Material Design 3</a> 规范，但并未使用其官方组件库。'
       },
       en: {
+        'hero-greeting': `try ${MODK} + K to search`,
         'hero-learn-btn': 'Learn',
         'hero-blog-btn': 'Blog',
         'mf-open': 'Here’s to the one.',
@@ -549,6 +557,39 @@
         onLangSwitch: (next) => { if (next !== currentLang) toggleLang(); }
       });
     });
+
+    // Default days keep the original rolling hero; themed days (lib/daily)
+    // show "Be the One." instead, so the roller only runs without a theme.
+    if (document.documentElement.dataset.daily) {
+      document.title = 'Be the One. by Louie';
+    } else {
+      const words = ['Louie', 'Developer', 'Creator', 'AI Enjoyer', 'CS Student'];
+      const rollEl = document.getElementById('hero-roll-text');
+      let idx = 0;
+      rollEl.classList.add('hero-spectrum');
+
+      function rollNext() {
+        rollEl.classList.remove('hero-spectrum');
+        rollEl.style.transition = 'transform 0.35s cubic-bezier(0.4,0,1,1), opacity 0.28s ease';
+        rollEl.style.transform = 'translateY(-115%)';
+        rollEl.style.opacity = '0';
+        setTimeout(() => {
+          idx = (idx + 1) % words.length;
+          rollEl.textContent = words[idx];
+          rollEl.style.transition = 'none';
+          rollEl.style.transform = 'translateY(115%)';
+          rollEl.style.opacity = '0';
+          requestAnimationFrame(() => requestAnimationFrame(() => {
+            rollEl.style.transition = 'transform 0.42s cubic-bezier(0,0,0.2,1), opacity 0.35s ease';
+            rollEl.style.transform = 'translateY(0)';
+            rollEl.style.opacity = '1';
+            rollEl.classList.add('hero-spectrum');
+          }));
+        }, 370);
+      }
+
+      setInterval(rollNext, 2800);
+    }
 
     // Manifesto: reveal one line at a time as it scrolls in (the day's lines
     // are already in place from applyLang). Lines entering together are
