@@ -663,6 +663,19 @@ html:not(.js) .mf-one::after { transform: scaleX(1); }
   -webkit-mask-image: linear-gradient(to bottom, #000 88%, transparent 100%);
   mask-image: linear-gradient(to bottom, #000 88%, transparent 100%);
 }
+/* A sprite sheet: every frame side by side, played as crisp pixels. */
+:root[data-cover="figure"][style*="--cover-frames"] #bg-overlay::before {
+  background-size: calc(var(--cover-frames) * 100%) 100%;
+  background-position: 0 0;
+  image-rendering: crisp-edges;
+  image-rendering: pixelated;
+  animation: figure-play calc(var(--cover-frames) / var(--cover-fps) * 1s)
+    steps(var(--cover-frames), jump-none) infinite;
+}
+@keyframes figure-play { to { background-position: 100% 0; } }
+@media (prefers-reduced-motion: reduce) {
+  :root[data-cover="figure"] #bg-overlay::before { animation: none; }
+}
 @media (max-aspect-ratio: 1 / 1) {
   :root[data-party] {
     --fig-h: min(36svh, 330px);

@@ -38,9 +38,10 @@
    LouieDaily.birthday({
      name: 'Cohen',
      // 可选：有照片就放 portrait.jpg 和 thumb.jpg，再写上 cover 和 credit；
-     // 去掉背景的透明抠图（像 Louie 的头像）用 figure，会直接站在页面上
+     // 去掉背景的透明抠图用 figure，会直接站在页面上；
+     // 像素动画就把每一帧横着排成一张图，再写上 frames 和 fps（参考 Louie 的头像）
      // cover: { portrait: 'portrait.jpg', ratio: 4 / 5 },
-     // cover: { figure: 'figure.webp', ratio: 宽 / 高 },
+     // cover: { figure: 'figure.png', ratio: 一帧的宽 / 高, frames: 32, fps: 8 },
      // credit: { zh: '今日封面：Cohen 的照片。', en: 'Today’s cover: a photo of Cohen.' }
    });
    ```
@@ -93,9 +94,10 @@ Birthdays use a fixed template: a cheerful hero in the site's own warm colours (
    LouieDaily.birthday({
      name: 'Cohen',
      // optional: with a photo, add portrait.jpg and thumb.jpg, then cover and credit;
-     // a transparent cut-out (like Louie's avatar) uses figure and stands on the page as is
+     // a transparent cut-out uses figure and stands on the page as is; for pixel
+     // animation, lay the frames side by side in one image and add frames and fps
      // cover: { portrait: 'portrait.jpg', ratio: 4 / 5 },
-     // cover: { figure: 'figure.webp', ratio: width / height },
+     // cover: { figure: 'figure.png', ratio: frame width / height, frames: 32, fps: 8 },
      // credit: { zh: '今日封面：Cohen 的照片。', en: 'Today’s cover: a photo of Cohen.' }
    });
    ```
