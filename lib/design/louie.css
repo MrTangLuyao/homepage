@@ -528,15 +528,11 @@ html:not(.js) .mf-one::after { transform: scaleX(1); }
 }
 .js .mf-line.is-in { opacity: 1; transform: none; }
 
-/* ─── Spotlight: hover one card and the rest step back ─── */
+/* ─── Hovered cards lift a little; the others stay as they are ─── */
 @media (hover: hover) and (pointer: fine) {
   :is(#projects, #social, #links) .grid > * {
-    transition: opacity .35s ease, filter .35s ease,
-                transform .35s cubic-bezier(.2,.7,.2,1),
+    transition: transform .35s cubic-bezier(.2,.7,.2,1),
                 background-color .2s ease, box-shadow .2s ease, border-color .2s ease;
-  }
-  :is(#projects, #social, #links) .grid:has(> :hover) > :not(:hover) {
-    opacity: .42; filter: grayscale(.7);
   }
   :is(#projects, #social, #links) .grid > :hover { transform: translateY(-3px); }
 }
@@ -743,8 +739,8 @@ html:not(.js) .mf-one::after { transform: scaleX(1); }
 :root:not([data-theme]) .frosted-cta:hover { background: #fff9ec; color: #302313; }
 :root:not([data-theme]) #scroll-down { background: rgba(255,255,255,.88); color: #5c4c35; box-shadow: inset 0 0 0 1px #b4a68f; }
 :root:not([data-theme]) #scroll-down:hover { background: #fff9ec; color: #302313; }
-:root:not([data-theme]) .content-surface .m3-card { box-shadow: 0 3px 10px rgba(53,44,29,.06); }
-:root:not([data-theme]) #about .m3-card { outline: 1px solid var(--border); outline-offset: -1px; }
+:root:not([data-theme]) .content-surface :is(.m3-card, .info-card) { box-shadow: 0 3px 10px rgba(53,44,29,.06); }
+:root:not([data-theme]) .info-card { outline: 1px solid var(--border); outline-offset: -1px; }
 :root:not([data-theme]) .content-surface .m3-card:hover { box-shadow: 0 4px 14px rgba(53,44,29,.12); border-color: #a68b5f; }
 :root:not([data-theme]) #licenses > p { color: var(--muted); }
 :root:not([data-theme]) footer.over-wallpaper { background: #e7e0d4 !important; box-shadow: inset 0 1px 0 #c8bda9; }
@@ -810,8 +806,8 @@ html:not(.js) .mf-one::after { transform: scaleX(1); }
 :root[data-theme="light"] .frosted-cta:hover { background: #fff9ec; color: #302313; }
 :root[data-theme="light"] #scroll-down { background: rgba(255,255,255,.88); color: #5c4c35; box-shadow: inset 0 0 0 1px #b4a68f; }
 :root[data-theme="light"] #scroll-down:hover { background: #fff9ec; color: #302313; }
-:root[data-theme="light"] .content-surface .m3-card { box-shadow: 0 3px 10px rgba(53,44,29,.06); }
-:root[data-theme="light"] #about .m3-card { outline: 1px solid var(--border); outline-offset: -1px; }
+:root[data-theme="light"] .content-surface :is(.m3-card, .info-card) { box-shadow: 0 3px 10px rgba(53,44,29,.06); }
+:root[data-theme="light"] .info-card { outline: 1px solid var(--border); outline-offset: -1px; }
 :root[data-theme="light"] .content-surface .m3-card:hover { box-shadow: 0 4px 14px rgba(53,44,29,.12); border-color: #a68b5f; }
 :root[data-theme="light"] #licenses > p { color: var(--muted); }
 :root[data-theme="light"] footer.over-wallpaper { background: #e7e0d4 !important; box-shadow: inset 0 1px 0 #c8bda9; }
