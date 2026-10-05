@@ -539,11 +539,13 @@ html:not(.js) .mf-one::after { transform: scaleX(1); }
 
 /* ─── Portrait covers (lib/daily): a person instead of a landscape.
    Wide screens: the photo stands full-height on the right, below the
-   navbar, clear of the headline. Tall screens: it sits at the top,
-   centred, and the hero moves down beneath it. Its edges dissolve into
-   the page: ::before holds the photo, ::after paints the fade over the
-   same box in the page's own ground colour, so no frame or seam shows. ─── */
-:root[data-cover="portrait"] { --cover-tall-h: 40vh; }
+   navbar, clear of the headline. Tall screens: it runs edge to edge
+   across the top and the headline rises into its lower half, like a
+   magazine cover; a centred photo with every edge feathered read as a
+   framed memorial portrait. Its edges dissolve into the page: ::before
+   holds the photo, ::after paints the fade over the same box in the
+   page's own ground colour, so no frame or seam shows. ─── */
+:root[data-cover="portrait"] { --cover-tall-h: 56svh; }
 :root[data-cover="portrait"] #bg-wallpaper {
   --fade: var(--cover-ground, #0a0a0a);
   background-color: var(--fade);
@@ -579,25 +581,28 @@ html:not(.js) .mf-one::after { transform: scaleX(1); }
 @media (max-aspect-ratio: 1 / 1) {
   :root[data-cover="portrait"] #bg-wallpaper::before,
   :root[data-cover="portrait"] #bg-wallpaper::after {
-    right: auto; left: 50%; transform: translateX(-50%);
+    left: 0; right: 0; width: 100%; aspect-ratio: auto;
     height: var(--cover-tall-h);
   }
+  :root[data-cover="portrait"] #bg-wallpaper::before {
+    background-position: center 18%;
+    clip-path: none;
+  }
   :root[data-cover="portrait"] #bg-wallpaper::after {
-    background:
-      linear-gradient(to bottom, var(--fade) 1%, transparent 11%, transparent 55%, var(--fade) 99%),
-      linear-gradient(to right, var(--fade) 2%, transparent 24%, transparent 76%, var(--fade) 98%);
+    background: linear-gradient(to bottom,
+      var(--fade) 0%, transparent 9%, transparent 42%, var(--fade) 100%);
   }
   :root[data-cover="portrait"] #bg-overlay {
-    background: linear-gradient(180deg, rgba(0,0,0,.12) 0%, rgba(0,0,0,.22) 40%, rgba(0,0,0,.6) 100%);
+    background: linear-gradient(180deg, rgba(0,0,0,0) 0%, rgba(0,0,0,.1) 35%, rgba(0,0,0,.55) 70%, rgba(0,0,0,.6) 100%);
   }
   :root[data-cover="portrait"][data-theme="light"] #bg-overlay {
     background: linear-gradient(180deg,
-      rgba(242,236,225,.05) 0%, rgba(242,236,225,.2) 30%,
-      rgba(242,236,225,.92) calc(4rem + var(--cover-tall-h)), rgba(242,236,225,.96) 100%);
+      rgba(242,236,225,0) 0%, rgba(242,236,225,.08) 35%,
+      rgba(242,236,225,.85) calc(4rem + var(--cover-tall-h)), rgba(242,236,225,.96) 100%);
   }
   :root[data-cover="portrait"] main {
     justify-content: flex-start;
-    padding-top: calc(3rem + var(--cover-tall-h));
+    padding-top: calc(var(--cover-tall-h) - 4.5rem);
     padding-bottom: 10rem;
   }
 }
