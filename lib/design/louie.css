@@ -607,6 +607,75 @@ html:not(.js) .mf-one::after { transform: scaleX(1); }
   }
 }
 
+/* ─── Party days (the birthday template in lib/daily/daily.js): a warm
+   night sky, or a bright morning in light, with fireworks from party.js
+   on #party-sky and a rainbow on the headline's last word. ─── */
+#party-sky {
+  position: fixed; top: 0; left: 0;
+  width: 100%; height: 100vh; height: 100lvh;
+  z-index: 0; pointer-events: none;
+}
+:root[data-party]:not([data-theme="light"]) #bg-wallpaper { --fade: #1c1230; }
+/* No photo of their own: a plain festive sky instead of the landscape. */
+:root[data-party]:not([data-cover]) { --cover-dark: none; --cover-light: none; }
+:root[data-party]:not([data-cover]) #bg-wallpaper { background-color: #1c1230; }
+:root[data-party][data-theme="light"]:not([data-cover]) #bg-wallpaper { background-color: #faf4ea; }
+:root[data-party] {
+  --one-glow: rgba(255, 120, 170, .32);
+  --party-paint: linear-gradient(90deg,
+    #ff5d73, #fb923c, #ffd166, #4ade80, #38bdf8, #a78bfa, #f472b6, #ff5d73);
+}
+:root[data-party][data-theme="light"] {
+  --one-glow: rgba(244, 114, 182, .22);
+  --party-paint: linear-gradient(90deg,
+    #e11d48, #ea580c, #ca8a04, #16a34a, #0284c7, #7c3aed, #db2777, #e11d48);
+}
+:root[data-party] #bg-overlay {
+  background:
+    radial-gradient(55% 45% at 10% 20%, rgba(255, 93, 115, .20), transparent 70%),
+    radial-gradient(45% 40% at 88% 8%, rgba(255, 209, 102, .16), transparent 70%),
+    radial-gradient(70% 55% at 45% 105%, rgba(167, 139, 250, .26), transparent 70%),
+    linear-gradient(90deg, rgba(28, 18, 48, .55) 0%, rgba(28, 18, 48, .25) 50%, rgba(28, 18, 48, 0) 80%);
+}
+:root[data-party][data-theme="light"] #bg-overlay {
+  background:
+    radial-gradient(50% 40% at 8% 14%, rgba(244, 114, 182, .16), transparent 70%),
+    radial-gradient(45% 40% at 90% 6%, rgba(250, 204, 21, .18), transparent 70%),
+    linear-gradient(90deg, rgba(250, 244, 234, .94) 0%, rgba(250, 244, 234, .78) 45%, rgba(250, 244, 234, 0) 75%);
+}
+@media (max-aspect-ratio: 1 / 1) {
+  :root[data-party] #bg-overlay {
+    background:
+      radial-gradient(60% 40% at 15% 85%, rgba(255, 93, 115, .18), transparent 70%),
+      radial-gradient(60% 40% at 90% 95%, rgba(167, 139, 250, .22), transparent 70%),
+      linear-gradient(180deg, rgba(28, 18, 48, 0) 35%, rgba(28, 18, 48, .45) 70%, rgba(28, 18, 48, .6) 100%);
+  }
+  :root[data-party][data-theme="light"] #bg-overlay {
+    background:
+      radial-gradient(60% 40% at 15% 85%, rgba(244, 114, 182, .14), transparent 70%),
+      linear-gradient(180deg,
+        rgba(250, 244, 234, 0) 0%, rgba(250, 244, 234, .1) 35%,
+        rgba(250, 244, 234, .86) calc(4rem + var(--cover-tall-h)), rgba(250, 244, 234, .96) 100%);
+  }
+}
+/* The headline waits for daily.js to write the day's words into it. */
+:root[data-party] .hero-title:not(.is-set) { visibility: hidden; }
+/* Two lines everywhere: "Happy Birthday" / "to Me." */
+:root[data-party] .hero-title { font-size: min(3rem, calc((100vw - 3rem) / 8.8)); }
+:root[data-party] .ht-br { display: inline; }
+@media (min-width: 640px) { :root[data-party] .hero-title { font-size: 4rem; } }
+@media (min-width: 1280px) { :root[data-party] .hero-title { font-size: 4.75rem; } }
+:root[data-party] .hero-one {
+  background-image: var(--party-paint);
+  background-size: 200% 100%;
+  background-repeat: repeat;
+  animation: party-shine 5s linear infinite;
+}
+@keyframes party-shine { to { background-position: 200% 50%; } }
+@media (prefers-reduced-motion: reduce) {
+  :root[data-party] .hero-one { animation: none; }
+}
+
 /* ─── Daily theme picker (lib/daily/picker.js): a Doodle-style archive
    of every themed day, opened from the hero's "每日主题" button. ─── */
 .dp-lock, .dp-lock body { overflow: hidden; }
