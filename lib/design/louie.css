@@ -964,14 +964,22 @@ html:not(.js) .mf-one::after { transform: scaleX(1); }
   #nav-links { display: none !important; }
   #menu-btn { display: inline-flex !important; }
 }
-@media (max-width: 480px) {
-  #navbar { padding-inline: 8px; }
-  #brand-dropdown-btn { padding-inline: 6px; font-size: 16px; }
+/* Phones keep the brand exactly as the blog shows it (18px, its own
+   padding and tracking); room for the icons comes from the margins,
+   the brand's unseen right padding and the gaps, narrowest last. */
+@media (max-width: 413px) {
+  #navbar { padding-inline: 16px 12px; }
+  #brand-dropdown-btn { padding-right: 6px; }
+}
+@media (max-width: 374px) {
+  #navbar { padding-inline: 12px 8px; }
+  #brand-dropdown-icon { margin-left: 4px; }
+  .nav-right { gap: 0 !important; }
 }
 @media (max-width: 359px) {
-  #brand-dropdown-btn { letter-spacing: 0; }
+  #navbar { padding-inline: 8px; }
+  #brand-dropdown-btn { padding-inline: 6px; font-size: 16px; letter-spacing: 0; }
   #brand-dropdown-icon { margin-left: 2px; }
-  .nav-right { gap: 0 !important; }
 }
 
 /* Give the frequent mobile actions full touch targets; GitHub lives in the menu. */
