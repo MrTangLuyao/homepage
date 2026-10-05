@@ -667,6 +667,7 @@
 
     function toggleLanguage() {
       currentLang = currentLang === 'zh' ? 'en' : 'zh';
+      try { localStorage.setItem('louie-lang', currentLang); } catch (e) {}
       applyLanguage();
     }
 
@@ -807,6 +808,10 @@
     }
 
     currentLang = (navigator.language || navigator.userLanguage).toLowerCase().startsWith('zh') ? 'zh' : 'en';
+    try {                       // a language picked by hand here or on the homepage
+      const saved = localStorage.getItem('louie-lang');
+      if (saved === 'zh' || saved === 'en') currentLang = saved;
+    } catch (e) {}
     applyLanguage();
     runBootSequence();
   </script>

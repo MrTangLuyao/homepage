@@ -528,7 +528,13 @@
       }
     };
 
+    // A language picked by hand is kept (same key as the blog and the search
+    // overlay), so it survives reloads such as opening a day from the picker.
     let currentLang = navigator.language.toLowerCase().includes('zh') ? 'zh' : 'en';
+    try {
+      const saved = localStorage.getItem('louie-lang');
+      if (saved === 'zh' || saved === 'en') currentLang = saved;
+    } catch (e) { /* no storage: follow the browser */ }
 
     function applyLang(lang) {
       const t = translations[lang];
@@ -551,6 +557,7 @@
 
     function toggleLang() {
       currentLang = currentLang === 'zh' ? 'en' : 'zh';
+      try { localStorage.setItem('louie-lang', currentLang); } catch (e) {}
       applyLang(currentLang);
       if (window.LouieSearch) LouieSearch.setLang(currentLang);
     }
