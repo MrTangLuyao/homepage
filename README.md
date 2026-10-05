@@ -30,7 +30,7 @@
 
 ### 生日模板
 
-生日是一个固定模板：首屏用网站自己的暖色（深色是炭灰配珊瑚色光晕，浅色是奶油色配蜜桃色光晕）、在人物身后放烟花（`lib/daily/party.js`），大标题是 “Happy Birthday, 名字.”，自己的生日写 `me: true` 就是 “Happy Birthday to Me.”。给某人加一个生日只要两步：
+生日是一个固定模板：首屏用网站自己的暖色（深色是炭灰配珊瑚色光晕，浅色是奶油色配蜜桃色光晕）、在人物身后放像素风烟花（`lib/daily/party.js`），大标题是 “Happy Birthday, 名字.”，自己的生日写 `me: true` 就是 “Happy Birthday to Me.”。给某人加一个生日只要两步：
 
 1. 新建 `lib/daily/<名字>/theme.js`：
 
@@ -86,7 +86,7 @@ On ordinary days the homepage is the original hero plus the manifesto; about one
 
 ### Birthday template
 
-Birthdays use a fixed template: a cheerful hero in the site's own warm colours (charcoal with a coral glow in dark, cream with a peach glow in light) with fireworks behind the person (`lib/daily/party.js`) and "Happy Birthday, <name>." as the headline, or "Happy Birthday to Me." with `me: true`. Adding someone's birthday takes two steps:
+Birthdays use a fixed template: a cheerful hero in the site's own warm colours (charcoal with a coral glow in dark, cream with a peach glow in light) with pixel-art fireworks behind the person (`lib/daily/party.js`) and "Happy Birthday, <name>." as the headline, or "Happy Birthday to Me." with `me: true`. Adding someone's birthday takes two steps:
 
 1. Create `lib/daily/<name>/theme.js`:
 
