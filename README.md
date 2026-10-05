@@ -30,15 +30,17 @@
 
 ### 生日模板
 
-生日是一个固定模板：首屏换成欢快的配色、放烟花（`lib/daily/party.js`），大标题是 “Happy Birthday, 名字.”，自己的生日写 `me: true` 就是 “Happy Birthday to Me.”。给某人加一个生日只要两步：
+生日是一个固定模板：首屏用网站自己的暖色（深色是炭灰配珊瑚色光晕，浅色是奶油色配蜜桃色光晕）、在人物身后放烟花（`lib/daily/party.js`），大标题是 “Happy Birthday, 名字.”，自己的生日写 `me: true` 就是 “Happy Birthday to Me.”。给某人加一个生日只要两步：
 
 1. 新建 `lib/daily/<名字>/theme.js`：
 
    ```js
    LouieDaily.birthday({
      name: 'Cohen',
-     // 可选：有照片就放 portrait.jpg 和 thumb.jpg，再写上 cover 和 credit
+     // 可选：有照片就放 portrait.jpg 和 thumb.jpg，再写上 cover 和 credit；
+     // 去掉背景的透明抠图（像 Louie 的头像）用 figure，会直接站在页面上
      // cover: { portrait: 'portrait.jpg', ratio: 4 / 5 },
+     // cover: { figure: 'figure.webp', ratio: 宽 / 高 },
      // credit: { zh: '今日封面：Cohen 的照片。', en: 'Today’s cover: a photo of Cohen.' }
    });
    ```
@@ -83,15 +85,17 @@ On ordinary days the homepage is the original hero plus the manifesto; about one
 
 ### Birthday template
 
-Birthdays use a fixed template: a cheerful hero with fireworks (`lib/daily/party.js`) and "Happy Birthday, <name>." as the headline, or "Happy Birthday to Me." with `me: true`. Adding someone's birthday takes two steps:
+Birthdays use a fixed template: a cheerful hero in the site's own warm colours (charcoal with a coral glow in dark, cream with a peach glow in light) with fireworks behind the person (`lib/daily/party.js`) and "Happy Birthday, <name>." as the headline, or "Happy Birthday to Me." with `me: true`. Adding someone's birthday takes two steps:
 
 1. Create `lib/daily/<name>/theme.js`:
 
    ```js
    LouieDaily.birthday({
      name: 'Cohen',
-     // optional: with a photo, add portrait.jpg and thumb.jpg, then cover and credit
+     // optional: with a photo, add portrait.jpg and thumb.jpg, then cover and credit;
+     // a transparent cut-out (like Louie's avatar) uses figure and stands on the page as is
      // cover: { portrait: 'portrait.jpg', ratio: 4 / 5 },
+     // cover: { figure: 'figure.webp', ratio: width / height },
      // credit: { zh: '今日封面：Cohen 的照片。', en: 'Today’s cover: a photo of Cohen.' }
    });
    ```
