@@ -608,31 +608,24 @@ html:not(.js) .mf-one::after { transform: scaleX(1); }
 }
 
 /* ─── Party days (the birthday template in lib/daily/daily.js). The
-   hero keeps the site's own ground and accent: warm charcoal with a
-   coral glow in dark, cream with a peach glow in light. Pixel-art
-   fireworks from party.js draw on #party-sky, between the ground and
-   the person.
+   hero keeps the site's own ground and accent, flat and without any
+   glow: warm charcoal in dark, cream in light. Pixel-art fireworks
+   from party.js draw on #party-sky, between the ground and the person.
 
    A figure cover ({ figure, ratio }) is a cut-out with no background
    of its own: it stands on the page as is, right of the headline on
    wide screens and above it on tall ones, with only its lower edge
-   fading out. Its glow follows it through --fig-x / --fig-cy. ─── */
+   fading out. It is placed through --fig-x / --fig-cy / --fig-h. ─── */
 :root[data-party] {
   --party-ground: #1d1b1a;
-  --party-glow: rgba(217, 119, 87, .42);
-  --party-glow-2: rgba(255, 196, 120, .10);
   --party-paint: linear-gradient(90deg, #d97757, #ffb49d, #ffd27a, #ffb49d, #d97757);
-  --one-glow: rgba(217, 119, 87, .30);
   --fig-h: min(70vh, 640px);
   --fig-x: 76vw;
   --fig-cy: calc(50vh + 2rem);
 }
 :root[data-party][data-theme="light"] {
   --party-ground: #f4eee4;
-  --party-glow: rgba(236, 150, 92, .30);
-  --party-glow-2: rgba(240, 190, 80, .16);
   --party-paint: linear-gradient(90deg, #b4552d, #d9822b, #e3a83b, #d9822b, #b4552d);
-  --one-glow: rgba(225, 160, 79, .22);
 }
 #party-sky {
   position: fixed; top: 0; left: 0;
@@ -642,14 +635,9 @@ html:not(.js) .mf-one::after { transform: scaleX(1); }
   image-rendering: pixelated;
 }
 
-/* The ground and its glow; the landscape is set aside for the day. */
+/* A plain ground; the landscape is set aside for the day. */
 :root[data-party]:not([data-cover="portrait"]) { --cover-dark: none; --cover-light: none; }
-:root[data-party]:not([data-cover="portrait"]) #bg-wallpaper {
-  background:
-    radial-gradient(circle at var(--fig-x) calc(var(--fig-cy) - var(--fig-h) * .12), var(--party-glow), transparent calc(var(--fig-h) * .7)),
-    radial-gradient(60% 50% at 12% 10%, var(--party-glow-2), transparent 70%),
-    var(--party-ground);
-}
+:root[data-party]:not([data-cover="portrait"]) #bg-wallpaper { background: var(--party-ground); }
 :root[data-party]:not([data-cover="portrait"]) #bg-overlay { background: none; }
 :root[data-party]:not([data-cover="portrait"]) #nav-bg-strip { background: var(--party-ground); }
 :root[data-party][data-cover="portrait"]:not([data-theme="light"]) #bg-wallpaper { --fade: var(--party-ground); }
@@ -692,7 +680,8 @@ html:not(.js) .mf-one::after { transform: scaleX(1); }
   }
 }
 
-/* "Happy Birthday" / "to Me." — always two lines. */
+/* "Happy Birthday" / "to Me." — always two lines, no halo behind "Me.". */
+:root[data-party] .ht-one::before { content: none; }
 :root[data-party] .hero-title:not(.is-set) { visibility: hidden; }
 :root[data-party] .hero-title { font-size: min(3rem, calc((100vw - 3rem) / 8.8)); }
 :root[data-party] .ht-br { display: inline; }
