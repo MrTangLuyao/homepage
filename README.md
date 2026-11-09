@@ -16,12 +16,12 @@
 .
 ├── index.html, 95.html   ← 入口页面
 ├── lib/
-│   ├── design/      ← louie.css（主页的全部样式和颜色变量）、theme.js（浅色 / 深色）、字体（smiley/ 得意黑、fonts_chunks/ 鸿蒙、JetBrains Mono）；95 页用的 Tailwind
+│   ├── design/      ← louie.css（主页的全部样式和颜色变量）、theme.js（浅色 / 深色）、scrollbar.js（滚动条）、字体（smiley/ 得意黑、fonts_chunks/ 鸿蒙、JetBrains Mono）；95 页用的 Tailwind
 │   ├── daily/       ← 生日：daily.js（日历）、party.js（像素烟花）+ 每人一个文件夹
 │   ├── search/      ← ⌘K 搜索 SDK（其他 louie.* 站点也在用）
 │   ├── icons/       ← Lucide 图标
 │   ├── runtime/     ← 第三方 JS（luxon，95 页用）
-│   └── resources/   ← 头像 po.webp（主页右侧和网站图标）
+│   └── resources/   ← 头像：po.svg（主页右侧的像素图）、po.webp（网站图标和分享图）
 ├── search/          ← 搜索的额外条目和接入说明
 ├── robots.txt, sitemap.xml
 └── README.md
@@ -82,12 +82,12 @@ Source code for my personal homepage.
 .
 ├── index.html, 95.html   ← entry points
 ├── lib/
-│   ├── design/      ← louie.css (all homepage styles and colour tokens), theme.js (light / dark), fonts (smiley/ Smiley Sans, fonts_chunks/ HarmonyOS Sans, JetBrains Mono); Tailwind for the 95 page
+│   ├── design/      ← louie.css (all homepage styles and colour tokens), theme.js (light / dark), scrollbar.js (the scrollbar), fonts (smiley/ Smiley Sans, fonts_chunks/ HarmonyOS Sans, JetBrains Mono); Tailwind for the 95 page
 │   ├── daily/       ← birthdays: daily.js (calendar), party.js (pixel fireworks) + one folder per person
 │   ├── search/      ← the ⌘K search SDK (also used by the other louie.* sites)
 │   ├── icons/       ← Lucide icons
 │   ├── runtime/     ← third-party JS (luxon, for the 95 page)
-│   └── resources/   ← avatar po.webp (the hero's right side and the favicon)
+│   └── resources/   ← avatar: po.svg (the pixel art on the hero) and po.webp (favicon and share image)
 ├── search/          ← extra search entries and how to embed the search
 ├── robots.txt, sitemap.xml
 └── README.md

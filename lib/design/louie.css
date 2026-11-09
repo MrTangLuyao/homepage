@@ -79,7 +79,7 @@
 
   --canvas: #FFFFFF;
   --surface: #FFFFFF;
-  --well: #F4F5F8;
+  --well: #E7E9EE;              /* a shade under the cards, so their light shows */
   --hover: #F4F5F8;
   --surface-high: #F4F5F8;
   --stage: #F4F5F8;
@@ -115,6 +115,17 @@
   /* "Hi, I'm" a shade softer than full ink, so the rolling word leads. */
   --hero-ink: rgba(14, 26, 43, .86);
 
+  --avatar-ground: #FEF7EC;     /* the drawing's own cream */
+
+  /* The list cards: a faint frosted skin (see Panels and rows), lit
+     from the left. The light, not an outline, gives the card its shape:
+     white at the left edge, easing off to a thin veil on the right. */
+  --card-bg: rgba(255, 255, 255, .38);
+  --card-sheen: linear-gradient(90deg, rgba(255, 255, 255, .95), rgba(255, 255, 255, .75) 18%, rgba(255, 255, 255, .4) 45%, rgba(255, 255, 255, .1) 75%, rgba(255, 255, 255, 0));
+  --card-grain: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='200' height='200'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='2.4' numOctaves='2' stitchTiles='stitch'/%3E%3CfeColorMatrix values='0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 .035 0 0 0 0'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+  --card-shadow: none;
+  --row-hover: rgba(14, 26, 43, .045);
+
   --tone-0: #2F5D4F;
   --tone-1: #8C6410;
   --tone-2: #9E4A30;
@@ -134,6 +145,10 @@
   --header-shadow: 0 1px 0 rgba(14, 26, 43, .06), 0 2px 6px rgba(14, 26, 43, .05);
   --menu-shadow: 0 8px 24px rgba(14, 26, 43, .16);
   --ripple: rgba(14, 26, 43, .08);
+  /* The scrollbar's thumb: the blog button's grey, fainter at rest. */
+  --scroll-thumb: rgba(97, 107, 128, .45);
+  --scroll-thumb-hover: rgba(97, 107, 128, .65);
+  --scroll-thumb-active: rgba(97, 107, 128, .8);
 
   /* Latin first (it claims no Han), then Han, then the full-width
      punctuation; system monospace and Chinese fonts stand in until the
@@ -204,6 +219,14 @@
 
   --hero-ink: rgba(230, 235, 242, .86);
 
+  --avatar-ground: #FEF7EC;
+
+  --card-bg: rgba(230, 235, 242, .04);
+  --card-sheen: linear-gradient(90deg, rgba(230, 235, 242, .035), rgba(230, 235, 242, 0) 45%);
+  --card-grain: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='200' height='200'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='2.4' numOctaves='2' stitchTiles='stitch'/%3E%3CfeColorMatrix values='0 0 0 0 1 0 0 0 0 1 0 0 0 0 1 .03 0 0 0 0'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+  --card-shadow: inset 1px 0 0 rgba(230, 235, 242, .05);
+  --row-hover: rgba(230, 235, 242, .055);
+
   --tone-0: #6FA593;
   --tone-1: #D6AA55;
   --tone-2: #E2896C;
@@ -221,6 +244,9 @@
   --header-shadow: 0 1px 0 rgba(230, 235, 242, .06), 0 2px 6px rgba(0, 0, 0, .30);
   --menu-shadow: 0 8px 24px rgba(0, 0, 0, .4);
   --ripple: rgba(230, 235, 242, .10);
+  --scroll-thumb: rgba(155, 165, 181, .35);
+  --scroll-thumb-hover: rgba(155, 165, 181, .55);
+  --scroll-thumb-active: rgba(155, 165, 181, .7);
 }
 
 @media (min-width: 640px) {
@@ -587,20 +613,33 @@ img, svg { display: block; flex-shrink: 0; }
 /* The portrait: Louie's avatar in a circle, the way GitHub frames one,
    with a hairline to hold the edge on white. Phones give it the right
    half of the column, above the headline. */
+/* The avatar is pixel art redrawn as an SVG (lib/resources/po.svg, a
+   44 by 45 grid, six colours, transparent), so it stays crisp at any
+   size and the circle behind it can follow the theme. */
 .portrait {
   grid-column: 7 / -1; grid-row: 1;
   position: relative;
+  aspect-ratio: 1;
   border-radius: 50%; overflow: hidden;
-  background: #FEF7EC;          /* the drawing's own cream ground */
+  background: var(--avatar-ground);
 }
-/* Framed as a bust: the drawing moves down 6%, so the hair keeps a
-   margin inside the circle all round, the face sits on its middle, and
-   the shirt's flat bottom edge falls just below the circle. */
+/* Framed as a bust: the drawing sits 6% low plus one of its 45 pixel
+   rows, so the hair keeps a margin inside the circle all round and the
+   shirt's flat bottom edge falls below it; and a quarter of one of its
+   pixels to the right. It fills the square by height, so one pixel is
+   1/45 of the box either way. */
 .portrait img {
-  width: 100%; height: auto;
-  transform: translateY(6%);
+  width: 100%; height: 100%;
+  object-fit: contain;
+  transform: translate(calc(25% / 45), calc(6% + 100% / 45));
 }
-:root[data-theme="dark"] .portrait { filter: brightness(.86); }
+/* The circle is a button: a click reloads the page. */
+button.portrait {
+  display: block; width: 100%;
+  margin: 0; padding: 0; border: 0;
+  cursor: pointer;
+}
+button.portrait:focus-visible { box-shadow: var(--focus); }
 .portrait::after {
   content: ""; position: absolute; inset: 0;
   border: 1px solid var(--border); border-radius: 50%;
@@ -725,25 +764,34 @@ img, svg { display: block; flex-shrink: 0; }
 /* Chinese breaks only at its comma here, never mid-phrase. */
 .lead:lang(zh) { line-height: 1.6; word-break: keep-all; overflow-wrap: anywhere; }
 
-/* ─── Panels and rows ─── */
+/* ─── Panels and rows ───
+   Each list is one card with a faint frosted skin: no real blur (there
+   is nothing behind it to blur), only a very fine grain, a soft sheen
+   from the left and a bright left edge, light falling across it from
+   the side, so it reads as matte translucent plastic. Inside, the rows carry no lines; the one under the pointer
+   lifts as a rounded tint. */
 .panel {
-  background: var(--surface);
-  border: 1px solid var(--border); border-radius: var(--r-m);
+  border-radius: var(--r-l);
+  padding: 4px;
+  background-color: var(--card-bg);
+  background-image: var(--card-sheen), var(--card-grain);
+  background-size: 100% 100%, 200px 200px;
+  box-shadow: var(--card-shadow);
   overflow: hidden;
 }
-.rows > li + li { border-top: 1px solid var(--border); }
 /* Icon and arrow sit on the name's line, so a row that runs to two
    lines (a licence, a wrapped description) still reads from its top. */
 .row {
   display: flex; align-items: flex-start; gap: 12px;
-  min-height: 48px; padding: 12px 20px;
+  min-height: 48px; padding: 12px 16px;
+  border-radius: 10px;
   color: var(--text);
   cursor: pointer;
   transition: background-color .15s ease;
 }
-.row:active { background: var(--hover); }
+.row:active { background: var(--row-hover); }
 @media (hover: hover) {
-  .row:hover { background: var(--hover); }
+  .row:hover { background: var(--row-hover); }
 }
 .row:focus-visible { box-shadow: var(--focus-inset); outline-offset: -2px; }
 .row-icon { color: var(--muted); margin-top: calc((var(--lh) * 14px - 20px) / 2); }
@@ -829,23 +877,53 @@ img, svg { display: block; flex-shrink: 0; }
   color: var(--muted);
 }
 .footer-desc:lang(zh) { word-break: keep-all; overflow-wrap: anywhere; }
+/* Small print on the band: muted, not subtle, so it keeps 4.5:1 there. */
 .footer-credit {
   margin-top: 24px;
   font-size: var(--t-small); line-height: 1.5;
-  color: var(--subtle);
+  color: var(--muted);
 }
 .footer-copy {
   margin-top: 48px;
   font-size: var(--t-small); line-height: 1.5;
-  color: var(--subtle);
+  color: var(--muted);
 }
 .footer-credit:not([hidden]) + .footer-copy { margin-top: 4px; }
+
+/* ─── Scrollbar ─── */
+/* scrollbar.js draws the page's own bar on mouse and trackpad screens and
+   only then hides the native one, so the grey band runs to the edge. The
+   bar starts under the sticky header and floats over the page: a slim
+   pill in the blog button's grey, shown while scrolling or when the
+   pointer comes near, a touch wider under the pointer. */
+html.has-scrollbar { scrollbar-width: none; }
+html.has-scrollbar::-webkit-scrollbar { display: none; }
+.scrollbar { display: none; }
+html.has-scrollbar .scrollbar {
+  display: block;
+  position: fixed; top: var(--nav-h); right: 0; bottom: 0; z-index: 90;
+  width: 14px;
+  opacity: 0;
+  transition: opacity .4s ease;
+}
+html.has-scrollbar .scrollbar.is-shown { opacity: 1; transition-duration: .15s; }
+html.has-scrollbar .scrollbar.is-idle { visibility: hidden; pointer-events: none; }
+.scrollbar-thumb {
+  position: absolute; top: 0; right: 3px;
+  width: 6px; border-radius: 999px;
+  background: var(--scroll-thumb);
+  transition: width .15s ease, background-color .15s ease;
+}
+.scrollbar:hover .scrollbar-thumb { width: 8px; background: var(--scroll-thumb-hover); }
+.scrollbar.is-dragging .scrollbar-thumb { width: 8px; background: var(--scroll-thumb-active); }
+@media print { .scrollbar { display: none !important; } }
 
 /* ─── Reduced motion: everything simply appears. ─── */
 @media (prefers-reduced-motion: reduce) {
   html { scroll-behavior: auto; }
   .ripple { display: none; }
   .dropdown, .mobile-menu, .brand-btn .chevron, .site-header,
-  .btn, .ghost, .dd-item, .mm-item, .row { transition: none; }
+  .btn, .ghost, .dd-item, .mm-item, .row,
+  html.has-scrollbar .scrollbar, .scrollbar-thumb { transition: none; }
   :root[data-sprite] .stage-figure { animation: none; }
 }

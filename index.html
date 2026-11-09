@@ -32,6 +32,7 @@
   <!-- On a birthday, loads that day's folder before first paint. -->
   <script src="lib/daily/daily.js"></script>
   <link rel="stylesheet" href="lib/design/louie.css">
+  <script defer src="lib/design/scrollbar.js"></script>
   <script defer src="lib/search/louie-search.js"></script>
 
   <!-- ─── Structured data (Person + WebSite) ─── -->
@@ -150,11 +151,11 @@
             <span id="daily-note-text"></span>
           </p>
         </div>
-        <!-- Every day but a birthday: the avatar (also the favicon, so
-             it is already on its way). -->
-        <div class="portrait">
-          <img src="lib/resources/po.webp" width="1024" height="1024" alt="Louie 的头像" data-i18n-alt="hero-avatar-alt" decoding="async">
-        </div>
+        <!-- Every day but a birthday: the avatar; a click reloads the
+             page. -->
+        <button type="button" class="portrait ripple-surface" data-i18n-label="avatar-reload" title="刷新页面" aria-label="刷新页面" onclick="location.reload()">
+          <img src="lib/resources/po.svg" width="44" height="45" alt="Louie 的头像" data-i18n-alt="hero-avatar-alt" decoding="async">
+        </button>
         <!-- Birthdays: the animated avatar takes its place, with party.js
              fireworks behind it. -->
         <div class="stage" id="party-stage" aria-hidden="true">
@@ -511,6 +512,7 @@
       zh: {
         'hero-blog-btn': '我的博客',
         'hero-avatar-alt': 'Louie 的头像',
+        'avatar-reload': '刷新页面',
         'section-about': 'About',
         'section-projects': 'Projects',
         'section-social': 'Social',
@@ -533,6 +535,7 @@
       en: {
         'hero-blog-btn': 'Blog',
         'hero-avatar-alt': 'Louie’s avatar',
+        'avatar-reload': 'Reload the page',
         'section-about': 'About',
         'section-projects': 'Projects',
         'section-social': 'Social',
@@ -571,6 +574,10 @@
       document.querySelectorAll('[data-i18n-html]').forEach(el => {
         const key = el.getAttribute('data-i18n-html');
         if (t[key]) el.innerHTML = t[key];
+      });
+      document.querySelectorAll('[data-i18n-label]').forEach(el => {
+        const key = el.getAttribute('data-i18n-label');
+        if (t[key]) { el.title = t[key]; el.setAttribute('aria-label', t[key]); }
       });
       document.querySelectorAll('[data-i18n-alt]').forEach(el => {
         const key = el.getAttribute('data-i18n-alt');
