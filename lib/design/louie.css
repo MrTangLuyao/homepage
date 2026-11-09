@@ -25,8 +25,7 @@
      character the site shows, so a visit loads only that; the rest of
      the font follows in small files for text added before the next run.
      Its one weight, Medium, serves every weight asked for: Chinese is
-     never drawn bolder by the browser.
-   Noto Sans SC draws only its own "Aa" sample in the licences list. */
+     never drawn bolder by the browser. */
 @font-face {
   font-family: 'Smiley Sans';
   font-weight: 400; font-display: swap;
@@ -94,12 +93,6 @@
 @font-face { font-family: 'HarmonyOS Sans SC'; font-weight: 100 900; font-display: swap; src: url('harmony/9e00.woff2') format('woff2'); unicode-range: U+9E00-9ED0, U+9ED2-9FFF; }
 @font-face { font-family: 'HarmonyOS Sans SC'; font-weight: 100 900; font-display: swap; src: url('harmony/misc.woff2') format('woff2'); unicode-range: U+3000, U+3003, U+3005-301B, U+301D-301E, U+3021-3029, U+303E, U+F9F1, U+FA0E-FA0F, U+FA11, U+FA13-FA14, U+FA1F, U+FA21, U+FA23-FA24, U+FA27-FA29, U+FF01-FF07, U+FF0A-FF0B, U+FF0D-FF19, U+FF1B-FF60, U+FFE0-FFE6; }
 /* harmony:end */
-@font-face {
-  font-family: 'Noto Sans SC';
-  font-weight: 100 900; font-display: swap;
-  src: url('NotoSansSC-subset.woff2') format('woff2');
-  unicode-range: U+0041, U+0061, U+FF01, U+FF05, U+FF08-FF09, U+FF0C, U+FF1A-FF1B, U+FF1F, U+FF5E;
-}
 
 /* ─── Tokens ─── */
 :root {
@@ -178,13 +171,13 @@
   --scroll-thumb-hover: rgba(97, 107, 128, .65);
   --scroll-thumb-active: rgba(97, 107, 128, .8);
 
-  /* Latin first (it claims no Han), then Han, then the full-width
-     punctuation; system monospace and Chinese fonts stand in until the
-     files arrive. */
-  --font: 'JetBrains Mono', 'HarmonyOS Sans SC', 'Noto Sans SC', ui-monospace,
+  /* Latin first (it claims no Han), then Han and its punctuation;
+     system monospace and Chinese fonts stand in until the files
+     arrive. */
+  --font: 'JetBrains Mono', 'HarmonyOS Sans SC', ui-monospace,
     'Cascadia Mono', Consolas, 'SF Mono', Menlo, 'PingFang SC', 'Hiragino Sans GB',
     'Microsoft YaHei', monospace;
-  --font-display: 'Smiley Sans', 'JetBrains Mono', 'HarmonyOS Sans SC', 'Noto Sans SC',
+  --font-display: 'Smiley Sans', 'JetBrains Mono', 'HarmonyOS Sans SC',
     'PingFang SC', 'Microsoft YaHei', sans-serif;
 
   /* Type scale. Mono sets wide, so the text sizes sit a step below a
@@ -922,7 +915,6 @@ button.portrait:focus-visible { box-shadow: var(--focus); }
 .mark-jb { font-family: 'JetBrains Mono', monospace; font-weight: 400; letter-spacing: -.06em; }
 .mark-hm { font-family: 'HarmonyOS Sans SC', sans-serif; }
 .mark-smiley { font-family: 'Smiley Sans', sans-serif; font-size: 18px; }
-.mark-noto { font-family: 'Noto Sans SC', sans-serif; font-weight: 500; }
 
 /* ─── Footer ───
    As on the old homepage, What's next sits on a picture behind a
