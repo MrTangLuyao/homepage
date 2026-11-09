@@ -565,11 +565,24 @@ img, svg { display: block; flex-shrink: 0; }
   margin-top: 48px;
 }
 /* The hero's one call to action, a size up from the other buttons. */
+/* The hero's one call to action, after the Android Developers site: a
+   full pill, a size up from the other buttons, bold and flat. The
+   site's slate grey at 80%, so it sits lighter on the page; hovering
+   brings it to full strength. */
+.hero-actions .btn,
+.hero-actions .btn:focus-visible { border-radius: 999px; }
 .hero-actions .btn {
-  height: 40px; padding: 0 20px;
-  border-radius: 8px;
-  font-size: 14px;
+  height: 48px; padding: 0 28px;
+  font-size: 16px; font-weight: 700;
 }
+.hero-actions .btn-primary {
+  background: rgba(97, 107, 128, .8); color: #FFFFFF;
+  box-shadow: none;
+}
+@media (hover: hover) {
+  .hero-actions .btn-primary:hover { background: #616B80; }
+}
+.hero-actions .btn-primary:active { background: #525B6E; }
 
 /* The portrait: Louie's avatar in a circle, the way GitHub frames one,
    with a hairline to hold the edge on white. Phones give it the right
