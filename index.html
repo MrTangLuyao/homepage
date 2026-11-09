@@ -1,14 +1,14 @@
 <!DOCTYPE html>
-<html lang="zh-CN" class="scroll-smooth" data-theme="dark">
+<html lang="zh-CN">
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
   <title>Louie's Homepage</title>
 
   <!-- ─── SEO ─── -->
-  <meta name="description" content="Louie's personal site — developer, learner, AI enjoyer. Projects, a bilingual blog, and an interactive coding playground for SQL and Python.">
+  <meta name="description" content="Louie's personal site: developer, learner, AI enjoyer. Projects, a bilingual blog, and an interactive coding playground for SQL and Python.">
   <meta name="author" content="Louie">
-  <meta name="theme-color" content="#1f1f1e">
+  <meta name="theme-color" content="#FFFFFF">
   <link rel="canonical" href="https://louie1.com/">
 
   <!-- ─── Open Graph (Facebook / LinkedIn / WeChat / Slack / Discord) ─── -->
@@ -28,16 +28,10 @@
   <meta name="twitter:image" content="https://louie1.com/lib/resources/po.webp">
 
   <link rel="icon" href="lib/resources/po.webp">
-  <!-- Flag JS early so scroll-reveal lines start hidden without a flash. -->
-  <script>document.documentElement.classList.add('js');</script>
   <script src="lib/design/theme.js"></script>
-  <!-- Picks today's theme (if any) and loads its folder before first paint. -->
+  <!-- On a birthday, loads that day's folder before first paint. -->
   <script src="lib/daily/daily.js"></script>
-  <script defer src="lib/daily/picker.js"></script>
-  <link rel="stylesheet" href="lib/design/fonts.css">
   <link rel="stylesheet" href="lib/design/louie.css">
-  <script src="lib/design/tailwindcss.js"></script>
-  <script src="lib/design/tailwind.config.js"></script>
   <script defer src="lib/search/louie-search.js"></script>
 
   <!-- ─── Structured data (Person + WebSite) ─── -->
@@ -68,335 +62,363 @@
     ]
   }
   </script>
-  <style>
-    /* index-only: disable text selection on the homepage */
-    body { -webkit-user-select: none; user-select: none; }
-
-    /* ─── Nav extras (index has horizontal nav-link list + mobile menu button) ─── */
-    .nav-link {
-      position: relative; overflow: hidden;
-      display: inline-flex; align-items: center;
-      padding: 8px 12px; border-radius: 9999px;
-      font-size: 14px; font-weight: 500; color: var(--muted);
-      text-decoration: none;
-      transition: color 0.2s ease, background 0.2s ease,
-                  backdrop-filter 0.2s ease, -webkit-backdrop-filter 0.2s ease;
-    }
-    .nav-link:hover {
-      color: var(--text);
-      background: var(--nav-hover);
-      backdrop-filter: blur(14px);
-      -webkit-backdrop-filter: blur(14px);
-    }
-    .nav-divider { width: 1px; height: 24px; background: var(--border); margin: 0 4px; }
-    #menu-btn {
-      display: none; align-items: center; justify-content: center;
-      background: none; border: none; color: var(--text);
-      cursor: pointer; padding: 8px; border-radius: 9999px;
-      position: relative; overflow: hidden;
-      transition: background 0.2s ease;
-    }
-    #menu-btn:hover { background: var(--surface-high); }
-    @media (max-width: 767px) {
-      #nav-links { display: none !important; }
-      #menu-btn { display: inline-flex !important; }
-    }
-    #mobile-menu {
-      visibility: hidden; pointer-events: none;
-      transition: clip-path 0.3s cubic-bezier(0.4, 0, 0.2, 1), visibility 0s 0.3s;
-      clip-path: circle(0% at top right);
-    }
-    #mobile-menu.open {
-      visibility: visible; pointer-events: auto; transition-delay: 0s;
-      clip-path: circle(150% at top right);
-    }
-  </style>
 </head>
-<body class="antialiased min-h-screen">
+<body>
 
-  <!-- ─── Fixed wallpaper + dim layered beneath all content.
-       The wallpaper lives on its own position:fixed element instead of as a
-       body background, because iOS Safari renders `background-attachment:fixed`
-       at the image's natural size in the top-left and scrolls it with the page. -->
-  <div id="bg-wallpaper" aria-hidden="true"></div>
-  <div id="bg-overlay" aria-hidden="true"></div>
-  <!-- Wallpaper clipped to the navbar strip. Sits above .content-surface so
-       the frosted navbar can blur it even when the middle sections hide the
-       main wallpaper. Aligned to #bg-wallpaper so it overlaps invisibly when
-       the navbar is transparent over the hero. -->
-  <div id="nav-bg-strip" aria-hidden="true"></div>
-
-  <nav id="navbar">
-    <div class="nav-brand-wrap" id="brand-dropdown-container">
-      <button id="brand-dropdown-btn" class="ripple-surface" type="button">
-        <span class="b-static">louie</span><span class="b-dot">.</span><span class="b-page">home</span>
-        <svg id="brand-dropdown-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"></polyline></svg>
-      </button>
-      <div id="brand-dropdown-menu">
-        <a href="index.html" class="nav-dd-item nav-active ripple-surface"><span style="color:var(--text)">louie</span><span class="b-dot">.</span><span style="color:var(--accent);font-weight:600">home</span></a>
-        <a href="https://blog.louie1.com" class="nav-dd-item ripple-surface"><span style="color:var(--text)">louie</span><span class="b-dot">.</span><span style="color:var(--muted)">blog</span></a>
-        <a href="https://learn.louie1.com" class="nav-dd-item ripple-surface"><span style="color:var(--text)">louie</span><span class="b-dot">.</span><span style="color:var(--muted)">learn</span></a>
-        <a href="95.html" class="nav-dd-item ripple-surface"><span style="color:var(--text)">louie</span><span class="b-dot">.</span><span style="color:var(--muted)">95</span></a>
+  <header class="site-header" id="navbar">
+    <div class="nav container">
+      <div class="brand" id="brand-dropdown-container">
+        <button id="brand-dropdown-btn" class="ghost brand-btn ripple-surface" type="button" aria-expanded="false" aria-controls="brand-dropdown-menu">
+          <span class="wordmark"><span class="wm-name">louie</span><span class="wm-dot">.</span><span class="wm-page">home</span></span>
+          <!-- Lucide `chevron-down` (ISC) -->
+          <svg class="icon chevron" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m6 9 6 6 6-6"/></svg>
+        </button>
+        <div id="brand-dropdown-menu" class="dropdown">
+          <a href="index.html" class="dd-item ripple-surface" aria-current="page">home</a>
+          <a href="https://blog.louie1.com" class="dd-item ripple-surface">blog</a>
+          <a href="https://learn.louie1.com" class="dd-item ripple-surface">learn</a>
+          <a href="95.html" class="dd-item ripple-surface">95</a>
+        </div>
       </div>
-    </div>
-    <div class="nav-right">
-      <nav id="nav-links" style="display:flex; align-items:center; gap:4px; margin-right:4px;">
-        <a href="#about" class="nav-link ripple-surface">About</a>
-        <a href="#projects" class="nav-link ripple-surface">Projects</a>
-        <a href="#social" class="nav-link ripple-surface">Social</a>
-        <a href="#links" class="nav-link ripple-surface">Friends</a>
-        <a href="#licenses" class="nav-link ripple-surface">Licenses</a>
-        <div class="nav-divider"></div>
-      </nav>
-      <button id="search-btn" class="ripple-surface" type="button" onclick="LouieSearch.open()" aria-label="Search">
-        <!-- Lucide `search` (ISC) -->
-        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m21 21-4.34-4.34"/><circle cx="11" cy="11" r="8"/></svg>
-      </button>
-      <a id="github-btn" class="ripple-surface" href="https://github.com/MrTangLuyao/homepage" target="_blank" rel="noopener" aria-label="GitHub repository" title="GitHub">
-        <svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M12 .5C5.65.5.5 5.65.5 12c0 5.08 3.29 9.39 7.86 10.91.58.11.79-.25.79-.56 0-.27-.01-1-.02-1.97-3.2.69-3.87-1.54-3.87-1.54-.52-1.32-1.27-1.67-1.27-1.67-1.04-.71.08-.7.08-.7 1.15.08 1.76 1.18 1.76 1.18 1.02 1.75 2.69 1.24 3.34.95.1-.74.4-1.24.72-1.53-2.55-.29-5.23-1.27-5.23-5.66 0-1.25.45-2.27 1.18-3.07-.12-.29-.51-1.46.11-3.04 0 0 .96-.31 3.16 1.17.92-.25 1.91-.38 2.89-.38.98 0 1.97.13 2.89.38 2.2-1.48 3.16-1.17 3.16-1.17.62 1.58.23 2.75.11 3.04.74.8 1.18 1.82 1.18 3.07 0 4.4-2.69 5.36-5.25 5.65.41.35.78 1.04.78 2.1 0 1.52-.01 2.74-.01 3.11 0 .31.21.67.8.55C20.71 21.39 24 17.08 24 12 24 5.65 18.85.5 12 .5z"/></svg>
-      </a>
-      <div class="nav-divider"></div>
-      <button id="theme-btn" class="ripple-surface" type="button" aria-label="外观：跟随系统">
-          <svg class="theme-sun" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" aria-hidden="true"><circle cx="12" cy="12" r="4"/><path d="M12 2v2m0 16v2M2 12h2m16 0h2M5 5l1.5 1.5m11 11L19 19M5 19l1.5-1.5m11-11L19 5"/></svg>
-          <svg class="theme-moon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M20.5 13A8.5 8.5 0 0 1 11 3.5 8.5 8.5 0 1 0 20.5 13Z"/></svg>
+
+      <div class="nav-right">
+        <nav class="nav-links" id="nav-links" aria-label="Sections">
+          <a href="#about" class="ghost nav-link ripple-surface">About</a>
+          <a href="#projects" class="ghost nav-link ripple-surface">Projects</a>
+          <a href="#social" class="ghost nav-link ripple-surface">Social</a>
+          <a href="#links" class="ghost nav-link ripple-surface">Friends</a>
+          <a href="#licenses" class="ghost nav-link ripple-surface">Licenses</a>
+        </nav>
+        <span class="nav-divider" aria-hidden="true"></span>
+        <button id="search-btn" class="ghost icon-btn ripple-surface" type="button" onclick="window.LouieSearch && LouieSearch.open()" aria-label="Search">
+          <!-- Lucide `search` (ISC) -->
+          <svg class="icon" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m21 21-4.34-4.34"/><circle cx="11" cy="11" r="8"/></svg>
+        </button>
+        <a id="github-btn" class="ghost icon-btn ripple-surface" href="https://github.com/MrTangLuyao/homepage" target="_blank" rel="noopener" aria-label="GitHub repository" title="GitHub">
+          <!-- Lucide `github` (ISC) -->
+          <svg class="icon" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M15 22v-4a4.8 4.8 0 0 0-1-3.5c3 0 6-2 6-5.5.08-1.25-.27-2.48-1-3.5.28-1.15.28-2.35 0-3.5 0 0-1 0-3 1.5-2.64-.5-5.36-.5-8 0C6 2 5 2 5 2c-.3 1.15-.3 2.35 0 3.5A5.403 5.403 0 0 0 4 9c0 3.5 3 5.5 6 5.5-.39.49-.68 1.05-.85 1.65-.17.6-.22 1.23-.15 1.85v4"/><path d="M9 18c-4.51 2-5-2-7-2"/></svg>
+        </a>
+        <button id="theme-btn" class="ghost icon-btn ripple-surface" type="button" aria-label="外观">
+          <!-- Lucide `sun` and `moon` (ISC) -->
+          <svg class="icon theme-sun" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="4"/><path d="M12 2v2"/><path d="M12 20v2"/><path d="m4.93 4.93 1.41 1.41"/><path d="m17.66 17.66 1.41 1.41"/><path d="M2 12h2"/><path d="M20 12h2"/><path d="m6.34 17.66-1.41 1.41"/><path d="m19.07 4.93-1.41 1.41"/></svg>
+          <svg class="icon theme-moon" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 3a6 6 0 0 0 9 9 9 9 0 1 1-9-9Z"/></svg>
           <span class="theme-auto" aria-hidden="true">A</span>
         </button>
-      <button id="lang-toggle" class="ripple-surface" onclick="toggleLang()">
-        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="flex-shrink:0;"><path d="m5 8 6 6"/><path d="m4 14 6-6 2-3"/><path d="M2 5h12"/><path d="M7 2h1"/><path d="m22 22-5-10-5 10"/><path d="M14 18h6"/></svg>
-        <span id="lang-label">EN ⇄ 文</span>
-      </button>
-      <button id="menu-btn" class="ripple-surface" type="button" aria-label="Menu" aria-controls="mobile-menu" aria-expanded="false">
-        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="3" y1="12" x2="21" y2="12"></line><line x1="3" y1="6" x2="21" y2="6"></line><line x1="3" y1="18" x2="21" y2="18"></line></svg>
-      </button>
+        <button id="lang-toggle" class="ghost icon-btn ripple-surface" type="button" onclick="toggleLang()">
+          <!-- Lucide `languages` (ISC) -->
+          <svg class="icon" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m5 8 6 6"/><path d="m4 14 6-6 2-3"/><path d="M2 5h12"/><path d="M7 2h1"/><path d="m22 22-5-10-5 10"/><path d="M14 18h6"/></svg>
+          <span id="lang-label">EN ⇄ 文</span>
+        </button>
+        <button id="menu-btn" class="ghost icon-btn ripple-surface" type="button" aria-label="Menu" aria-controls="mobile-menu" aria-expanded="false">
+          <!-- Lucide `menu` (ISC) -->
+          <svg class="icon" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 12h16"/><path d="M4 18h16"/><path d="M4 6h16"/></svg>
+        </button>
+      </div>
     </div>
-  </nav>
 
-  <div id="mobile-menu" class="fixed top-16 left-0 w-full bg-m3-surfaceContainer border-b border-m3-outlineVariant z-[90] flex flex-col p-3 shadow-xl">
-    <a href="#about" class="ripple-surface nav-dd-item" style="border-radius:8px; color:var(--text);">About</a>
-    <a href="#projects" class="ripple-surface nav-dd-item" style="border-radius:8px; color:var(--text);">Projects</a>
-    <a href="#social" class="ripple-surface nav-dd-item" style="border-radius:8px; color:var(--text);">Social</a>
-    <a href="#links" class="ripple-surface nav-dd-item" style="border-radius:8px; color:var(--text);">Friends</a>
-    <a href="#licenses" class="ripple-surface nav-dd-item" style="border-radius:8px; color:var(--text);">Licenses</a>
-    <a id="mobile-github" href="https://github.com/MrTangLuyao/homepage" target="_blank" rel="noopener" class="ripple-surface nav-dd-item">
-      <span>GitHub</span>
-      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M7 17 17 7M7 7h10v10"/></svg>
-    </a>
-  </div>
-
-  <main class="pt-32 pb-20 px-6 max-w-4xl mx-auto flex flex-col items-start min-h-screen justify-center">
-    <!-- Default days: the original hero. -->
-    <p class="hero-default text-m3-primary font-bold tracking-widest uppercase mb-6 text-sm flex items-center gap-4 before:w-8 before:h-[2px] before:bg-m3-primary" style="cursor:pointer" onclick="LouieSearch.open()" data-i18n="hero-greeting">试试 ⌘ + K 搜索</p>
-    <h1 class="hero-default text-5xl md:text-7xl font-extrabold leading-tight text-m3-onSurface">
-      Hi, I'm <br/><span style="display:inline-block; overflow:hidden; line-height:1.2;"><span id="hero-roll-text" style="display:inline-block;">Louie</span></span>
-    </h1>
-    <!-- Themed days (lib/daily): "Be the One." -->
-    <h1 class="hero-themed hero-title">
-      <span class="ht-lead">Be the</span><br class="ht-br"> <span class="ht-one"><span class="ht-pre"></span><span class="hero-one">One</span><span class="one-dot">.</span></span>
-    </h1>
-    <p class="hero-themed hero-sub">by Louie.</p>
-    <div class="grid grid-cols-2 gap-4 mt-12 w-full max-w-xs">
-      <a href="https://blog.louie1.com" class="ripple-surface ripple-primary bg-m3-primary text-m3-onPrimary rounded-m3-full w-full px-5 py-3.5 flex items-center justify-center font-bold tracking-wide whitespace-nowrap shadow-sm hover:shadow-md transition-shadow">
-        <span data-i18n="hero-blog-btn">Blog</span>
+    <nav id="mobile-menu" class="mobile-menu" aria-label="Sections">
+      <a href="#about" class="mm-item ripple-surface">About</a>
+      <a href="#projects" class="mm-item ripple-surface">Projects</a>
+      <a href="#social" class="mm-item ripple-surface">Social</a>
+      <a href="#links" class="mm-item ripple-surface">Friends</a>
+      <a href="#licenses" class="mm-item ripple-surface">Licenses</a>
+      <div class="mm-sep" aria-hidden="true"></div>
+      <a id="mobile-github" href="https://github.com/MrTangLuyao/homepage" target="_blank" rel="noopener" class="mm-item ripple-surface">
+        <span>GitHub</span>
+        <!-- Lucide `arrow-up-right` (ISC) -->
+        <svg class="icon" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M7 7h10v10"/><path d="M7 17 17 7"/></svg>
       </a>
-      <!-- Opens the daily theme picker (lib/daily/picker.js). -->
-      <button type="button" id="daily-picker-btn" class="frosted-cta ripple-surface ripple-surface-variant rounded-m3-full w-full px-5 py-3.5 flex items-center justify-center font-bold tracking-wide whitespace-nowrap" aria-haspopup="dialog">
-        <span data-i18n="hero-themes-btn">特别主题</span>
-      </button>
-    </div>
-    <!-- Today's theme (lib/daily) leaves one quiet line here. -->
-    <p id="daily-note" class="daily-note"></p>
+    </nav>
+  </header>
 
-    <a id="scroll-down" class="ripple-surface" href="#manifesto" aria-label="Scroll to manifesto">
-      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><polyline points="6 9 12 15 18 9"></polyline></svg>
-    </a>
+  <main id="main">
+    <section class="hero container">
+      <div class="hero-grid grid">
+        <div class="hero-text">
+          <!-- Every day but a birthday. -->
+          <h1 class="hero-title hero-default" lang="en">Hi, I’m <span class="roll"><span id="hero-roll-text">Louie</span></span></h1>
+          <!-- Birthdays (lib/daily): daily.js writes the headline. -->
+          <h1 class="hero-title hero-birthday" id="birthday-title" lang="en"></h1>
+          <div class="hero-actions">
+            <a href="https://blog.louie1.com" class="btn btn-primary ripple-surface">
+              <span data-i18n="hero-blog-btn">我的博客</span>
+            </a>
+          </div>
+          <p class="birthday-note" id="daily-note">
+            <!-- Lucide `cake` (ISC) -->
+            <svg class="icon" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M20 21v-8a2 2 0 0 0-2-2H6a2 2 0 0 0-2 2v8"/><path d="M4 16s.5-1 2-1 2.5 2 4 2 2.5-2 4-2 2.5 2 4 2 2-1 2-1"/><path d="M2 21h20"/><path d="M7 8v3"/><path d="M12 8v3"/><path d="M17 8v3"/><path d="M7 4h.01"/><path d="M12 4h.01"/><path d="M17 4h.01"/></svg>
+            <span id="daily-note-text"></span>
+          </p>
+        </div>
+        <!-- Every day but a birthday: the avatar (also the favicon, so
+             it is already on its way). -->
+        <div class="portrait">
+          <img src="lib/resources/po.webp" width="1024" height="1024" alt="Louie 的头像" data-i18n-alt="hero-avatar-alt" decoding="async">
+        </div>
+        <!-- Birthdays: the animated avatar takes its place, with party.js
+             fireworks behind it. -->
+        <div class="stage" id="party-stage" aria-hidden="true">
+          <div class="stage-figure"></div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Everything below the hero shares one band, so the hero stands as
+         its own level above it. -->
+    <div class="sections band">
+      <div class="container">
+        <section id="about" class="section">
+          <div class="section-grid">
+            <h2 class="section-title" lang="en" data-i18n="section-about">About</h2>
+            <div class="section-body">
+              <p class="lead" data-i18n-html="about-text">来自武汉，现旅居颠倒世界墨尔本。</p>
+            </div>
+          </div>
+        </section>
+
+        <section id="projects" class="section">
+          <div class="section-grid">
+            <h2 class="section-title" lang="en" data-i18n="section-projects">Projects</h2>
+            <div class="section-body">
+              <ul class="panel rows projects">
+                <li>
+                  <a href="https://github.com/MrTangLuyao/Bilibili-thread-ripper" target="_blank" rel="noopener" class="row ripple-surface">
+                    <!-- BTR's own mark, a B with speed lines, drawn in the line style
+                         of the other icons (the B is Lucide `bold`, ISC). -->
+                    <svg class="icon-lg row-icon" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M8.5 12h9a4 4 0 0 1 0 8H9.5a1 1 0 0 1-1-1V5a1 1 0 0 1 1-1h7a4 4 0 0 1 0 8"/><path d="M3 8.5h2.5"/><path d="M2 12h3.5"/><path d="M3 15.5h2.5"/></svg>
+                    <span class="row-main">
+                      <span class="row-title" data-i18n="project-btr-name">Bilibili 线程撕裂者</span>
+                      <span class="row-desc" data-i18n="project-btr-desc">缓解B站海外卡顿的插件</span>
+                    </span>
+                    <svg class="icon row-arrow" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M7 7h10v10"/><path d="M7 17 17 7"/></svg>
+                  </a>
+                </li>
+                <li>
+                  <a href="https://github.com/MrTangLuyao/Bilibili-thread-ripper-desktop" target="_blank" rel="noopener" class="row ripple-surface">
+                    <!-- BTR Desktop: the BTR mark (B and speed lines) on a monitor,
+                         in the line style of the other icons (the frame is Lucide
+                         `monitor`, ISC). -->
+                    <svg class="icon-lg row-icon" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect width="20" height="15" x="2" y="2.5" rx="2"/><path d="M8 21h8"/><path d="M12 17.5V21"/><path d="M11 10h3.5a2 2 0 0 0 0-4H11v8h4a2 2 0 0 0 0-4"/><path d="M6 7.5h2"/><path d="M5.5 10h2.5"/><path d="M6 12.5h2"/></svg>
+                    <span class="row-main">
+                      <span class="row-title" data-i18n="project-btr-desktop-name">BTR 桌面</span>
+                      <span class="row-desc" data-i18n="project-btr-desktop-desc">适用于官方客户端的 BTR 插件</span>
+                    </span>
+                    <svg class="icon row-arrow" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M7 7h10v10"/><path d="M7 17 17 7"/></svg>
+                  </a>
+                </li>
+                <li>
+                  <a href="https://github.com/MrTangLuyao/opendrop" target="_blank" rel="noopener" class="row ripple-surface">
+                    <!-- Lucide `send` (ISC) -->
+                    <svg class="icon-lg row-icon" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M14.536 21.686a.5.5 0 0 0 .937-.024l6.5-19a.496.496 0 0 0-.635-.635l-19 6.5a.5.5 0 0 0-.024.937l7.93 3.18a2 2 0 0 1 1.112 1.11z"/><path d="m21.854 2.147-10.94 10.939"/></svg>
+                    <span class="row-main">
+                      <span class="row-title">opendrop</span>
+                      <span class="row-desc" data-i18n="project-opendrop-desc">一个模仿空投快传的开源网站</span>
+                    </span>
+                    <svg class="icon row-arrow" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M7 7h10v10"/><path d="M7 17 17 7"/></svg>
+                  </a>
+                </li>
+                <li>
+                  <a href="https://learn.louie1.com" class="row ripple-surface">
+                    <!-- Lucide `graduation-cap` (ISC) -->
+                    <svg class="icon-lg row-icon" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M21.42 10.922a1 1 0 0 0-.019-1.838L12.83 5.18a2 2 0 0 0-1.66 0L2.6 9.08a1 1 0 0 0 0 1.832l8.57 3.908a2 2 0 0 0 1.66 0z"/><path d="M22 10v6"/><path d="M6 12.5V16a6 3 0 0 0 12 0v-3.5"/></svg>
+                    <span class="row-main">
+                      <span class="row-title">louie.learn</span>
+                      <span class="row-desc" data-i18n="project-learn-desc">一个在线学习编程平台</span>
+                    </span>
+                    <svg class="icon row-arrow" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M7 7h10v10"/><path d="M7 17 17 7"/></svg>
+                  </a>
+                </li>
+                <li>
+                  <a href="https://github.com/TH-Chen-CN/PrimerScore" target="_blank" rel="noopener" class="row ripple-surface">
+                    <!-- Lucide `dna` (ISC) -->
+                    <svg class="icon-lg row-icon" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m10 16 1.5 1.5"/><path d="m14 8-1.5-1.5"/><path d="M15 2c-1.798 1.998-2.518 3.995-2.807 5.993"/><path d="m16.5 10.5 1 1"/><path d="m17 6-2.891-2.891"/><path d="M2 15c6.667-6 13.333 0 20-6"/><path d="m20 9 .891.891"/><path d="M3.109 14.109 4 15"/><path d="m6.5 12.5 1 1"/><path d="m7 18 2.891 2.891"/><path d="M9 22c1.798-1.998 2.518-3.995 2.807-5.993"/></svg>
+                    <span class="row-main">
+                      <span class="row-title">PrimerScore Web</span>
+                      <span class="row-desc" data-i18n="project-primer-desc">PCR 引物设计工具的网页实现</span>
+                    </span>
+                    <svg class="icon row-arrow" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M7 7h10v10"/><path d="M7 17 17 7"/></svg>
+                  </a>
+                </li>
+              </ul>
+            </div>
+          </div>
+        </section>
+
+        <section id="social" class="section">
+          <div class="section-grid">
+            <h2 class="section-title" lang="en" data-i18n="section-social">Social</h2>
+            <div class="section-body">
+              <ul class="panel rows contacts">
+                <li>
+                  <a href="https://github.com/mrtangluyao/" target="_blank" rel="noopener" class="row ripple-surface">
+                    <!-- Lucide `github` (ISC) -->
+                    <svg class="icon-lg row-icon" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M15 22v-4a4.8 4.8 0 0 0-1-3.5c3 0 6-2 6-5.5.08-1.25-.27-2.48-1-3.5.28-1.15.28-2.35 0-3.5 0 0-1 0-3 1.5-2.64-.5-5.36-.5-8 0C6 2 5 2 5 2c-.3 1.15-.3 2.35 0 3.5A5.403 5.403 0 0 0 4 9c0 3.5 3 5.5 6 5.5-.39.49-.68 1.05-.85 1.65-.17.6-.22 1.23-.15 1.85v4"/><path d="M9 18c-4.51 2-5-2-7-2"/></svg>
+                    <span class="row-main">
+                      <span class="row-title">GitHub</span>
+                      <span class="row-handle">@mrtangluyao</span>
+                    </span>
+                    <svg class="icon row-arrow" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M7 7h10v10"/><path d="M7 17 17 7"/></svg>
+                  </a>
+                </li>
+                <li>
+                  <a href="https://space.bilibili.com/501015028" target="_blank" rel="noopener" class="row ripple-surface">
+                    <!-- Lucide `tv` (ISC) -->
+                    <svg class="icon-lg row-icon" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m17 2-5 5-5-5"/><rect width="20" height="15" x="2" y="7" rx="2"/></svg>
+                    <span class="row-main">
+                      <span class="row-title">Bilibili</span>
+                      <span class="row-handle" lang="zh-CN">@古怪的路易</span>
+                    </span>
+                    <svg class="icon row-arrow" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M7 7h10v10"/><path d="M7 17 17 7"/></svg>
+                  </a>
+                </li>
+                <li>
+                  <a href="https://xhslink.com/m/7yaJ9ssWxsW" target="_blank" rel="noopener" class="row ripple-surface">
+                    <!-- Lucide `book-open` (ISC) -->
+                    <svg class="icon-lg row-icon" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 7v14"/><path d="M3 18a1 1 0 0 1-1-1V4a1 1 0 0 1 1-1h5a4 4 0 0 1 4 4 4 4 0 0 1 4-4h5a1 1 0 0 1 1 1v13a1 1 0 0 1-1 1h-6a3 3 0 0 0-3 3 3 3 0 0 0-3-3z"/></svg>
+                    <span class="row-main">
+                      <span class="row-title" lang="zh-CN">小红书</span>
+                      <span class="row-handle" lang="zh-CN">@古怪的路易</span>
+                    </span>
+                    <svg class="icon row-arrow" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M7 7h10v10"/><path d="M7 17 17 7"/></svg>
+                  </a>
+                </li>
+                <li>
+                  <a href="mailto:louieluyaotang@gmail.com" class="row ripple-surface">
+                    <!-- Lucide `mail` (ISC) -->
+                    <svg class="icon-lg row-icon" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m22 7-8.991 5.727a2 2 0 0 1-2.009 0L2 7"/><rect x="2" y="4" width="20" height="16" rx="2"/></svg>
+                    <span class="row-main">
+                      <span class="row-title" data-i18n="social-email">邮箱</span>
+                      <span class="row-handle">louieluyaotang@gmail.com</span>
+                    </span>
+                    <svg class="icon row-arrow" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M7 7h10v10"/><path d="M7 17 17 7"/></svg>
+                  </a>
+                </li>
+              </ul>
+            </div>
+          </div>
+        </section>
+
+        <section id="links" class="section">
+          <div class="section-grid">
+            <h2 class="section-title" lang="en" data-i18n="section-links">Friend links</h2>
+            <div class="section-body">
+              <ul class="panel rows contacts">
+                <li>
+                  <a href="https://cohenjikan.com" target="_blank" rel="noopener" class="row ripple-surface">
+                    <!-- Lucide `user` (ISC) -->
+                    <svg class="icon-lg row-icon" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M19 21v-2a4 4 0 0 0-4-4H9a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
+                    <span class="row-main">
+                      <span class="row-title" data-i18n="links-cohen-name">Cohen 的主页</span>
+                      <span class="row-handle">cohenjikan.com</span>
+                    </span>
+                    <svg class="icon row-arrow" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M7 7h10v10"/><path d="M7 17 17 7"/></svg>
+                  </a>
+                </li>
+                <li>
+                  <a href="https://brandyxue.com" target="_blank" rel="noopener" class="row ripple-surface">
+                    <!-- Lucide `user` (ISC) -->
+                    <svg class="icon-lg row-icon" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M19 21v-2a4 4 0 0 0-4-4H9a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
+                    <span class="row-main">
+                      <span class="row-title" data-i18n="links-jimmyxue-name">JimmyXue 的主页</span>
+                      <span class="row-handle">brandyxue.com</span>
+                    </span>
+                    <svg class="icon row-arrow" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M7 7h10v10"/><path d="M7 17 17 7"/></svg>
+                  </a>
+                </li>
+                <li>
+                  <a href="https://melboard.org" target="_blank" rel="noopener" class="row ripple-surface">
+                    <!-- Lucide `users` (ISC) -->
+                    <svg class="icon-lg row-icon" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M22 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>
+                    <span class="row-main">
+                      <span class="row-title">Melboard</span>
+                      <span class="row-handle">melboard.org</span>
+                    </span>
+                    <svg class="icon row-arrow" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M7 7h10v10"/><path d="M7 17 17 7"/></svg>
+                  </a>
+                </li>
+              </ul>
+            </div>
+          </div>
+        </section>
+
+        <section id="licenses" class="section">
+          <div class="section-grid">
+            <h2 class="section-title" lang="en" data-i18n="section-licenses">Open source licenses</h2>
+            <div class="section-body">
+              <ul class="panel rows contacts licenses" lang="en">
+                <li>
+                  <a href="https://github.com/JetBrains/JetBrainsMono" target="_blank" rel="noopener" class="row ripple-surface" title="© 2020 JetBrains s.r.o.">
+                    <!-- The typeface's own sample, set in that typeface. -->
+                    <span class="row-icon font-mark mark-jb" aria-hidden="true">Aa</span>
+                    <span class="row-main">
+                      <span class="row-title">JetBrains Mono</span>
+                      <span class="row-desc">SIL Open Font License 1.1</span>
+                    </span>
+                    <svg class="icon row-arrow" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M7 7h10v10"/><path d="M7 17 17 7"/></svg>
+                  </a>
+                </li>
+                <li>
+                  <a href="https://developer.huawei.com/consumer/cn/design/resource/" target="_blank" rel="noopener" class="row ripple-surface" title="© 2021 Huawei Device Co., Ltd.">
+                    <!-- The typeface's own sample, set in that typeface. -->
+                    <span class="row-icon font-mark mark-hm" lang="zh-CN" aria-hidden="true">文</span>
+                    <span class="row-main">
+                      <span class="row-title">HarmonyOS Sans</span>
+                      <span class="row-desc">HarmonyOS Sans Fonts License</span>
+                    </span>
+                    <svg class="icon row-arrow" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M7 7h10v10"/><path d="M7 17 17 7"/></svg>
+                  </a>
+                </li>
+                <li>
+                  <a href="https://github.com/atelier-anchor/smiley-sans" target="_blank" rel="noopener" class="row ripple-surface" title="© 2022–2024 atelierAnchor">
+                    <!-- The typeface's own sample, set in that typeface. -->
+                    <span class="row-icon font-mark mark-smiley" aria-hidden="true">Aa</span>
+                    <span class="row-main">
+                      <span class="row-title">Smiley Sans <span lang="zh-CN">得意黑</span></span>
+                      <span class="row-desc">SIL Open Font License 1.1</span>
+                    </span>
+                    <svg class="icon row-arrow" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M7 7h10v10"/><path d="M7 17 17 7"/></svg>
+                  </a>
+                </li>
+                <li>
+                  <a href="https://fonts.google.com/noto/specimen/Noto+Sans+SC" target="_blank" rel="noopener" class="row ripple-surface" title="© 2014–2021 Adobe">
+                    <!-- The typeface's own sample, set in that typeface. -->
+                    <span class="row-icon font-mark mark-noto" aria-hidden="true">Aa</span>
+                    <span class="row-main">
+                      <span class="row-title">Noto Sans SC</span>
+                      <span class="row-desc">SIL Open Font License 1.1</span>
+                    </span>
+                    <svg class="icon row-arrow" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M7 7h10v10"/><path d="M7 17 17 7"/></svg>
+                  </a>
+                </li>
+                <li>
+                  <a href="https://lucide.dev/license" target="_blank" rel="noopener" class="row ripple-surface" title="© Lucide Contributors">
+                    <!-- Lucide `shapes` (ISC) -->
+                    <svg class="icon-lg row-icon" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M8.3 10a.7.7 0 0 1-.626-1.079L11.4 3a.7.7 0 0 1 1.198-.043L16.3 8.9a.7.7 0 0 1-.572 1.1Z"/><rect x="3" y="14" width="7" height="7" rx="1"/><circle cx="17.5" cy="17.5" r="3.5"/></svg>
+                    <span class="row-main">
+                      <span class="row-title">Lucide</span>
+                      <span class="row-desc">ISC License</span>
+                    </span>
+                    <svg class="icon row-arrow" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M7 7h10v10"/><path d="M7 17 17 7"/></svg>
+                  </a>
+                </li>
+              </ul>
+            </div>
+          </div>
+        </section>
+      </div>
+    </div>
   </main>
 
-  <div class="content-surface">
-
-  <section id="manifesto" class="pt-[5.5rem] pb-24 px-6 max-w-4xl mx-auto">
-    <div class="mf-body">
-      <p class="mf-line mf-open" data-i18n="mf-open">致那唯一的一个。</p>
-      <!-- The day's lines (lib/daily/<name>/theme.js) go between the opening and the end. -->
-      <div id="daily-lines"></div>
-      <p class="mf-line mf-gap" data-i18n-html="mf-end-1">这个世界从不缺「之一」，</p>
-      <p class="mf-line mf-strong" data-i18n-html="mf-end-2">它一直在等「<em>唯一</em>」。</p>
-      <p class="mf-line mf-close">Be the <span class="mf-one">One</span><span class="one-dot">.</span></p>
-    </div>
-  </section>
-
-  <section id="about" class="py-20 px-6 max-w-4xl mx-auto border-t border-m3-outlineVariant">
-    <h2 class="text-2xl font-bold mb-8 text-m3-onSurface flex items-center gap-4">
-      <span class="text-m3-primary font-mono opacity-80">01.</span> <span data-i18n="section-about">About</span>
-    </h2>
-    <div class="bg-m3-surfaceContainer rounded-m3-xl p-8 info-card">
-      <p class="text-[17px] leading-loose text-m3-onSurfaceVariant" data-i18n-html="about-text">
-        来自江城武汉，现旅居颠倒世界墨尔本。
-      </p>
-    </div>
-  </section>
-
-  <section id="projects" class="py-20 px-6 max-w-4xl mx-auto border-t border-m3-outlineVariant">
-    <h2 class="text-2xl font-bold mb-8 text-m3-onSurface flex items-center gap-4">
-      <span class="text-m3-primary font-mono opacity-80">02.</span> <span data-i18n="section-projects">Projects</span>
-    </h2>
-    
-    <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
-      <a href="https://github.com/MrTangLuyao/Bilibili-thread-ripper" target="_blank" rel="noopener" class="ripple-surface m3-card bg-m3-surfaceContainer rounded-m3-xl p-6 border border-m3-outlineVariant block">
-        <h3 class="text-xl text-m3-onSurface font-bold mb-2" data-i18n="project-btr-name">Bilibili 线程撕裂者</h3>
-        <p class="text-m3-onSurfaceVariant text-[15px] leading-relaxed" data-i18n="project-btr-desc">通过多线程并发加载，缓解海外观看 B 站视频时的卡顿</p>
-      </a>
-
-      <a href="https://github.com/MrTangLuyao/Bilibili-thread-ripper-desktop" target="_blank" rel="noopener" class="ripple-surface m3-card bg-m3-surfaceContainer rounded-m3-xl p-6 border border-m3-outlineVariant block">
-        <h3 class="text-xl text-m3-onSurface font-bold mb-2" data-i18n="project-btr-desktop-name">Bilibili 线程撕裂者桌面版</h3>
-        <p class="text-m3-onSurfaceVariant text-[15px] leading-relaxed" data-i18n="project-btr-desktop-desc">为 Bilibili 官方 Windows 客户端带来多线程加载加速</p>
-      </a>
-
-      <a href="https://github.com/MrTangLuyao/opendrop" target="_blank" rel="noopener" class="ripple-surface m3-card bg-m3-surfaceContainer rounded-m3-xl p-6 border border-m3-outlineVariant block">
-        <h3 class="text-xl text-m3-onSurface font-bold mb-2">opendrop</h3>
-        <p class="text-m3-onSurfaceVariant text-[15px] leading-relaxed" data-i18n="project-opendrop-desc">一个模仿 AirPortal 空投快传的开源网站</p>
-      </a>
-
-      <a href="https://learn.louie1.com" class="ripple-surface m3-card bg-m3-surfaceContainer rounded-m3-xl p-6 border border-m3-outlineVariant block">
-        <h3 class="text-xl text-m3-onSurface font-bold mb-2">louie.learn</h3>
-        <p class="text-m3-onSurfaceVariant text-[15px] leading-relaxed" data-i18n="project-learn-desc">一个在线学习编程平台</p>
-      </a>
-
-      <a href="https://jetlag.louie1.com" target="_blank" class="ripple-surface m3-card bg-m3-surfaceContainer rounded-m3-xl p-6 border border-m3-outlineVariant block">
-        <h3 class="text-xl text-m3-onSurface font-bold mb-2">Jetlag Commander</h3>
-        <p class="text-m3-onSurfaceVariant text-[15px] leading-relaxed" data-i18n="project-jetlag-desc">科学时差调节系统</p>
-      </a>
-
-      <a href="https://github.com/Cohenjikan/sync-station" target="_blank" class="ripple-surface m3-card bg-m3-surfaceContainer rounded-m3-xl p-6 border border-m3-outlineVariant block">
-        <h3 class="text-xl text-m3-onSurface font-bold mb-2">Sync Station</h3>
-        <p class="text-m3-onSurfaceVariant text-[15px] leading-relaxed" data-i18n="project-sync-desc">聊天交互式文件分享工具</p>
-      </a>
-
-      <a href="https://github.com/TH-Chen-CN/PrimerScore" target="_blank" class="ripple-surface m3-card bg-m3-surfaceContainer rounded-m3-xl p-6 border border-m3-outlineVariant block">
-        <h3 class="text-xl text-m3-onSurface font-bold mb-2">PrimerScore Web</h3>
-        <p class="text-m3-onSurfaceVariant text-[15px] leading-relaxed" data-i18n="project-primer-desc">PCR 引物设计工具的网页实现</p>
-      </a>
-    </div>
-  </section>
-
-  <section id="social" class="py-20 px-6 max-w-4xl mx-auto border-t border-m3-outlineVariant">
-    <h2 class="text-2xl font-bold mb-8 text-m3-onSurface flex items-center gap-4">
-      <span class="text-m3-primary font-mono opacity-80">03.</span> <span data-i18n="section-social">Social</span>
-    </h2>
-    
-    <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
-      <a href="https://github.com/mrtangluyao/" target="_blank" class="ripple-surface m3-card flex items-center gap-4 p-4 bg-m3-surfaceContainer rounded-m3-xl border border-m3-outlineVariant">
-        <div class="w-12 h-12 flex items-center justify-center rounded-m3-full bg-m3-primaryContainer text-m3-onPrimaryContainer">
-          <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 19c-5 1.5-5-2.5-7-3m14 6v-3.87a3.37 3.37 0 0 0-.94-2.61c3.14-.35 6.44-1.54 6.44-7A5.44 5.44 0 0 0 20 4.77 5.07 5.07 0 0 0 19.91 1S18.73.65 16 2.48a13.38 13.38 0 0 0-7 0C6.27.65 5.09 1 5.09 1A5.07 5.07 0 0 0 5 4.77a5.44 5.44 0 0 0-1.5 3.78c0 5.42 3.3 6.61 6.44 7A3.37 3.37 0 0 0 9 18.13V22"></path></svg>
+  <footer class="site-footer band">
+    <div class="container">
+      <div class="section-grid">
+        <h2 class="footer-title" lang="en" data-i18n="footer-title">What’s next?</h2>
+        <div class="section-body">
+          <p class="footer-desc" data-i18n="contact-desc">我的收件箱始终敞开。无论是有项目合作、技术交流，还是简单地打个招呼，我都会尽量回复。</p>
+          <!-- Birthdays: the day's cover credit. -->
+          <p class="footer-credit" id="daily-credit" hidden></p>
+          <p class="footer-copy"><span id="footer-year"></span> Louie</p>
         </div>
-        <div class="flex flex-col">
-          <span class="text-m3-onSurface font-bold">GitHub</span>
-          <span class="text-sm text-m3-onSurfaceVariant">@mrtangluyao</span>
-        </div>
-      </a>
-
-      <a href="https://space.bilibili.com/501015028" target="_blank" class="ripple-surface m3-card flex items-center gap-4 p-4 bg-m3-surfaceContainer rounded-m3-xl border border-m3-outlineVariant">
-        <div class="w-12 h-12 flex items-center justify-center rounded-m3-full bg-m3-primaryContainer text-m3-onPrimaryContainer">
-          <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="7" width="20" height="15" rx="2" ry="2"></rect><polyline points="17 2 12 7 7 2"></polyline></svg>
-        </div>
-        <div class="flex flex-col">
-          <span class="text-m3-onSurface font-bold">Bilibili</span>
-          <span class="text-sm text-m3-onSurfaceVariant">@古怪的路易</span>
-        </div>
-      </a>
-
-      <a href="https://xhslink.com/m/7yaJ9ssWxsW" target="_blank" class="ripple-surface m3-card flex items-center gap-4 p-4 bg-m3-surfaceContainer rounded-m3-xl border border-m3-outlineVariant">
-        <div class="w-12 h-12 flex items-center justify-center rounded-m3-full bg-m3-primaryContainer text-m3-onPrimaryContainer">
-          <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"></path><path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"></path></svg>
-        </div>
-        <div class="flex flex-col">
-          <span class="text-m3-onSurface font-bold">小红书</span>
-          <span class="text-sm text-m3-onSurfaceVariant">@古怪的路易</span>
-        </div>
-      </a>
-    </div>
-  </section>
-
-  <section id="links" class="py-20 px-6 max-w-4xl mx-auto border-t border-m3-outlineVariant">
-    <h2 class="text-2xl font-bold mb-8 text-m3-onSurface flex items-center gap-4">
-      <span class="text-m3-primary font-mono opacity-80">04.</span> <span data-i18n="section-links">Friend Links</span>
-    </h2>
-    
-    <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
-      <a href="https://cohenjikan.com" target="_blank" class="ripple-surface m3-card flex items-center gap-4 p-4 bg-m3-surfaceContainer rounded-m3-xl border border-m3-outlineVariant">
-        <div class="w-12 h-12 flex items-center justify-center rounded-m3-full bg-m3-primaryContainer text-m3-onPrimaryContainer">
-          <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"></path><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"></path></svg>
-        </div>
-        <div class="flex flex-col">
-          <span class="text-m3-onSurface font-bold" data-i18n="links-cohen-name">Cohen 的主页</span>
-          <span class="text-sm text-m3-onSurfaceVariant">cohenjikan.com</span>
-        </div>
-      </a>
-
-      <a href="https://brandyxue.com" target="_blank" class="ripple-surface m3-card flex items-center gap-4 p-4 bg-m3-surfaceContainer rounded-m3-xl border border-m3-outlineVariant">
-        <div class="w-12 h-12 flex items-center justify-center rounded-m3-full bg-m3-primaryContainer text-m3-onPrimaryContainer">
-          <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"></path><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"></path></svg>
-        </div>
-        <div class="flex flex-col">
-          <span class="text-m3-onSurface font-bold" data-i18n="links-jimmyxue-name">JimmyXue 的主页</span>
-          <span class="text-sm text-m3-onSurfaceVariant">brandyxue.com</span>
-        </div>
-      </a>
-
-      <a href="https://melboard.org" target="_blank" class="ripple-surface m3-card flex items-center gap-4 p-4 bg-m3-surfaceContainer rounded-m3-xl border border-m3-outlineVariant">
-        <div class="w-12 h-12 flex items-center justify-center rounded-m3-full bg-m3-primaryContainer text-m3-onPrimaryContainer">
-          <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"></path><circle cx="9" cy="7" r="4"></circle><path d="M22 21v-2a4 4 0 0 0-3-3.87"></path><path d="M16 3.13a4 4 0 0 1 0 7.75"></path></svg>
-        </div>
-        <div class="flex flex-col">
-          <span class="text-m3-onSurface font-bold">Melboard</span>
-          <span class="text-sm text-m3-onSurfaceVariant">melboard.org</span>
-        </div>
-      </a>
-    </div>
-  </section>
-
-  <section id="licenses" class="py-20 px-6 max-w-4xl mx-auto border-t border-m3-outlineVariant">
-    <h2 class="text-2xl font-bold mb-8 text-m3-onSurface flex items-center gap-4">
-      <span class="text-m3-primary font-mono opacity-80">05.</span> <span data-i18n="section-licenses">OPEN SOURCE LICENSES</span>
-    </h2>
-    
-    <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-      <div class="p-6 bg-m3-surfaceContainer rounded-m3-xl info-card">
-        <div class="font-bold text-m3-onSurface text-lg mb-2">Tailwind CSS</div>
-        <div class="text-sm text-m3-onSurfaceVariant tracking-wide">MIT License | Copyright (c) Tailwind Labs, Inc.</div>
-      </div>
-      <div class="p-6 bg-m3-surfaceContainer rounded-m3-xl info-card">
-        <div class="font-bold text-m3-onSurface text-lg mb-2">Luxon.js</div>
-        <div class="text-sm text-m3-onSurfaceVariant tracking-wide">MIT License | Copyright (c) 2017 Isaac Cambron</div>
-      </div>
-      <div class="p-6 bg-m3-surfaceContainer rounded-m3-xl info-card">
-        <div class="font-bold text-m3-onSurface text-lg mb-2">JetBrains Mono</div>
-        <div class="text-sm text-m3-onSurfaceVariant tracking-wide">SIL Open Font License 1.1 | Copyright (c) 2020 JetBrains s.r.o.</div>
-      </div>
-      <div class="p-6 bg-m3-surfaceContainer rounded-m3-xl info-card">
-        <div class="font-bold text-m3-onSurface text-lg mb-2">HarmonyOS Sans</div>
-        <div class="text-sm text-m3-onSurfaceVariant tracking-wide">Copyright (c) Huawei Device Co., Ltd.</div>
-      </div>
-      <div class="p-6 bg-m3-surfaceContainer rounded-m3-xl info-card">
-        <div class="font-bold text-m3-onSurface text-lg mb-2">Lucide</div>
-        <div class="text-sm text-m3-onSurfaceVariant tracking-wide">ISC License | Copyright (c) Lucide Contributors</div>
-      </div>
-    </div>
-    <p class="mt-6 text-sm text-m3-onSurfaceVariant/60" data-i18n-html="m3-note">本站视觉设计参考了 <a href="https://m3.material.io" target="_blank" rel="noopener" class="ripple-surface ripple-surface-variant inline-flex items-center text-m3-primary px-2 py-0.5 rounded-m3-sm hover:bg-m3-primaryContainer transition-colors">Material Design 3</a> 规范，但并未使用其官方组件库。</p>
-  </section>
-
-  </div>
-
-  <footer class="over-wallpaper text-center py-10 border-t border-m3-outlineVariant bg-m3-surfaceContainer/50">
-    <div class="container mx-auto px-6 max-w-4xl">
-      <h2 class="text-2xl font-bold mb-4 text-m3-onSurface" data-i18n="footer-title">What's Next?</h2>
-      <p class="max-w-md mx-auto mb-6 text-[15px] leading-relaxed text-m3-onSurfaceVariant" data-i18n="contact-desc">我的收件箱始终敞开。无论是有项目合作、技术交流，还是简单地打个招呼，我都会尽量回复。</p>
-
-      <p class="max-w-2xl mx-auto mb-4 text-xs leading-relaxed text-m3-onSurfaceVariant/70" data-i18n-html="bg-credit">
-        背景图 <em>Camel thorn trees, Deadvlei, Namib-Naukluft Park, Namibia</em> &copy; Inge Johnsson / Alamy Stock Photo，转载自 Bing 每日壁纸（2025-08-03）。版权归原作者所有。
-      </p>
-
-      <div class="text-xs text-m3-onSurfaceVariant tracking-widest uppercase font-mono">
-        <span id="footer-year"></span> Louie
       </div>
     </div>
   </footer>
@@ -432,104 +454,108 @@
         });
       });
     }
+    window.bindRipples = bindRipples;
     bindRipples();
+
+    // The bar lifts off the page once it has something to sit over.
+    const header = document.getElementById('navbar');
+    function updateHeader() { header.classList.toggle('is-scrolled', window.scrollY > 0); }
+    window.addEventListener('scroll', updateHeader, { passive: true });
+    updateHeader();
 
     const brandBtn = document.getElementById('brand-dropdown-btn');
     const brandMenu = document.getElementById('brand-dropdown-menu');
-    const brandIcon = document.getElementById('brand-dropdown-icon');
-
+    function setBrandMenu(open) {
+      brandMenu.classList.toggle('is-open', open);
+      brandBtn.setAttribute('aria-expanded', String(open));
+    }
+    // Each button stops its click from reaching the outside-click closer,
+    // so opening one popover closes the other by hand.
     brandBtn.addEventListener('click', (e) => {
       e.stopPropagation();
-      const isOpen = brandMenu.classList.contains('is-open');
-      if (isOpen) {
-        brandMenu.classList.remove('is-open');
-        brandIcon.style.transform = 'rotate(0deg)';
-      } else {
-        brandMenu.classList.add('is-open');
-        brandIcon.style.transform = 'rotate(180deg)';
-      }
-    });
-
-    document.addEventListener('click', (e) => {
-      if (!brandBtn.contains(e.target) && !brandMenu.contains(e.target)) {
-        brandMenu.classList.remove('is-open');
-        brandIcon.style.transform = 'rotate(0deg)';
-      }
+      setMobileMenu(false);
+      setBrandMenu(!brandMenu.classList.contains('is-open'));
     });
 
     const menuBtn = document.getElementById('menu-btn');
     const mobileMenu = document.getElementById('mobile-menu');
     function setMobileMenu(open) {
-      mobileMenu.classList.toggle('open', open);
+      mobileMenu.classList.toggle('is-open', open);
       menuBtn.setAttribute('aria-expanded', String(open));
     }
-    menuBtn.addEventListener('click', () => setMobileMenu(!mobileMenu.classList.contains('open')));
-    mobileMenu.addEventListener('click', () => setMobileMenu(false));
+    menuBtn.addEventListener('click', (e) => {
+      e.stopPropagation();
+      setBrandMenu(false);
+      setMobileMenu(!mobileMenu.classList.contains('is-open'));
+    });
+    mobileMenu.addEventListener('click', (e) => { if (e.target.closest('a')) setMobileMenu(false); });
+    // Wider screens show the links in the bar; the menu has no place there.
+    // (Safari before 14 only knows addListener.)
+    const wide = window.matchMedia('(min-width: 768px)');
+    const onWide = (e) => { if (e.matches) setMobileMenu(false); };
+    if (wide.addEventListener) wide.addEventListener('change', onWide);
+    else if (wide.addListener) wide.addListener(onWide);
+
+    document.addEventListener('click', (e) => {
+      if (!brandBtn.contains(e.target) && !brandMenu.contains(e.target)) setBrandMenu(false);
+      if (!menuBtn.contains(e.target) && !mobileMenu.contains(e.target)) setMobileMenu(false);
+    });
+    document.addEventListener('keydown', (e) => {
+      if (e.key !== 'Escape') return;
+      if (brandMenu.classList.contains('is-open')) { setBrandMenu(false); brandBtn.focus(); }
+      if (mobileMenu.classList.contains('is-open')) { setMobileMenu(false); menuBtn.focus(); }
+    });
 
     const MODK = /Mac|iPhone|iPad/.test(navigator.platform) ? '⌘' : 'Ctrl';
     const translations = {
       zh: {
-        'hero-greeting': `试试 ${MODK} + K 搜索`,
-        'hero-themes-btn': '特别主题',
         'hero-blog-btn': '我的博客',
-        'mf-open': '致那唯一的一个。',
-        'mf-end-1': '这个世界从不缺「之一」，',
-        'mf-end-2': '它一直在等「<em>唯一</em>」。',
+        'hero-avatar-alt': 'Louie 的头像',
         'section-about': 'About',
         'section-projects': 'Projects',
         'section-social': 'Social',
-        'section-links': 'Friend Links',
-        'section-licenses': 'OPEN SOURCE LICENSES',
-        'about-text': '来自江城武汉，现旅居颠倒世界墨尔本。',
+        'social-email': '邮箱',
+        'section-links': 'Friend links',
+        'section-licenses': 'Open source licenses',
+        'about-text': '来自武汉，现旅居颠倒世界墨尔本。',
         'project-btr-name': 'Bilibili 线程撕裂者',
-        'project-btr-desc': '通过多线程并发加载，缓解海外观看 B 站视频时的卡顿',
-        'project-btr-desktop-name': 'Bilibili 线程撕裂者桌面版',
-        'project-btr-desktop-desc': '为 Bilibili 官方 Windows 客户端带来多线程加载加速',
+        'project-btr-desc': '缓解B站海外卡顿的插件',
+        'project-btr-desktop-name': 'BTR 桌面',
+        'project-btr-desktop-desc': '适用于官方客户端的 BTR 插件',
         'project-learn-desc': '一个在线学习编程平台',
-        'project-jetlag-desc': '科学时差调节系统',
-        'project-sync-desc': '聊天交互式文件分享工具',
         'project-primer-desc': 'PCR 引物设计工具的网页实现',
-        'project-opendrop-desc': '一个模仿 AirPortal 空投快传的开源网站',
+        'project-opendrop-desc': '一个模仿空投快传的开源网站',
         'links-cohen-name': 'Cohen 的主页',
         'links-jimmyxue-name': 'JimmyXue 的主页',
         'contact-desc': '我的收件箱始终敞开。无论是有项目合作、技术交流，还是简单地打个招呼，我都会尽量回复。',
-        'footer-title': "What's Next?",
-        'bg-credit': '背景图 <em>Camel thorn trees, Deadvlei, Namib-Naukluft Park, Namibia</em> &copy; Inge Johnsson / Alamy Stock Photo，转载自 Bing 每日壁纸（2025-08-03）。版权归原作者所有。',
-        'm3-note': '本站视觉设计参考了 <a href="https://m3.material.io" target="_blank" rel="noopener" class="ripple-surface ripple-surface-variant inline-flex items-center text-m3-primary px-2 py-0.5 rounded-m3-sm hover:bg-m3-primaryContainer transition-colors">Material Design 3</a> 规范，但并未使用其官方组件库。'
+        'footer-title': 'What’s next?'
       },
       en: {
-        'hero-greeting': `try ${MODK} + K to search`,
-        'hero-themes-btn': 'Themes',
         'hero-blog-btn': 'Blog',
-        'mf-open': 'Here’s to the one.',
-        'mf-end-1': 'The world has plenty of “one of many.”',
-        'mf-end-2': 'It’s waiting for <em>the one</em>.',
+        'hero-avatar-alt': 'Louie’s avatar',
         'section-about': 'About',
         'section-projects': 'Projects',
         'section-social': 'Social',
-        'section-links': 'Friend Links',
-        'section-licenses': 'OPEN SOURCE LICENSES',
-        'about-text': 'Born in Wuhan, currently residing in Melbourne — the Upside Down.',
+        'social-email': 'Email',
+        'section-links': 'Friend links',
+        'section-licenses': 'Open source licenses',
+        'about-text': 'Born in Wuhan, currently residing in Melbourne, the Upside Down.',
         'project-btr-name': 'Bilibili Thread Ripper',
-        'project-btr-desc': 'Reduce Bilibili buffering overseas with parallel downloads.',
-        'project-btr-desktop-name': 'Bilibili Thread Ripper Desktop',
-        'project-btr-desktop-desc': 'Accelerate the official Bilibili Windows client with parallel downloads.',
-        'project-learn-desc': 'An online programming learning platform.',
-        'project-jetlag-desc': 'Circadian Rhythm Override Protocol / Scientific Jetlag Adjustment.',
-        'project-sync-desc': 'Chat-style file sharing tool',
-        'project-primer-desc': 'Web-based PCR primer design tool',
-        'project-opendrop-desc': 'An open-source imitation of AirPortal website',
-        'links-cohen-name': "Cohen's Homepage",
-        'links-jimmyxue-name': "JimmyXue's Homepage",
-        'contact-desc': "My inbox is always open. Whether it's a collaboration proposal, a tech chat, or just a hello — I'll do my best to reply.",
-        'footer-title': "What's Next?",
-        'bg-credit': 'Background: <em>Camel thorn trees, Deadvlei, Namib-Naukluft Park, Namibia</em> &copy; Inge Johnsson / Alamy Stock Photo, via Bing daily wallpaper (3 Aug 2025). All rights reserved by the photographer.',
-        'm3-note': 'Visual design inspired by the <a href="https://m3.material.io" target="_blank" rel="noopener" class="ripple-surface ripple-surface-variant inline-flex items-center text-m3-primary px-2 py-0.5 rounded-m3-sm hover:bg-m3-primaryContainer transition-colors">Material Design 3</a> spec — not using the official component library.'
+        'project-btr-desc': 'A plugin that eases Bilibili lag overseas',
+        'project-btr-desktop-name': 'BTR Desktop',
+        'project-btr-desktop-desc': 'The BTR plugin for the official client',
+        'project-learn-desc': 'An online programming learning platform',
+        'project-primer-desc': 'A web tool for PCR primer design',
+        'project-opendrop-desc': 'An open source take on AirPortal',
+        'links-cohen-name': 'Cohen’s Homepage',
+        'links-jimmyxue-name': 'JimmyXue’s Homepage',
+        'contact-desc': 'Fancy a chat about tech, AI, or life down under? Or just want to say hi? My inbox is always open, and I’ll get back to you.',
+        'footer-title': 'What’s next?'
       }
     };
 
     // A language picked by hand is kept (same key as the blog and the search
-    // overlay), so it survives reloads such as opening a day from the picker.
+    // overlay), so it survives reloads such as previewing another day.
     let currentLang = navigator.language.toLowerCase().includes('zh') ? 'zh' : 'en';
     try {
       const saved = localStorage.getItem('louie-lang');
@@ -546,11 +572,23 @@
         const key = el.getAttribute('data-i18n-html');
         if (t[key]) el.innerHTML = t[key];
       });
+      document.querySelectorAll('[data-i18n-alt]').forEach(el => {
+        const key = el.getAttribute('data-i18n-alt');
+        if (t[key]) el.alt = t[key];
+      });
+      // One-line rows may cut a description short; hovering shows it all.
+      document.querySelectorAll('.projects .row-desc').forEach(d => { d.title = d.textContent; });
       if (window.LouieDaily) LouieDaily.render(lang);
       const langLabel = document.getElementById('lang-label');
       if (langLabel) langLabel.textContent = lang === 'zh' ? '文 ⇄ EN' : 'EN ⇄ 文';
-      document.getElementById('lang-toggle').setAttribute('aria-label', lang === 'zh' ? '切换为英文' : 'Switch to Chinese');
+      // The visible label names the language button; the hint is a tooltip
+      // (and the name itself on the narrowest phones, which hide the label).
+      document.getElementById('lang-toggle').title = lang === 'zh' ? '切换为英文' : 'Switch to Chinese';
+      document.getElementById('search-btn').setAttribute('aria-label', lang === 'zh' ? '搜索' : 'Search');
+      document.getElementById('github-btn').setAttribute('aria-label', lang === 'zh' ? 'GitHub 仓库' : 'GitHub repository');
       menuBtn.setAttribute('aria-label', lang === 'zh' ? '菜单' : 'Menu');
+      document.querySelectorAll('#nav-links, #mobile-menu').forEach(nav =>
+        nav.setAttribute('aria-label', lang === 'zh' ? '页面导航' : 'Sections'));
       document.documentElement.lang = lang === 'zh' ? 'zh-CN' : 'en';
       bindRipples();
     }
@@ -577,24 +615,23 @@
       });
     });
 
-    // Default days keep the original rolling hero; themed days (lib/daily)
-    // show "Be the One." instead, so the roller only runs without a theme.
-    if (document.documentElement.dataset.daily) {
-      document.title = 'Be the One. by Louie';
-    } else {
+    const reducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+    // "Hi, I'm …" rolls through these; birthdays have their own headline,
+    // and reduced motion keeps "Louie" still.
+    if (!document.documentElement.dataset.birthday && !reducedMotion) {
       const words = ['Louie', 'Developer', 'Creator', 'AI Enjoyer', 'CS Student'];
       const rollEl = document.getElementById('hero-roll-text');
       let idx = 0;
-      rollEl.classList.add('hero-spectrum');
 
       function rollNext() {
-        rollEl.classList.remove('hero-spectrum');
         rollEl.style.transition = 'transform 0.35s cubic-bezier(0.4,0,1,1), opacity 0.28s ease';
         rollEl.style.transform = 'translateY(-115%)';
         rollEl.style.opacity = '0';
         setTimeout(() => {
           idx = (idx + 1) % words.length;
           rollEl.textContent = words[idx];
+          rollEl.dataset.tone = idx;          // its colour (louie.css)
           rollEl.style.transition = 'none';
           rollEl.style.transform = 'translateY(115%)';
           rollEl.style.opacity = '0';
@@ -602,79 +639,12 @@
             rollEl.style.transition = 'transform 0.42s cubic-bezier(0,0,0.2,1), opacity 0.35s ease';
             rollEl.style.transform = 'translateY(0)';
             rollEl.style.opacity = '1';
-            rollEl.classList.add('hero-spectrum');
           }));
         }, 370);
       }
 
       setInterval(rollNext, 2800);
     }
-
-    // Manifesto: reveal one line at a time as it scrolls in (the day's lines
-    // are already in place from applyLang). Lines entering together are
-    // staggered top-to-bottom so they still read in order.
-    (function () {
-      const lines = document.querySelectorAll('.mf-line');
-      if (!('IntersectionObserver' in window) ||
-          window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
-        lines.forEach(el => el.classList.add('is-in'));
-        return;
-      }
-      const io = new IntersectionObserver(entries => {
-        entries.filter(e => e.isIntersecting)
-          .sort((a, b) => a.boundingClientRect.top - b.boundingClientRect.top)
-          .forEach((e, n) => {
-            e.target.style.transitionDelay = `${n * 140}ms`;
-            e.target.classList.add('is-in');
-            io.unobserve(e.target);
-          });
-      }, { threshold: 0.35, rootMargin: '0px 0px -8% 0px' });
-      lines.forEach(el => io.observe(el));
-    })();
-
-    // Drive a --frost-progress CSS variable (0 → 1) from scroll position so
-    // the navbar dark tint, backdrop blur, and #nav-bg-strip opacity all ramp
-    // smoothly from the hero top, peaking right as the hero's bottom meets
-    // the navbar (i.e. About reaches the top of the viewport).
-    (function () {
-      const hero = document.querySelector('main');
-      if (!hero) return;
-      const root = document.documentElement;
-      const scrollHint = document.getElementById('scroll-down');
-      let ticking = false;
-      function update() {
-        ticking = false;
-        const range = Math.max(1, hero.offsetHeight - 64);
-        // Hold off frost until the hero is halfway off-screen, then ramp
-        // to full by the time About reaches the navbar.
-        const raw = window.scrollY / range;
-        const p = Math.min(1, Math.max(0, (raw - 0.5) * 2));
-        root.style.setProperty('--frost-progress', p.toFixed(3));
-
-        // Keep the hero pristine at rest, then reveal the glass transition as
-        // soon as the user scrolls. Fade the chevron first so it always stays
-        // crisp instead of being caught inside the blurred transition layer.
-        const transitionRange = Math.max(180, Math.min(260, window.innerHeight * 0.22));
-        const transitionP = Math.min(1, Math.max(0, window.scrollY / transitionRange));
-        const hintRange = Math.min(72, transitionRange * 0.45);
-        const hintP = 1 - Math.min(1, Math.max(0, window.scrollY / hintRange));
-        root.style.setProperty('--content-transition-progress', transitionP.toFixed(3));
-        root.style.setProperty('--scroll-hint-progress', hintP.toFixed(3));
-        if (scrollHint) {
-          const hidden = hintP <= 0.01;
-          scrollHint.classList.toggle('is-hidden', hidden);
-          scrollHint.setAttribute('aria-hidden', hidden ? 'true' : 'false');
-          if (hidden) scrollHint.setAttribute('tabindex', '-1');
-          else scrollHint.removeAttribute('tabindex');
-        }
-      }
-      function onScroll() {
-        if (!ticking) { ticking = true; requestAnimationFrame(update); }
-      }
-      window.addEventListener('scroll', onScroll, { passive: true });
-      window.addEventListener('resize', update);
-      update();
-    })();
   </script>
 </body>
 </html>

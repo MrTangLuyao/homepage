@@ -1,997 +1,838 @@
 /* ============================================================
  * lib/design/louie.css
- * Common design tokens & components used by index.html.
+ * The homepage's whole stylesheet, after the Cadrify design system:
+ * a white canvas, deep navy ink, civic blue for actions, and 1px
+ * hairlines for structure. The page follows the system's light or dark
+ * unless the visitor picks one; theme.js sets data-theme before the
+ * first paint.
+ *
+ * The search overlay (lib/search/louie-search.js) renders in a shadow
+ * root and reads the inherited tokens below (--text, --muted,
+ * --surface, --surface-high, --border, --outline, --accent-dim,
+ * --accent-on, --search-shadow), so both themes define all of them.
  * ============================================================ */
 
-/* ─── Design tokens ─── */
+/* ─── Fonts ───
+   Three voices, each with one job:
+   - 得意黑 Smiley Sans: the display voice. The headline and the section
+     heads, all Latin, so only its two small Latin chunks ship
+     (lib/design/smiley, from @chinese-fonts/dyh).
+   - JetBrains Mono: every other piece of Latin, from the nav to the
+     footer. Regular and Bold (the Bold file is the one 95.html uses).
+   - HarmonyOS Sans SC: every Han character. The original split files in
+     lib/design/fonts_chunks, one per Unicode block, so a page only
+     fetches the blocks its text touches. Its one weight serves every
+     weight asked for: Chinese is never drawn bolder by the browser.
+   The split files stop short of the full-width forms (，：；（）), so a
+   2 KB cut of Noto Sans SC Medium fills in just those, plus the "Aa"
+   it shows as its own sample in the licences list. */
+@font-face {
+  font-family: 'Smiley Sans';
+  font-weight: 400; font-display: swap;
+  src: url('smiley/SmileySans-latin.woff2') format('woff2');
+  unicode-range: U+0, U+20-7E, U+C0-CB, U+D1-D6, U+D8-DE, U+E0-EC, U+F1-F6, U+F8-106, U+10A, U+10C, U+112-113, U+116-11B, U+11D-123, U+12F, U+131-133, U+136-137, U+139, U+13B, U+13D, U+141, U+143-148, U+14C-15B, U+15E-165, U+167-168, U+16A, U+16E, U+170, U+172, U+174-17E, U+18F, U+1A0-1A1, U+1AF, U+1CD-1CE, U+1D1-1DC, U+218-21B, U+237, U+259;
+}
+@font-face {
+  font-family: 'Smiley Sans';
+  font-weight: 400; font-display: swap;
+  src: url('smiley/SmileySans-punct.woff2') format('woff2');
+  unicode-range: U+2013-2014, U+2018-2019, U+201C-201D, U+2022, U+2026;
+}
+@font-face {
+  font-family: 'JetBrains Mono';
+  font-weight: 400; font-display: swap;
+  src: url('JetBrainsMono.woff2') format('woff2');
+}
+@font-face {
+  font-family: 'JetBrains Mono';
+  font-weight: 700; font-display: swap;
+  src: url('JetBrainsMono-Bold.woff2') format('woff2');
+}
+@font-face { font-family: 'HarmonyOS Sans SC'; font-weight: 100 900; font-display: swap; src: url('fonts_chunks/chunk_3.woff2') format('woff2'); unicode-range: U+3000-303F; }
+@font-face { font-family: 'HarmonyOS Sans SC'; font-weight: 100 900; font-display: swap; src: url('fonts_chunks/chunk_4.woff2') format('woff2'); unicode-range: U+4E00-52FF; }
+@font-face { font-family: 'HarmonyOS Sans SC'; font-weight: 100 900; font-display: swap; src: url('fonts_chunks/chunk_5.woff2') format('woff2'); unicode-range: U+5300-57FF; }
+@font-face { font-family: 'HarmonyOS Sans SC'; font-weight: 100 900; font-display: swap; src: url('fonts_chunks/chunk_6.woff2') format('woff2'); unicode-range: U+5800-5CFF; }
+@font-face { font-family: 'HarmonyOS Sans SC'; font-weight: 100 900; font-display: swap; src: url('fonts_chunks/chunk_7.woff2') format('woff2'); unicode-range: U+5D00-61FF; }
+@font-face { font-family: 'HarmonyOS Sans SC'; font-weight: 100 900; font-display: swap; src: url('fonts_chunks/chunk_8.woff2') format('woff2'); unicode-range: U+6200-66FF; }
+@font-face { font-family: 'HarmonyOS Sans SC'; font-weight: 100 900; font-display: swap; src: url('fonts_chunks/chunk_9.woff2') format('woff2'); unicode-range: U+6700-6BFF; }
+@font-face { font-family: 'HarmonyOS Sans SC'; font-weight: 100 900; font-display: swap; src: url('fonts_chunks/chunk_10.woff2') format('woff2'); unicode-range: U+6C00-70FF; }
+@font-face { font-family: 'HarmonyOS Sans SC'; font-weight: 100 900; font-display: swap; src: url('fonts_chunks/chunk_11.woff2') format('woff2'); unicode-range: U+7100-75FF; }
+@font-face { font-family: 'HarmonyOS Sans SC'; font-weight: 100 900; font-display: swap; src: url('fonts_chunks/chunk_12.woff2') format('woff2'); unicode-range: U+7600-7AFF; }
+@font-face { font-family: 'HarmonyOS Sans SC'; font-weight: 100 900; font-display: swap; src: url('fonts_chunks/chunk_13.woff2') format('woff2'); unicode-range: U+7B00-7FFF; }
+@font-face { font-family: 'HarmonyOS Sans SC'; font-weight: 100 900; font-display: swap; src: url('fonts_chunks/chunk_14.woff2') format('woff2'); unicode-range: U+8000-84FF; }
+@font-face { font-family: 'HarmonyOS Sans SC'; font-weight: 100 900; font-display: swap; src: url('fonts_chunks/chunk_15.woff2') format('woff2'); unicode-range: U+8500-89FF; }
+@font-face { font-family: 'HarmonyOS Sans SC'; font-weight: 100 900; font-display: swap; src: url('fonts_chunks/chunk_16.woff2') format('woff2'); unicode-range: U+8A00-8EFF; }
+@font-face { font-family: 'HarmonyOS Sans SC'; font-weight: 100 900; font-display: swap; src: url('fonts_chunks/chunk_17.woff2') format('woff2'); unicode-range: U+8F00-93FF; }
+@font-face { font-family: 'HarmonyOS Sans SC'; font-weight: 100 900; font-display: swap; src: url('fonts_chunks/chunk_18.woff2') format('woff2'); unicode-range: U+9400-98FF; }
+@font-face { font-family: 'HarmonyOS Sans SC'; font-weight: 100 900; font-display: swap; src: url('fonts_chunks/chunk_19.woff2') format('woff2'); unicode-range: U+9900-9FFF; }
+@font-face { font-family: 'HarmonyOS Sans SC'; font-weight: 100 900; font-display: swap; src: url('fonts_chunks/chunk_20.woff2') format('woff2'); unicode-range: U+F900-FAFF; }
+@font-face {
+  font-family: 'Noto Sans SC';
+  font-weight: 100 900; font-display: swap;
+  src: url('NotoSansSC-subset.woff2') format('woff2');
+  unicode-range: U+0041, U+0061, U+FF01, U+FF05, U+FF08-FF09, U+FF0C, U+FF1A-FF1B, U+FF1F, U+FF5E;
+}
+
+/* ─── Tokens ─── */
 :root {
+  color-scheme: light;
+
+  --canvas: #FFFFFF;
+  --surface: #FFFFFF;
+  --well: #F4F5F8;
+  --hover: #F4F5F8;
+  --surface-high: #F4F5F8;
+  --stage: #F4F5F8;
+
+  --text: #0E1A2B;
+  --ghost-text: #3D485C;
+  --muted: #5C6678;
+  --subtle: #616B80;
+
+  --border: rgba(14, 26, 43, .12);
+  --border-soft: rgba(14, 26, 43, .08);
+  --border-strong: rgba(14, 26, 43, .20);
+  --outline: #BDC2CC;
+
+  --accent: #2C5A8C;
+  --primary: #2C5A8C;
+  --primary-hover: #1F3F66;
+  --primary-pressed: #163059;
+  --on-primary: #FFFFFF;
+  --secondary: #EEF3F9;
+  --secondary-hover: #E3EDFA;
+  --secondary-pressed: #DCE7F2;
+  --on-secondary: #1F3F66;
+  --selected: #EEF3F9;
+  --on-selected: #1F3F66;
+  --accent-dim: #E3EDFA;
+  --accent-on: #1F3F66;
+  --brand-dot: #2F5D4F;
+
+  /* The rolling word's colours, one per word: forest, ochre,
+     terracotta, olive, petrol. Earth tones beside the navy ink, each at
+     least 5:1 on the canvas. */
+  /* "Hi, I'm" a shade softer than full ink, so the rolling word leads. */
+  --hero-ink: rgba(14, 26, 43, .86);
+
+  --tone-0: #2F5D4F;
+  --tone-1: #8C6410;
+  --tone-2: #9E4A30;
+  --tone-3: #5E6A1A;
+  --tone-4: #2A6577;
+
+  --focus-edge: #2C5A8C;
+  --focus-halo: #DCE7F2;
+  --focus: 0 0 0 1px var(--focus-edge), 0 0 0 4px var(--focus-halo);
+  --focus-inset: inset 0 0 0 1px var(--focus-edge), inset 0 0 0 4px var(--focus-halo);
+  --lift: 0 1px 2px rgba(14, 26, 43, .08);
+  --shadow-1: 0 1px 0 rgba(14, 26, 43, .04), 0 1px 2px rgba(14, 26, 43, .06);
+  --shadow-2: 0 2px 4px rgba(14, 26, 43, .06), 0 8px 16px rgba(14, 26, 43, .06);
+  --search-shadow: 0 12px 32px rgba(14, 26, 43, .12);
+  /* Under the sticky bar once the page scrolls: a hairline and a soft
+     drop, so the bar reads as lifted above the grey band. */
+  --header-shadow: 0 1px 0 rgba(14, 26, 43, .06), 0 2px 6px rgba(14, 26, 43, .05);
+  --menu-shadow: 0 8px 24px rgba(14, 26, 43, .16);
+  --ripple: rgba(14, 26, 43, .08);
+
+  /* Latin first (it claims no Han), then Han, then the full-width
+     punctuation; system monospace and Chinese fonts stand in until the
+     files arrive. */
+  --font: 'JetBrains Mono', 'HarmonyOS Sans SC', 'Noto Sans SC', ui-monospace,
+    'Cascadia Mono', Consolas, 'SF Mono', Menlo, 'PingFang SC', 'Hiragino Sans GB',
+    'Microsoft YaHei', monospace;
+  --font-display: 'Smiley Sans', 'JetBrains Mono', 'HarmonyOS Sans SC', 'Noto Sans SC',
+    'PingFang SC', 'Microsoft YaHei', sans-serif;
+
+  /* Type scale. Mono sets wide, so the text sizes sit a step below a
+     proportional face's: 12 for small print, 14 for text. The display
+     sizes double from there (28, 56) and the headline grows to 128 on
+     wide screens; Smiley Sans is condensed, so it carries the size. */
+  --t-small: 12px;
+  --t-body: 14px;
+  --t-lead: 17px;
+  --t-head: 26px;
+  /* Phones scale the headline with the screen, so it fits beside the
+     portrait down to 320px; from 640px it steps up in fixed sizes. */
+  --t-hero: clamp(44px, 13.5vw, 64px);
+
+  /* Leading: Latin 1.6, Chinese 1.8 (clreq). */
+  --lh: 1.6;
+
+  /* Corners: controls, panels, the birthday stage. */
+  --r-s: 6px;
+  --r-m: 10px;
+  --r-l: 14px;
+
+  --nav-h: 56px;
+  --gutter: 16px;
+  --col-gap: 24px;
+  --section-gap: 64px;
+}
+:root:lang(zh) { --lh: 1.8; }
+
+:root[data-theme="dark"] {
   color-scheme: dark;
-  --bg-rgb: 31 31 30;
-  --surface-rgb: 42 42 41;
-  --surface-high-rgb: 51 51 50;
-  --border-rgb: 58 58 57;
-  --outline-rgb: 74 74 73;
-  --text-rgb: 232 232 232;
-  --muted-rgb: 161 161 160;
-  --accent-rgb: 217 119 87;
-  --accent-on-rgb: 255 180 157;
-  --accent-dim-alpha: 0.15;
-  --nav-hover: rgba(255, 255, 255, 0.10);
-  --hero-role-paint: linear-gradient(90deg, #d97757, #ffb49d);
-  --one-glow: rgba(217, 119, 87, .30);
-  --bg: #1f1f1e;
-  --surface: #2a2a29;
-  --surface-high: #333332;
-  --border: #3a3a39;
-  --outline: #4a4a49;
-  --text: #e8e8e8;
-  --muted: #a1a1a0;
-  --accent: #d97757;
-  --accent-dim: rgba(217, 119, 87, 0.15);
-  --accent-on: #ffb49d;
+
+  --canvas: #0A111C;
+  --surface: #131F2E;
+  --well: #0F1825;
+  --hover: #1A2738;
+  --surface-high: #1A2738;
+  --stage: #131F2E;
+
+  --text: #E6EBF2;
+  --ghost-text: #9BA5B5;
+  --muted: #9BA5B5;
+  --subtle: #9BA5B5;
+
+  --border: rgba(230, 235, 242, .12);
+  --border-soft: rgba(230, 235, 242, .08);
+  --border-strong: rgba(230, 235, 242, .20);
+  --outline: rgba(230, 235, 242, .20);
+
+  --accent: #6096D0;
+  --secondary: rgba(96, 150, 208, .16);
+  --secondary-hover: rgba(96, 150, 208, .24);
+  --secondary-pressed: rgba(96, 150, 208, .30);
+  --on-secondary: #A9C8EA;
+  --selected: rgba(96, 150, 208, .16);
+  --on-selected: #A9C8EA;
+  --accent-dim: rgba(96, 150, 208, .16);
+  --accent-on: #A9C8EA;
+  --brand-dot: #6FA593;
+
+  --hero-ink: rgba(230, 235, 242, .86);
+
+  --tone-0: #6FA593;
+  --tone-1: #D6AA55;
+  --tone-2: #E2896C;
+  --tone-3: #B6C266;
+  --tone-4: #6DAFC4;
+
+  --focus-edge: #6096D0;
+  --focus-halo: rgba(96, 150, 208, .35);
+  --focus: 0 0 0 1px var(--focus-edge), 0 0 0 4px var(--focus-halo);
+  --focus-inset: inset 0 0 0 1px var(--focus-edge), inset 0 0 0 4px var(--focus-halo);
+  --lift: 0 1px 2px rgba(0, 0, 0, .35);
+  --shadow-1: 0 1px 0 rgba(0, 0, 0, .35), 0 1px 2px rgba(0, 0, 0, .35);
+  --shadow-2: 0 2px 4px rgba(0, 0, 0, .35), 0 8px 16px rgba(0, 0, 0, .35);
+  --search-shadow: 0 12px 32px rgba(0, 0, 0, .5);
+  --header-shadow: 0 1px 0 rgba(230, 235, 242, .06), 0 2px 6px rgba(0, 0, 0, .30);
+  --menu-shadow: 0 8px 24px rgba(0, 0, 0, .4);
+  --ripple: rgba(230, 235, 242, .10);
 }
 
-/* ─── Body base ─── */
-html { background-color: var(--bg); }
+@media (min-width: 640px) {
+  :root { --gutter: 24px; --t-lead: 20px; --t-head: 30px; }
+}
+@media (min-width: 768px) {
+  :root { --t-hero: 88px; }
+}
+@media (min-width: 960px) {
+  :root { --section-gap: 96px; --t-hero: 112px; }
+}
+@media (min-width: 1200px) {
+  :root { --gutter: 64px; --t-hero: 128px; }
+}
+
+/* ─── Base ─── */
+*, *::before, *::after { box-sizing: border-box; }
+html {
+  background: var(--canvas);
+  scroll-behavior: smooth;
+  /* Anchor jumps land below the sticky bar. */
+  scroll-padding-top: calc(var(--nav-h) + 24px);
+  -webkit-text-size-adjust: 100%;
+  text-size-adjust: 100%;
+}
 body {
-  font-family: 'JetBrains Mono', 'HarmonyOS Sans', 'PingFang SC', 'Microsoft YaHei', sans-serif !important;
-  background-color: var(--bg);
+  margin: 0;
+  min-height: 100vh;
+  background: var(--canvas);
   color: var(--text);
+  font: 400 var(--t-body)/var(--lh) var(--font);
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
   -webkit-tap-highlight-color: transparent;
+  /* The homepage is not for copying text from. */
+  -webkit-user-select: none;
+  user-select: none;
+}
+/* Only the weights in the files, never a drawn-on bold or slant, and
+   paired Chinese punctuation set tight (clreq). The copy already puts a
+   space between Han and Latin, so the browser adds none of its own.
+   Kept off the search overlay, which brings its own fonts. */
+.site-header, main, .site-footer {
+  font-synthesis: none;
+  font-kerning: normal;
+  text-autospace: no-autospace;
+  text-spacing-trim: normal;
+}
+h1, h2, h3, p, ul, figure { margin: 0; }
+ul { padding: 0; list-style: none; }
+a { color: inherit; text-decoration: none; }
+button {
+  margin: 0; padding: 0; border: 0;
+  background: none; color: inherit;
+  font: inherit; cursor: pointer;
+}
+img, svg { display: block; flex-shrink: 0; }
+[hidden] { display: none !important; }
+
+/* A ring on keyboard focus only, never on a mouse click. Forced-colours
+   modes drop shadows, so a transparent outline stands in for the ring
+   there (they paint it in the system colour). */
+:focus:not(:focus-visible) { outline: none; }
+:focus-visible { outline: 2px solid transparent; outline-offset: 2px; }
+:is(a, button, [tabindex]):focus-visible { box-shadow: var(--focus); }
+
+.icon { width: 16px; height: 16px; }
+.icon-lg { width: 20px; height: 20px; }
+
+.container {
+  width: 100%;
+  max-width: calc(1040px + 2 * var(--gutter));
+  /* Physical sides throughout: older Safari has no margin-inline or
+     padding-block, and would lose the centring and the spacing. */
+  margin-left: auto; margin-right: auto;
+  padding-left: var(--gutter); padding-right: var(--gutter);
+  /* viewport-fit=cover lets the bands reach a notched phone's edges;
+     the content itself stays clear of the notch. */
+  padding-left: max(var(--gutter), env(safe-area-inset-left, 0px));
+  padding-right: max(var(--gutter), env(safe-area-inset-right, 0px));
 }
 
-/* ─── Fixed wallpaper layer beneath all content.
-   Implemented as a position:fixed div rather than a body background, because
-   iOS Safari renders `background-attachment: fixed` at the image's natural
-   size in the top-left corner and scrolls it with the page.
-   Height is pinned to 100lvh (large viewport) so the element's box doesn't
-   resize when iOS Safari collapses its bottom bar — otherwise `cover` would
-   recompute and the wallpaper crop would visibly jump on scroll. ─── */
-#bg-wallpaper {
-  position: fixed;
-  top: 0;
-  left: 0;
-  right: 0;
-  height: 100vh;
-  height: 100lvh;
-  z-index: 0;
-  pointer-events: none;
-  /* A daily theme (lib/daily) may swap the cover through these vars. */
-  background-image: var(--cover-dark, url('../resources/th.jpg'));
-  background-size: cover;
-  background-position: var(--cover-pos, center);
-  background-repeat: no-repeat;
+/* The page grid: twelve columns, read as three fields of four. The
+   headline and every section heading hang from column 1, all content
+   from column 5, and the portrait from column 9. */
+.grid {
+  display: grid;
+  grid-template-columns: repeat(12, minmax(0, 1fr));
+  column-gap: var(--col-gap);
 }
 
-/* ─── Fixed dark dim layered over the wallpaper, beneath all content ─── */
-#bg-overlay {
-  position: fixed;
-  top: 0;
-  left: 0;
-  right: 0;
-  height: 100vh;
-  height: 100lvh;
-  z-index: 0;
-  pointer-events: none;
-  background: linear-gradient(180deg, rgba(0, 0, 0, 0.45) 0%, rgba(0, 0, 0, 0.65) 100%);
-}
-
-/* ─── Wallpaper strip clipped to the navbar.
-   Uses the same inset:0 + cover sizing as #bg-wallpaper so the image lines up
-   exactly with the underlying wallpaper; clip-path keeps only the top 64px
-   visible. Sits above the solid .content-surface (z-index 1) but below the
-   navbar (z-index 9999). Its dim gradient mirrors #bg-overlay's so the strip
-   pixel-matches the underlying wallpaper while the navbar is transparent.
-   Opacity is driven by --frost-progress so the strip fades in gradually as
-   the user scrolls through the hero. ─── */
-:root {
-  --frost-progress: 0;
-  --content-transition-progress: 0;
-  --scroll-hint-progress: 1;
-  --content-transition-height: clamp(200px, 26vh, 300px);
-}
-
-#nav-bg-strip {
-  position: fixed;
-  top: 0;
-  left: 0;
-  right: 0;
-  height: 100vh;
-  height: 100lvh;
-  z-index: 50;
-  pointer-events: none;
-  clip-path: inset(0 0 calc(100% - 64px) 0);
-  background:
-    linear-gradient(180deg, rgba(0, 0, 0, 0.15) 0%, rgba(0, 0, 0, 0.25) 100%),
-    var(--cover-dark, url('../resources/th.jpg')) var(--cover-pos, center) / cover no-repeat;
-  opacity: var(--frost-progress);
-}
-
-/* Ensure foreground stacking sits above #bg-overlay.
-   NOTE: do NOT include #navbar / #mobile-menu here — their position
-   is already `fixed` and overriding it to `relative` breaks the
-   layout (mobile-menu would take flow space on desktop). */
-main { position: relative; z-index: 2; }
-.content-surface { position: relative; z-index: 1; }
-
-/* ─── Middle article sections — solid surface covering the wallpaper ─── */
-.content-surface {
-  background-color: var(--bg);
-  position: relative;
-  z-index: 1;
-}
-
-/* Blend the hero into the solid article surface, and back out before the
-   footer. Two things change together across the whole width:
-   - the page colour eases in along a smooth many-stop curve (no bands),
-   - an even blur fades in along a gentler curve beneath it.
-   The top transition stays invisible at rest and fades in as a whole as
-   soon as the user scrolls (--content-transition-progress, set by the page). */
-:root {
-  --transition-fill:
-    rgb(var(--bg-rgb) / 0) 0%,     rgb(var(--bg-rgb) / .013) 8%,
-    rgb(var(--bg-rgb) / .049) 15%, rgb(var(--bg-rgb) / .104) 22%,
-    rgb(var(--bg-rgb) / .175) 29%, rgb(var(--bg-rgb) / .259) 35%,
-    rgb(var(--bg-rgb) / .352) 41%, rgb(var(--bg-rgb) / .45) 47%,
-    rgb(var(--bg-rgb) / .55) 53%,  rgb(var(--bg-rgb) / .648) 59%,
-    rgb(var(--bg-rgb) / .741) 65%, rgb(var(--bg-rgb) / .825) 71%,
-    rgb(var(--bg-rgb) / .896) 78%, rgb(var(--bg-rgb) / .951) 85%,
-    rgb(var(--bg-rgb) / .987) 92%, rgb(var(--bg-rgb)) 100%;
-  --transition-overlap: 16px;
-  --transition-blur:
-    transparent 0%, rgb(0 0 0 / .18) 12%, rgb(0 0 0 / .45) 26%,
-    rgb(0 0 0 / .75) 40%, rgb(0 0 0 / .93) 52%, #000 62%;
-}
-.content-surface::before,
-.content-surface::after {
-  content: "";
-  position: absolute;
-  z-index: -1;
-  left: 0;
-  right: 0;
-  /* Reach into the article and fade out there: the blurred layer's own edge
-     can leave a hairline on fractional pixel positions, and inside the
-     article that edge sits over the same solid colour, out of sight. */
-  height: calc(var(--content-transition-height) + var(--transition-overlap));
-  pointer-events: none;
-  backdrop-filter: blur(14px);
-  -webkit-backdrop-filter: blur(14px);
-}
-.content-surface::before {
-  top: calc(-1 * var(--content-transition-height));
-  background: linear-gradient(180deg, var(--transition-fill));
-  -webkit-mask-image: linear-gradient(180deg, var(--transition-blur), #000 calc(100% - var(--transition-overlap)), transparent 100%);
-  mask-image: linear-gradient(180deg, var(--transition-blur), #000 calc(100% - var(--transition-overlap)), transparent 100%);
-  opacity: var(--content-transition-progress);
-}
-.content-surface::after {
-  bottom: calc(-1 * var(--content-transition-height));
-  background: linear-gradient(0deg, var(--transition-fill));
-  -webkit-mask-image: linear-gradient(0deg, var(--transition-blur), #000 calc(100% - var(--transition-overlap)), transparent 100%);
-  mask-image: linear-gradient(0deg, var(--transition-blur), #000 calc(100% - var(--transition-overlap)), transparent 100%);
-}
-
-/* ─── Frosted surface — translucent dark fill with blur, used by elements
-   that sit directly over the hero wallpaper (scroll-down chevron, hero CTAs). */
-.frosted-cta {
-  color: rgba(255, 255, 255, 0.95);
-  background: rgba(255, 255, 255, 0.10);
-  backdrop-filter: blur(14px);
-  -webkit-backdrop-filter: blur(14px);
-  text-decoration: none;
-  transition: color 0.25s ease, background 0.25s ease;
-}
-.frosted-cta:hover {
-  color: #fff;
-  background: rgba(255, 255, 255, 0.20);
-}
-
-
-/* ─── Hero scroll-down hint — gently bobbing chevron at the bottom of main ─── */
-#scroll-down {
-  position: absolute;
-  bottom: 96px;
-  left: 50%;
-  transform: translateX(-50%);
-  width: 40px;
-  height: 40px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  border-radius: 50%;
-  color: rgba(255, 255, 255, 0.78);
-  background: rgba(255, 255, 255, 0.10);
-  backdrop-filter: blur(14px);
-  -webkit-backdrop-filter: blur(14px);
-  animation: bob 2s ease-in-out infinite;
-  opacity: var(--scroll-hint-progress);
-  transition: opacity 0.12s linear, color 0.25s ease, background 0.25s ease;
-  text-decoration: none;
-  will-change: opacity;
-}
-#scroll-down.is-hidden {
-  pointer-events: none;
-  animation-play-state: paused;
-}
-#scroll-down:hover {
-  color: #fff;
-  background: rgba(255, 255, 255, 0.20);
-}
-#scroll-down svg { width: 18px; height: 18px; }
-@keyframes bob {
-  0%, 100% { transform: translate(-50%, 0); }
-  50%      { transform: translate(-50%, 6px); }
-}
-
-/* ─── Footer — transparent over wallpaper with a gradient for legibility ─── */
-footer.over-wallpaper {
-  background: transparent !important;
-  border-top: none !important;
-  min-height: calc(var(--content-transition-height) + 18rem);
-  padding-block: 2.5rem !important;
-  display: flex;
-  align-items: center;
-  position: relative;
-  /* Keep footer text above the preceding surface's blurred transition. */
-  z-index: 2;
-  isolation: isolate;
-}
-footer.over-wallpaper::before {
-  content: "";
-  position: absolute;
-  inset: 0;
-  z-index: -1;
-  background: linear-gradient(180deg,
-              rgba(0, 0, 0, 0.0) 0%,
-              rgba(0, 0, 0, 0.45) 30%,
-              rgba(0, 0, 0, 0.7) 100%);
-  pointer-events: none;
-}
-
-/* ─── Ripple ─── */
+/* ─── Ripple (bindRipples in index.html) ─── */
 .ripple-surface { position: relative; overflow: hidden; }
 .ripple {
   position: absolute; border-radius: 50%; transform: scale(0);
   animation: ripple 600ms linear; pointer-events: none;
-  background-color: rgba(255, 255, 255, 0.15);
+  background-color: var(--ripple);
 }
-.ripple-primary .ripple { background-color: rgba(255, 255, 255, 0.3); }
-.ripple-surface-variant .ripple { background-color: rgba(255, 255, 255, 0.08); }
+.btn-primary .ripple { background-color: rgba(255, 255, 255, .28); }
 @keyframes ripple { to { transform: scale(4); opacity: 0; } }
 
-/* ─── M3 Card ─── */
-.m3-card { transition: background-color 0.2s ease, box-shadow 0.2s ease, border-color 0.2s ease; }
-.m3-card:hover {
-  background-color: var(--surface-high);
-  box-shadow: 0 8px 20px rgba(0, 0, 0, 0.28);
+/* ─── Buttons ─── */
+.btn {
+  display: inline-flex; align-items: center; justify-content: center; gap: 8px;
+  height: 32px; padding: 0 14px; border-radius: var(--r-s);
+  font: 700 13px/1.25 var(--font);
+  white-space: nowrap;
+  box-shadow: var(--lift);
+  transition: background-color .15s ease, color .15s ease;
 }
+.btn-primary {
+  background: var(--primary); color: var(--on-primary);
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, .14), var(--lift);
+}
+/* The ring's edge is the fill's own blue, so a sliver of canvas keeps
+   them apart. */
+.btn-primary:focus-visible {
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, .14), 0 0 0 2px var(--canvas),
+    0 0 0 3px var(--focus-edge), 0 0 0 6px var(--focus-halo);
+}
+.btn-secondary { background: var(--secondary); color: var(--on-secondary); }
+@media (hover: hover) {
+  .btn-primary:hover { background: var(--primary-hover); }
+  .btn-secondary:hover { background: var(--secondary-hover); }
+}
+.btn-primary:active { background: var(--primary-pressed); }
+.btn-secondary:active { background: var(--secondary-pressed); }
 
-/* ─── Navbar — frost intensity ramps with --frost-progress (driven by scroll)
-   so the dark tint and blur build smoothly from 0 at the hero top to peak
-   right as About reaches the navbar. The dark tint + backdrop-filter live on
-   the ::before pseudo, NOT on #navbar itself: putting backdrop-filter on the
-   navbar would create a backdrop root and break child elements' own
-   backdrop-filter (e.g. .nav-link hover frost). ─── */
-#navbar {
-  position: fixed; top: 0; left: 0; right: 0; z-index: 9999;
-  display: flex; align-items: center; justify-content: space-between;
-  height: 64px; padding: 0 24px;
-  background: transparent;
-}
-#navbar::before {
-  content: "";
-  position: absolute;
-  inset: 0;
-  z-index: -1;
-  pointer-events: none;
-  background-color: rgba(20, 20, 19, calc(0.45 * var(--frost-progress)));
-  backdrop-filter: blur(calc(14px * var(--frost-progress)));
-  -webkit-backdrop-filter: blur(calc(14px * var(--frost-progress)));
-}
-
-.nav-brand-wrap { position: relative; }
-
-#brand-dropdown-btn {
-  position: relative; overflow: hidden;
-  display: inline-flex; align-items: center;
-  padding: 8px 12px; border-radius: 9999px;
-  border: none; background: transparent;
-  font-family: inherit; font-size: 18px; font-weight: 700;
-  cursor: pointer; letter-spacing: 0.05em;
-  transition: background 0.2s ease,
-              backdrop-filter 0.2s ease, -webkit-backdrop-filter 0.2s ease;
-}
-#brand-dropdown-btn:hover {
-  background: rgba(255, 255, 255, 0.10);
-  backdrop-filter: blur(14px);
-  -webkit-backdrop-filter: blur(14px);
-}
-#brand-dropdown-btn .b-static { color: var(--text); }
-#brand-dropdown-btn .b-page { color: rgba(232, 232, 232, 0.6); font-weight: 500; }
-
-.b-dot {
-  background: linear-gradient(90deg, #d97757, #ffb49d);
-  -webkit-background-clip: text; background-clip: text; color: transparent;
-}
-
-#brand-dropdown-icon {
-  width: 16px; height: 16px; margin-left: 6px;
-  color: rgba(232, 232, 232, 0.6); transition: transform 0.2s ease;
-}
-
-#brand-dropdown-menu {
-  position: absolute; top: 100%; left: 0; margin-top: 8px;
-  width: 192px; background: var(--surface); border-radius: 8px;
-  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.4); border: 1px solid var(--border);
-  padding: 8px 0; overflow: hidden;
-  opacity: 0; pointer-events: none; transition: opacity 0.2s ease; z-index: 110;
-}
-#brand-dropdown-menu.is-open { opacity: 1; pointer-events: auto; }
-
-.nav-dd-item {
-  position: relative; overflow: hidden;
-  display: block; padding: 12px 16px;
-  font-size: 14px; font-weight: 500; text-decoration: none; color: var(--muted);
-  transition: color 0.2s ease, background 0.2s ease;
-}
-.nav-dd-item:hover { color: var(--text); background: var(--surface-high); }
-.nav-dd-item.nav-active { color: var(--accent); background: var(--accent-dim); }
-
-.nav-right { display: flex; align-items: center; gap: 8px; }
-.nav-divider { width: 1px; height: 24px; background: var(--border); margin: 0 4px; flex-shrink: 0; }
-
-#lang-toggle {
-  background: transparent; border: none;
-  color: var(--muted); font-family: inherit; font-size: 13.5px; font-weight: 500;
-  padding: 9px 18px; border-radius: 9999px; cursor: pointer; letter-spacing: 0.1em;
-  position: relative; overflow: hidden;
-  display: inline-flex; align-items: center; gap: 6px;
-  height: 40px; box-sizing: border-box;
-  transition: background 0.2s ease, color 0.2s ease,
-              backdrop-filter 0.2s ease, -webkit-backdrop-filter 0.2s ease;
-}
-#lang-toggle:hover {
-  background: rgba(255, 255, 255, 0.10);
-  backdrop-filter: blur(14px);
-  -webkit-backdrop-filter: blur(14px);
-  color: var(--text);
-}
-
-/* Circular M3-style icon buttons (GitHub link, louie. search).
- * Same height as the brand button on the left so the navbar reads as one
- * unified row. */
-#github-btn, #search-btn, #theme-btn {
+/* Ghost: no fill until hovered. */
+.ghost {
   display: inline-flex; align-items: center; justify-content: center;
-  width: 40px; height: 40px; border-radius: 50%;
-  background: transparent; border: none;
+  height: 32px; border-radius: var(--r-s);
+  color: var(--ghost-text);
+  font: 400 13px/1.25 var(--font);
+  white-space: nowrap;
+  transition: background-color .15s ease, color .15s ease;
+}
+.ghost:active { background: var(--hover); color: var(--text); }
+@media (hover: hover) {
+  .ghost:hover { background: var(--hover); color: var(--text); }
+}
+
+/* ─── Nav ─── */
+.site-header {
+  position: sticky; top: 0; z-index: 100;
+  background: var(--canvas);
+  transition: box-shadow .15s ease;
+}
+.site-header.is-scrolled { box-shadow: var(--header-shadow); }
+.nav {
+  display: flex; align-items: center; justify-content: space-between; gap: 8px;
+  height: var(--nav-h);
+}
+
+/* The wordmark sits on the content edge; its padding hangs outside. */
+.brand { position: relative; margin-left: -8px; flex-shrink: 0; }
+.brand-btn {
+  gap: 4px; padding: 0 8px;
+  font-size: 15px; font-weight: 700;
+  color: var(--text);
+}
+.wm-name { color: var(--text); }
+.wm-dot { color: var(--brand-dot); }
+.wm-page { color: var(--ghost-text); font-weight: 400; }
+.brand-btn .chevron { color: var(--ghost-text); transition: transform .15s ease; }
+.brand-btn[aria-expanded="true"] .chevron { transform: rotate(180deg); }
+
+/* The brand menu, as on the homepage before the redesign: a Material
+   menu. A 144px sheet with a soft shadow, 8px of padding top and
+   bottom, and full-width list rows; the row under the pointer turns
+   grey, the page you are on takes the accent on a tint of it. */
+.dropdown {
+  position: absolute; top: 100%; left: 0; z-index: 110;
+  margin-top: 8px;
+  width: 144px; padding: 8px 0;
+  background: var(--surface);
+  border: 1px solid var(--border); border-radius: 8px;
+  box-shadow: var(--menu-shadow);
+  overflow: hidden;
+  opacity: 0; visibility: hidden;
+  transition: opacity .2s ease, visibility 0s linear .2s;
+}
+.dropdown.is-open {
+  opacity: 1; visibility: visible;
+  transition-delay: 0s;
+}
+.dd-item {
+  display: block;
+  padding: 12px 16px;
+  font: 500 14px/1.25 var(--font);
+  /* JetBrains Mono ships Regular and Bold only; a hair of stroke gives
+     these rows the medium weight in between. */
+  -webkit-text-stroke: .35px currentColor;
   color: var(--muted);
-  text-decoration: none;
-  cursor: pointer;
-  position: relative; overflow: hidden;
-  transition: background 0.2s ease, color 0.2s ease,
-              backdrop-filter 0.2s ease, -webkit-backdrop-filter 0.2s ease;
+  transition: background-color .2s ease, color .2s ease;
 }
-#github-btn:hover, #search-btn:hover, #theme-btn:hover {
-  background: rgba(255, 255, 255, 0.10);
-  backdrop-filter: blur(14px);
-  -webkit-backdrop-filter: blur(14px);
-  color: var(--text);
+.dd-item:active { background: var(--surface-high); color: var(--text); }
+@media (hover: hover) {
+  .dd-item:hover { background: var(--surface-high); color: var(--text); }
 }
-#github-btn svg, #search-btn svg, #theme-btn svg { width: 18px; height: 18px; display: block; }
+.dd-item[aria-current="page"],
+.dd-item[aria-current="page"]:hover {
+  color: var(--accent); background: var(--accent-dim); font-weight: 700;
+}
+.dd-item:focus-visible { box-shadow: var(--focus-inset); outline-offset: -2px; }
 
-/* On mobile, collapse the language toggle into a circular icon button that
- * mirrors #github-btn — drop the "EN ⇄ 文" label and keep only the icon. */
-@media (max-width: 767px) {
-  #lang-toggle {
-    width: 40px; padding: 0; gap: 0;
-    justify-content: center; letter-spacing: 0;
-  }
-  #lang-toggle #lang-label { display: none; }
-  #lang-toggle svg { width: 18px; height: 18px; }
+.nav-right {
+  display: flex; align-items: center; gap: 4px;
+  margin-right: -8px; min-width: 0;
 }
+.nav-links { display: flex; align-items: center; gap: 2px; }
+.nav-link { padding: 0 12px; }
+.nav-divider {
+  width: 1px; height: 20px; margin: 0 6px;
+  background: var(--border); flex-shrink: 0;
+}
+.icon-btn { gap: 6px; min-width: 32px; padding: 0 8px; }
 
-:root {
-  /* Light theme: a quiet resting color frames one copper/gold pass. */
-  --spectrum-paint: linear-gradient(105deg,
-    var(--hero-rest) 25%, var(--hero-copper) 43%, var(--hero-gold) 57%, var(--hero-rest) 75%);
-}
-#hero-roll-text {
-  background-image: var(--hero-role-paint);
-  background-size: var(--hero-role-size, 100% 100%);
-  background-position: 100% 50%;
-  -webkit-background-clip: text; background-clip: text; color: transparent;
-}
-#hero-roll-text.hero-spectrum { animation: var(--hero-role-animation, none); }
-@keyframes hero-spectrum-pass {
-  from { background-position: 100% 50%; }
-  to { background-position: 0% 50%; }
-}
-@media (prefers-reduced-motion: reduce) {
-  #hero-roll-text.hero-spectrum { animation: none; }
-}
-
-/* ============================================================
- * Be the One.
- * One idea runs through the page: one among many. One word lit,
- * and everything else stepping back around it.
- * ============================================================ */
-
-/* Default days keep the original hero; a themed day (lib/daily) swaps
-   it for "Be the One." — daily.js sets data-daily before first paint. */
-:root[data-daily] .hero-default,
-:root:not([data-daily]) .hero-themed { display: none; }
-
-/* ─── Hero: "Be the One. by Louie." ─── */
-.hero-title {
-  margin: 0;
-  font-size: 3.75rem; font-weight: 800;
-  line-height: 1.02; letter-spacing: -.035em;
-  color: var(--text);
-}
-@media (min-width: 640px) { .hero-title { font-size: 4.5rem; } .ht-br { display: none; } }
-@media (min-width: 768px) { .hero-title { font-size: 6rem; } }
-.hero-title .ht-lead,
-.hero-title .ht-one { display: inline-block; }
-.ht-one { position: relative; isolation: isolate; }
-/* A soft spotlight that settles on the one word that matters. */
-.ht-one::before {
-  content: "";
-  position: absolute; z-index: -1;
-  inset: -45% -35%;
-  pointer-events: none;
-  background: radial-gradient(closest-side, var(--one-glow), transparent);
-}
-.hero-one, .mf-one {
-  display: inline-block;
-  /* Room for the last glyph so tight tracking never clips the paint. */
-  padding-inline: .06em; margin-inline: -.06em;
-  background-image: var(--hero-role-paint);
-  background-size: var(--hero-role-size, 100% 100%);
-  /* Dark paints the static coral gradient; in light this lands on the
-     copper/gold middle of the spectrum, so "One" always reads as lit. */
-  background-position: 50% 50%;
-  -webkit-background-clip: text; background-clip: text; color: transparent;
-}
-.one-dot { color: var(--accent); }
-
-/* "by Louie." — the signature line under the headline. */
-.hero-sub {
-  margin: 1.5rem 0 0;
-  /* Nudged in so it lines up with the stem of the big "B" above. */
-  padding-left: .5em;
-  font-size: clamp(1.05rem, 1.4vw + .65rem, 1.4rem);
-  font-weight: 500; letter-spacing: .02em;
-  color: rgb(var(--text-rgb) / .82);
-}
-
-/* Today's theme (lib/daily) leaves one quiet line under the buttons. */
-.daily-note {
+/* The theme button shows the appearance in effect: a sun in light, a
+   moon in dark, with a small A while it follows the system. */
+.theme-moon { display: none; }
+:root[data-theme="dark"] .theme-sun { display: none; }
+:root[data-theme="dark"] .theme-moon { display: block; }
+.theme-auto {
   display: none;
-  align-items: center; gap: 12px;
-  margin-top: 2.25rem;
-  font-size: 12.5px; letter-spacing: .06em;
-  color: rgb(var(--text-rgb) / .68);
+  position: absolute; left: calc(50% + 2px); top: calc(50% + 1px);
+  padding: 0 1px; border-radius: 3px;
+  font: 700 9px/1 var(--font);
+  background: var(--canvas);
+  pointer-events: none;
 }
-.daily-note::before {
-  content: ""; width: 20px; height: 1px; flex-shrink: 0;
-  background: currentColor; opacity: .7;
+:root[data-theme-mode="auto"] .theme-auto { display: block; }
+@media (hover: hover) {
+  #theme-btn:hover .theme-auto { background: var(--hover); }
 }
-.daily-note:not(:empty) { display: inline-flex; }
 
-/* ─── 00. Manifesto. The opening and the end are fixed; the day's
-   lines (lib/daily) go between them. ─── */
-.mf-body { max-width: 46rem; }
-.mf-line {
-  margin: .45em 0 0;
-  font-size: clamp(1.125rem, 1.1vw + .85rem, 1.55rem);
-  line-height: 1.65;
+#menu-btn { display: none; }
+
+.mobile-menu {
+  position: absolute; top: 100%; left: 0; right: 0;
+  padding: 4px 0 8px;
+  background: var(--surface);
+  border-bottom: 1px solid var(--border);
+  box-shadow: var(--shadow-2);
+  opacity: 0; visibility: hidden; transform: translateY(-4px);
+  transition: opacity .15s ease, transform .15s ease, visibility 0s linear .15s;
+}
+.mobile-menu.is-open {
+  opacity: 1; visibility: visible; transform: none;
+  transition-delay: 0s;
+}
+.mm-item {
+  display: flex; align-items: center; justify-content: space-between;
+  height: 44px; padding: 0 var(--gutter);
+  padding-left: max(var(--gutter), env(safe-area-inset-left, 0px));
+  padding-right: max(var(--gutter), env(safe-area-inset-right, 0px));
+  font: 400 var(--t-body)/1.25 var(--font);
+  color: var(--ghost-text);
+  transition: background-color .15s ease, color .15s ease;
+}
+.mm-item:active { background: var(--hover); color: var(--text); }
+@media (hover: hover) {
+  .mm-item:hover { background: var(--hover); color: var(--text); }
+}
+.mm-item:focus-visible { box-shadow: var(--focus-inset); outline-offset: -2px; }
+.mm-item .icon { color: var(--muted); }
+.mm-sep { height: 1px; margin: 4px 0; background: var(--border-soft); }
+
+@media (min-width: 768px) {
+  .mobile-menu { display: none; }
+}
+
+/* Touch screens get 44px targets everywhere. */
+@media (pointer: coarse) {
+  .ghost, .btn { height: 44px; }
+  .icon-btn { min-width: 44px; }
+}
+
+@media (max-width: 767px) {
+  .nav-links, .nav-divider, #github-btn { display: none; }
+  #menu-btn { display: inline-flex; }
+  .ghost, .btn { height: 44px; }
+  .nav-right { gap: 0; margin-right: -14px; }
+  .icon-btn { min-width: 44px; padding: 0 14px; }
+  #lang-toggle { padding: 0 10px; }
+}
+/* The narrowest phones keep the language icon and drop its label. */
+@media (max-width: 374px) {
+  #lang-label { display: none; }
+  #lang-toggle { padding: 0 14px; }
+}
+
+/* ─── Hero ───
+   The headline in Smiley Sans, large, against the portrait; the
+   buttons follow it closely, and the text block sits on the portrait's
+   middle. */
+.hero {
+  /* The headline's two lines got more air (line-height 1.24, up from
+     1.12); the padding gives the same amount back, so the hero is no
+     taller than before. */
+  --hero-top: 32px;
+  --lead-gain: calc(var(--t-hero) * .12);
+  padding-top: calc(var(--hero-top) - var(--lead-gain));
+  padding-bottom: calc(var(--section-gap) - var(--lead-gain));
+}
+.hero-grid { row-gap: 32px; }
+.hero-text {
+  grid-column: 1 / -1; min-width: 0;
+  display: flex; flex-direction: column; align-items: flex-start;
+}
+.hero-title {
+  font-family: var(--font-display);
+  font-size: var(--t-hero);
+  font-weight: 400;
+  line-height: 1.24;
+  color: var(--text);
+  /* Smiley Sans leans right, so its letters' feet reach left of their
+     box; a small indent puts the feet, not the heads, on the column. */
+  padding-left: .05em;
+  /* No lone last word when a narrow phone wraps the birthday headline. */
+  text-wrap: pretty;
+}
+
+/* The rolling word keeps its own line, so the headline never jumps, and
+   each word comes in its own colour (index.html sets data-tone as it
+   rolls). The padding gives descenders, and the slanted foot of a
+   leading A or J, room inside the clip. */
+.roll {
+  display: grid; justify-items: start;
+  overflow: hidden;
+  padding: 0 .1em .16em; margin: 0 -.1em -.16em;
+  white-space: nowrap;
+}
+#hero-roll-text { display: block; color: var(--tone-0); }
+#hero-roll-text[data-tone="1"] { color: var(--tone-1); }
+#hero-roll-text[data-tone="2"] { color: var(--tone-2); }
+#hero-roll-text[data-tone="3"] { color: var(--tone-3); }
+#hero-roll-text[data-tone="4"] { color: var(--tone-4); }
+
+.hero-actions {
+  display: flex; flex-wrap: wrap; gap: 8px;
+  margin-top: 48px;
+}
+/* The hero's one call to action, a size up from the other buttons. */
+.hero-actions .btn {
+  height: 40px; padding: 0 20px;
+  border-radius: 8px;
+  font-size: 14px;
+}
+
+/* The portrait: Louie's avatar in a circle, the way GitHub frames one,
+   with a hairline to hold the edge on white. Phones give it the right
+   half of the column, above the headline. */
+.portrait {
+  grid-column: 7 / -1; grid-row: 1;
+  position: relative;
+  border-radius: 50%; overflow: hidden;
+  background: #FEF7EC;          /* the drawing's own cream ground */
+}
+/* Framed as a bust: the drawing moves down 6%, so the hair keeps a
+   margin inside the circle all round, the face sits on its middle, and
+   the shirt's flat bottom edge falls just below the circle. */
+.portrait img {
+  width: 100%; height: auto;
+  transform: translateY(6%);
+}
+:root[data-theme="dark"] .portrait { filter: brightness(.86); }
+.portrait::after {
+  content: ""; position: absolute; inset: 0;
+  border: 1px solid var(--border); border-radius: 50%;
+  pointer-events: none;
+}
+.hero-grid > .hero-text { grid-row: 2; }
+
+/* Phones keep the two sides too: the headline on the left, a smaller
+   portrait on the right, centred on the text. (A birthday's stage still
+   spans the width above the headline: the fireworks need the room.) */
+@media (max-width: 639px) {
+  :root:not([data-birthday]) .hero-grid {
+    grid-template-columns: minmax(0, 1fr) auto;
+    column-gap: 16px;
+    align-items: center;
+  }
+  :root:not([data-birthday]) .hero-grid > .hero-text { grid-column: 1; grid-row: 1; }
+  .portrait { grid-column: 2; grid-row: 1; width: clamp(88px, 28vw, 168px); }
+}
+
+/* Birthdays (lib/daily/daily.js sets data-birthday before first paint):
+   their own headline replaces "Hi, I’m …", and the animated avatar on
+   its stage takes the portrait's place. */
+.hero-default { color: var(--hero-ink); }
+
+/* A birthday's headline runs longer, so it sits a step below. */
+.hero-birthday { font-size: calc(var(--t-hero) * .75); }
+
+:root[data-birthday] .hero-default,
+:root:not([data-birthday]) .hero-birthday,
+:root[data-birthday] .portrait { display: none; }
+.hero-birthday:not(.is-set) { visibility: hidden; }
+
+.birthday-note {
+  display: none; align-items: center; gap: 8px;
+  margin-top: 24px;
+  font-size: var(--t-small); line-height: 1.5;
   color: var(--muted);
 }
-.mf-line.mf-open {
-  margin: 0 0 .55em;
-  font-size: clamp(2rem, 3.2vw + 1rem, 3.25rem);
-  font-weight: 800; line-height: 1.2; letter-spacing: -.02em;
-  color: var(--text);
-}
-.mf-line.mf-gap { margin-top: 1.5em; }
-.mf-line.mf-strong { color: var(--text); font-weight: 700; }
-.mf-line em { font-style: normal; color: var(--accent); }
-/* The name sits right under the words it signs. */
-.mf-line.mf-cite {
-  margin-top: .35em;
-  font-size: .875rem; letter-spacing: .06em;
-  color: rgb(var(--muted-rgb) / .85);
-}
-.mf-line.mf-close {
-  margin-top: 1.2em;
-  font-size: clamp(3rem, 7vw + 1rem, 5.5rem);
-  font-weight: 800; line-height: 1.1; letter-spacing: -.035em;
-  color: var(--text);
-}
-/* "One", underlined by 一: a single stroke written left to right. */
-.mf-one { position: relative; }
-.mf-one::after {
-  content: "";
-  position: absolute; left: .08em; right: .08em; bottom: -.02em;
-  height: max(4px, .07em); border-radius: 999px;
-  background: linear-gradient(90deg, var(--accent), var(--accent-on));
-  transform: scaleX(0); transform-origin: left center;
-  transition: transform 1.1s cubic-bezier(.2,.7,.2,1) .55s;
-}
-.mf-close.is-in .mf-one::after,
-html:not(.js) .mf-one::after { transform: scaleX(1); }
+.birthday-note .icon { color: var(--muted); }
+:root[data-birthday] .birthday-note { display: flex; }
 
-/* Lines rise in one at a time; the page adds .is-in and the stagger. */
-.js .mf-line {
-  opacity: 0; transform: translateY(18px);
-  transition: opacity .8s ease, transform .9s cubic-bezier(.2,.7,.2,1);
+.stage {
+  display: none;
+  grid-column: 1 / -1; grid-row: 1;
+  position: relative; overflow: hidden;
+  height: 260px;
+  background: var(--stage);
+  border: 1px solid var(--border); border-radius: var(--r-l);
+  justify-content: center; align-items: flex-end;
 }
-.js .mf-line.is-in { opacity: 1; transform: none; }
+:root[data-birthday] .stage { display: flex; }
+:root[data-birthday] .hero { --hero-top: 24px; }
 
-/* ─── Hovered cards lift a little; the others stay as they are ─── */
-@media (hover: hover) and (pointer: fine) {
-  :is(#projects, #social, #links) .grid > * {
-    transition: transform .35s cubic-bezier(.2,.7,.2,1),
-                background-color .2s ease, box-shadow .2s ease, border-color .2s ease;
-  }
-  :is(#projects, #social, #links) .grid > :hover { transform: translateY(-3px); }
+/* The avatar: a sprite sheet with every frame side by side, played as
+   crisp pixels, standing in front of the fireworks. */
+.stage-figure {
+  position: relative; z-index: 1;
+  flex: none; height: 80%;
+  aspect-ratio: var(--figure-ratio, 1);
+  background: var(--figure, none) 0 0 / contain no-repeat;
+  image-rendering: pixelated;
 }
-
-/* ─── Portrait covers (lib/daily): a person instead of a landscape.
-   Wide screens: the photo stands full-height on the right, below the
-   navbar, clear of the headline. Tall screens: it runs edge to edge
-   across the top and the headline rises into its lower half, like a
-   magazine cover; a centred photo with every edge feathered read as a
-   framed memorial portrait. Its edges dissolve into the page: ::before
-   holds the photo, ::after paints the fade over the same box in the
-   page's own ground colour, so no frame or seam shows. ─── */
-:root[data-cover="portrait"] { --cover-tall-h: 56svh; }
-:root[data-cover="portrait"] #bg-wallpaper {
-  --fade: var(--cover-ground, #0a0a0a);
-  background-color: var(--fade);
+:root[data-sprite] .stage-figure {
+  background-size: calc(var(--figure-frames) * 100%) 100%;
+  animation: figure-play calc(var(--figure-frames) / var(--figure-fps) * 1s)
+    steps(var(--figure-frames), jump-none) infinite;
 }
-:root[data-cover="portrait"][data-theme="light"] #bg-wallpaper { --fade: var(--bg); }
-:root[data-cover="portrait"] #bg-wallpaper::before,
-:root[data-cover="portrait"] #bg-wallpaper::after {
-  content: "";
-  position: absolute; top: 4rem; right: 0;
-  height: calc(100% - 4rem);
-  aspect-ratio: var(--cover-ratio, 2 / 3);
-}
-:root[data-cover="portrait"] #bg-wallpaper::before {
-  background: var(--cover-photo) center top / cover no-repeat;
-  /* Keep the photo's edge pixels under the fade's solid band; on fractional
-     pixel boundaries they would otherwise bleed through as a hairline. */
-  clip-path: inset(3px);
-}
-:root[data-cover="portrait"] #bg-wallpaper::after {
-  background:
-    linear-gradient(to right, var(--fade) 2%, transparent 34%),
-    linear-gradient(to bottom, var(--fade) 1%, transparent 7%, transparent 70%, var(--fade) 99%);
-}
-:root[data-cover-mono] #bg-wallpaper::before { filter: grayscale(1) contrast(1.08); }
-:root[data-cover="portrait"] #bg-overlay {
-  background: linear-gradient(90deg, rgba(0,0,0,.55) 0%, rgba(0,0,0,.35) 55%, rgba(0,0,0,.18) 100%);
-}
-:root[data-cover="portrait"][data-theme="light"] #bg-overlay {
-  background: linear-gradient(90deg,
-    rgba(242,236,225,.97) 0%, rgba(242,236,225,.9) 45%,
-    rgba(242,236,225,.25) 72%, rgba(242,236,225,.08) 100%);
-}
-@media (max-aspect-ratio: 1 / 1) {
-  :root[data-cover="portrait"] #bg-wallpaper::before,
-  :root[data-cover="portrait"] #bg-wallpaper::after {
-    left: 0; right: 0; width: 100%; aspect-ratio: auto;
-    height: var(--cover-tall-h);
-  }
-  :root[data-cover="portrait"] #bg-wallpaper::before {
-    background-position: center 18%;
-    clip-path: none;
-  }
-  :root[data-cover="portrait"] #bg-wallpaper::after {
-    background: linear-gradient(to bottom,
-      var(--fade) 0%, transparent 9%, transparent 42%, var(--fade) 100%);
-  }
-  :root[data-cover="portrait"] #bg-overlay {
-    background: linear-gradient(180deg, rgba(0,0,0,0) 0%, rgba(0,0,0,.1) 35%, rgba(0,0,0,.55) 70%, rgba(0,0,0,.6) 100%);
-  }
-  :root[data-cover="portrait"][data-theme="light"] #bg-overlay {
-    background: linear-gradient(180deg,
-      rgba(242,236,225,0) 0%, rgba(242,236,225,.08) 35%,
-      rgba(242,236,225,.85) calc(4rem + var(--cover-tall-h)), rgba(242,236,225,.96) 100%);
-  }
-  :root[data-cover="portrait"] main {
-    justify-content: flex-start;
-    padding-top: calc(var(--cover-tall-h) - 4.5rem);
-    padding-bottom: 10rem;
-  }
-}
-
-/* ─── Party days (the birthday template in lib/daily/daily.js). The
-   hero keeps the site's own ground and accent, flat and without any
-   glow: warm charcoal in dark, cream in light. Pixel-art fireworks
-   from party.js draw on #party-sky, between the ground and the person.
-
-   A figure cover ({ figure, ratio }) is a cut-out with no background
-   of its own: it stands on the page as is, right of the headline on
-   wide screens and above it on tall ones, with only its lower edge
-   fading out. It is placed through --fig-x / --fig-cy / --fig-h. ─── */
-:root[data-party] {
-  --party-ground: #1d1b1a;
-  --party-paint: linear-gradient(90deg, #d97757, #ffb49d, #ffd27a, #ffb49d, #d97757);
-  --fig-h: min(70vh, 640px);
-  --fig-x: 76vw;
-  --fig-cy: calc(50vh + 2rem);
-}
-:root[data-party][data-theme="light"] {
-  --party-ground: #f4eee4;
-  --party-paint: linear-gradient(90deg, #b4552d, #d9822b, #e3a83b, #d9822b, #b4552d);
+@keyframes figure-play {
+  from { background-position: 0 0; }
+  to { background-position: 100% 0; }
 }
 #party-sky {
-  position: fixed; top: 0; left: 0;
-  width: 100%; height: 100vh; height: 100lvh;   /* party.js sets whole cells */
-  z-index: 0; pointer-events: none;
-  image-rendering: crisp-edges;
+  position: absolute; top: 0; left: 0;
+  pointer-events: none;
   image-rendering: pixelated;
 }
 
-/* A plain ground; the landscape is set aside for the day. */
-:root[data-party]:not([data-cover="portrait"]) { --cover-dark: none; --cover-light: none; }
-:root[data-party]:not([data-cover="portrait"]) #bg-wallpaper { background: var(--party-ground); }
-:root[data-party]:not([data-cover="portrait"]) #bg-overlay { background: none; }
-:root[data-party]:not([data-cover="portrait"]) #nav-bg-strip { background: var(--party-ground); }
-:root[data-party][data-cover="portrait"]:not([data-theme="light"]) #bg-wallpaper { --fade: var(--party-ground); }
+/* From tablets up: headline in columns 1 to 8, portrait or stage in 9 to 12. */
+@media (min-width: 640px) {
+  .hero, :root[data-birthday] .hero { --hero-top: 80px; }
+  .hero-grid { align-items: center; }
+  .hero-grid > .hero-text { grid-column: 1 / span 8; grid-row: 1; }
+  .portrait, .stage { grid-column: 9 / span 4; grid-row: 1; }
+  .stage { height: auto; aspect-ratio: 1; }
+}
+@media (min-width: 960px) {
+  .hero, :root[data-birthday] .hero { --hero-top: 96px; }
+}
 
-/* The person, on #bg-overlay so the fireworks go off behind them. */
-:root[data-cover="figure"] #bg-overlay::before {
-  content: "";
-  position: absolute;
-  height: var(--fig-h);
-  aspect-ratio: var(--cover-ratio, 1 / 2);
-  left: calc(var(--fig-x) - var(--fig-h) * var(--cover-ratio, .5) / 2);
-  top: calc(var(--fig-cy) - var(--fig-h) / 2);
-  background: var(--cover-photo) center bottom / contain no-repeat;
-  -webkit-mask-image: linear-gradient(to bottom, #000 88%, transparent 100%);
-  mask-image: linear-gradient(to bottom, #000 88%, transparent 100%);
+/* ─── Sections ───
+   The hero is the page's top level on the canvas; everything after it,
+   About to the footer, sits on one band below, the panels white on it. */
+.sections { padding-top: var(--section-gap); padding-bottom: var(--section-gap); }
+.section + .section { margin-top: var(--section-gap); }
+.section-grid { display: grid; row-gap: 16px; }
+.section-title {
+  font-family: var(--font-display);
+  font-size: var(--t-head); font-weight: 400;
+  line-height: 1.1;
+  color: var(--text);
 }
-/* A sprite sheet: every frame side by side, played as crisp pixels. */
-:root[data-cover="figure"][style*="--cover-frames"] #bg-overlay::before {
-  background-size: calc(var(--cover-frames) * 100%) 100%;
-  background-position: 0 0;
-  image-rendering: crisp-edges;
-  image-rendering: pixelated;
-  animation: figure-play calc(var(--cover-frames) / var(--cover-fps) * 1s)
-    steps(var(--cover-frames), jump-none) infinite;
-}
-@keyframes figure-play { to { background-position: 100% 0; } }
-@media (prefers-reduced-motion: reduce) {
-  :root[data-cover="figure"] #bg-overlay::before { animation: none; }
-}
-@media (max-aspect-ratio: 1 / 1) {
-  :root[data-party] {
-    --fig-h: min(36svh, 330px);
-    --fig-x: 50vw;
-    --fig-cy: calc(4.5rem + var(--fig-h) / 2);
+.section-body { min-width: 0; }
+@media (min-width: 960px) {
+  .section-grid {
+    grid-template-columns: repeat(12, minmax(0, 1fr));
+    column-gap: var(--col-gap);
+    /* A heading shares its first baseline with what it heads. */
+    align-items: baseline;
   }
-  :root[data-cover="figure"] main {
-    justify-content: flex-start;
-    padding-top: calc(4.5rem + var(--fig-h) + 1rem);
-    padding-bottom: 10rem;
+  .section-title, .footer-title { grid-column: 1 / span 4; }
+  .section-body { grid-column: 5 / span 8; }
+}
+
+/* About: the page's one sentence of prose, a step up from the text. */
+.lead {
+  font-size: var(--t-lead);
+  line-height: 1.5;
+  color: var(--text);
+  text-wrap: pretty;
+}
+/* Chinese breaks only at its comma here, never mid-phrase. */
+.lead:lang(zh) { line-height: 1.6; word-break: keep-all; overflow-wrap: anywhere; }
+
+/* ─── Panels and rows ─── */
+.panel {
+  background: var(--surface);
+  border: 1px solid var(--border); border-radius: var(--r-m);
+  overflow: hidden;
+}
+.rows > li + li { border-top: 1px solid var(--border); }
+/* Icon and arrow sit on the name's line, so a row that runs to two
+   lines (a licence, a wrapped description) still reads from its top. */
+.row {
+  display: flex; align-items: flex-start; gap: 12px;
+  min-height: 48px; padding: 12px 20px;
+  color: var(--text);
+  cursor: pointer;
+  transition: background-color .15s ease;
+}
+.row:active { background: var(--hover); }
+@media (hover: hover) {
+  .row:hover { background: var(--hover); }
+}
+.row:focus-visible { box-shadow: var(--focus-inset); outline-offset: -2px; }
+.row-icon { color: var(--muted); margin-top: calc((var(--lh) * 14px - 20px) / 2); }
+.row-main {
+  flex: 1 1 auto; min-width: 0;
+  display: flex; flex-wrap: wrap; align-items: baseline;
+  column-gap: 16px; row-gap: 2px;
+  line-height: var(--lh);
+}
+.row-title {
+  font-weight: 700;
+  color: var(--text);
+}
+.row-desc, .row-handle {
+  font-size: 13px;
+  color: var(--muted);
+  min-width: 0;
+}
+
+.row-arrow {
+  color: var(--subtle); opacity: .55; transition: opacity .15s ease;
+  margin-top: calc((var(--lh) * 14px - 16px) / 2);
+}
+@media (hover: hover) {
+  .row:hover .row-arrow { opacity: 1; }
+}
+/* A mono space is a full character wide, which opens a hole wherever
+   Chinese meets Latin ("B 站", "为 Bilibili 官方"). In Chinese copy it
+   is cut to about the gap a typesetter leaves between the two. */
+.row-main:lang(zh), .lead:lang(zh), .footer-desc:lang(zh), .birthday-note:lang(zh) {
+  word-spacing: -.3em;
+}
+
+/* Phones put the second part under the title in every row. */
+.rows .row-title { flex: 1 1 100%; }
+/* From tablets up every row is icon, name, then the second column: the
+   name takes a column as wide as the longest one (27 characters of mono
+   in English, 23 in Chinese, less the icon and its gap), and the second
+   part wraps beside it rather than being cut. All four panels share the
+   one measure, so their second columns line up. */
+@media (min-width: 640px) {
+  .rows .row-main { flex-wrap: nowrap; column-gap: 24px; }
+  .rows .row-title {
+    white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
   }
+  .rows .row-title { flex: 0 0 calc(27ch - 32px); }  /* icon 20 + gap 12 */
+  :root:lang(zh) .rows .row-title { flex-basis: calc(23ch - 32px); }
+  .rows .row-desc { flex: 1 1 0; }
 }
 
-/* "Happy Birthday" / "to Me." — always two lines, no halo behind "Me.". */
-:root[data-party] .ht-one::before { content: none; }
-:root[data-party] .hero-title:not(.is-set) { visibility: hidden; }
-:root[data-party] .hero-title { font-size: min(3rem, calc((100vw - 3rem) / 8.8)); }
-:root[data-party] .ht-br { display: inline; }
-@media (min-width: 640px) { :root[data-party] .hero-title { font-size: 4rem; } }
-@media (min-width: 1280px) { :root[data-party] .hero-title { font-size: 4.75rem; } }
-:root[data-party] .hero-one {
-  background-image: var(--party-paint);
-  background-size: 200% 100%;
-  background-repeat: repeat;
-  animation: party-shine 6s linear infinite;
-}
-@keyframes party-shine { to { background-position: 200% 50%; } }
-@media (prefers-reduced-motion: reduce) {
-  :root[data-party] .hero-one { animation: none; }
-}
-
-/* ─── Daily theme picker (lib/daily/picker.js): a Doodle-style archive
-   of every themed day, opened from the hero's "每日主题" button. ─── */
-.dp-lock, .dp-lock body { overflow: hidden; }
-.dp-overlay {
-  position: fixed; inset: 0; z-index: 10000;
-  background: rgba(0, 0, 0, .55);
-  backdrop-filter: blur(5px); -webkit-backdrop-filter: blur(5px);
-}
-.dp-panel {
-  position: absolute; left: 50%; top: clamp(16px, 5vh, 56px); bottom: 0;
-  transform: translateX(-50%);
-  width: min(1040px, calc(100vw - 28px));
-  display: flex; flex-direction: column;
-  background: var(--surface); color: var(--text);
-  border: 1px solid var(--border); border-bottom: 0;
-  border-radius: 16px 16px 0 0;
-  box-shadow: var(--search-shadow, 0 24px 64px rgba(0, 0, 0, .5));
-  animation: dp-in .18s ease-out;
-}
-@keyframes dp-in { from { opacity: 0; transform: translate(-50%, 8px); } }
-.dp-overlay.is-closing { pointer-events: none; animation: dp-out .18s ease forwards; }
-@keyframes dp-out { to { opacity: 0; } }
-.dp-head {
-  display: flex; align-items: flex-start; justify-content: space-between; gap: 16px;
-  padding: 22px 24px 16px; border-bottom: 1px solid var(--border);
-}
-.dp-title { margin: 0; font-size: 1.375rem; font-weight: 800; }
-.dp-sub { margin: 6px 0 0; font-size: 13px; line-height: 1.6; color: var(--muted); }
-.dp-actions { display: flex; align-items: center; gap: 8px; flex-shrink: 0; }
-.dp-back {
-  display: inline-flex; align-items: center;
-  padding: 8px 14px; border-radius: 999px;
-  font-size: 13px; font-weight: 600; color: var(--accent); text-decoration: none;
-  box-shadow: inset 0 0 0 1px var(--accent);
-}
-.dp-back:hover { background: var(--accent-dim); }
-.dp-close {
+/* ─── Licenses ───
+   The same one-line rows as above: the typeface (or library), then its
+   licence; the copyright line is the row's tooltip, and in full on the
+   page the row links to. */
+/* Each typeface stands for itself: its own "Aa" (HarmonyOS, whose split
+   files hold only Chinese, shows 文) in the icon's 20px square. */
+.font-mark {
   display: inline-flex; align-items: center; justify-content: center;
-  width: 40px; height: 40px; border-radius: 50%;
-  background: transparent; border: 0; color: var(--muted); cursor: pointer;
+  flex: none; width: 20px; height: 20px;
+  font-size: 15px; line-height: 1; white-space: nowrap;
+  color: var(--muted);
 }
-.dp-close:hover { background: var(--surface-high); color: var(--text); }
-.dp-close svg { width: 20px; height: 20px; }
-.dp-body { flex: 1; overflow-y: auto; overscroll-behavior: contain; padding: 4px 24px 32px; }
-.dp-month-title {
-  margin: 22px 0 12px;
-  font-size: 13px; font-weight: 700; letter-spacing: .12em; text-transform: uppercase;
-  color: var(--accent);
-}
-.dp-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(124px, 1fr)); gap: 14px; }
-.dp-card {
-  position: relative; display: flex; flex-direction: column; overflow: hidden;
-  border-radius: 14px; border: 1px solid var(--border);
-  background: var(--surface-high); color: var(--text); text-decoration: none;
-  transition: transform .2s ease, border-color .2s ease, box-shadow .2s ease;
-}
-.dp-card:hover { transform: translateY(-3px); border-color: var(--muted); box-shadow: 0 8px 20px rgba(0, 0, 0, .28); }
-.dp-thumb {
-  display: block; width: 100%; aspect-ratio: 4 / 5;
-  object-fit: cover; object-position: 50% 15%;
-  background: var(--bg); filter: grayscale(1);
-  transition: filter .25s ease;
-}
-.dp-card:hover .dp-thumb, .dp-thumb.dp-color { filter: none; }
-.dp-blank {
-  display: flex; align-items: center; justify-content: center;
-  font-size: 2.5rem; font-weight: 800; color: var(--muted); filter: none;
-}
-.dp-cap { display: flex; flex-direction: column; gap: 2px; padding: 8px 10px 10px; }
-.dp-date { font-size: 11px; letter-spacing: .06em; color: var(--muted); }
-.dp-name {
-  font-size: 13px; font-weight: 600; line-height: 1.35;
-  display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden;
-}
-.dp-badge {
-  position: absolute; top: 8px; left: 8px;
-  padding: 2px 8px; border-radius: 999px;
-  font-size: 11px; font-weight: 700; background: var(--accent); color: #fff;
-}
-.dp-card.is-today, .dp-card.is-current { border-color: var(--accent); box-shadow: 0 0 0 1px var(--accent); }
-.dp-card.is-current .dp-badge { background: var(--surface); color: var(--accent); box-shadow: inset 0 0 0 1px var(--accent); }
-@media (max-width: 640px) {
-  .dp-panel { top: 0; width: 100vw; border: 0; border-radius: 0; }
-  .dp-head { padding: 16px; }
-  .dp-body { padding: 0 16px 24px; }
-  .dp-grid { grid-template-columns: repeat(auto-fill, minmax(100px, 1fr)); gap: 10px; }
-}
+.mark-jb { font-family: 'JetBrains Mono', monospace; font-weight: 400; letter-spacing: -.06em; }
+.mark-hm { font-family: 'HarmonyOS Sans SC', sans-serif; font-size: 16px; }
+.mark-smiley { font-family: 'Smiley Sans', sans-serif; font-size: 18px; }
+.mark-noto { font-family: 'Noto Sans SC', sans-serif; font-weight: 500; }
 
+/* ─── Footer ─── */
+.band { background: var(--well); }
+.site-footer { padding-top: 0; padding-bottom: 48px; }
+.site-footer > .container > .section-grid {
+  padding-top: var(--section-gap);
+  border-top: 1px solid var(--border);
+}
+.footer-title {
+  font-family: var(--font-display);
+  font-size: var(--t-head); font-weight: 400;
+  line-height: 1.1;
+  color: var(--text);
+}
+.footer-desc {
+  max-width: 40em;
+  color: var(--muted);
+}
+.footer-desc:lang(zh) { word-break: keep-all; overflow-wrap: anywhere; }
+.footer-credit {
+  margin-top: 24px;
+  font-size: var(--t-small); line-height: 1.5;
+  color: var(--subtle);
+}
+.footer-copy {
+  margin-top: 48px;
+  font-size: var(--t-small); line-height: 1.5;
+  color: var(--subtle);
+}
+.footer-credit:not([hidden]) + .footer-copy { margin-top: 4px; }
+
+/* ─── Reduced motion: everything simply appears. ─── */
 @media (prefers-reduced-motion: reduce) {
-  .js .mf-line, .mf-one::after { transition: none; }
-  .dp-panel, .dp-overlay.is-closing { animation: none; }
-  .dp-card, .dp-thumb { transition: none; }
-}
-
-/* System preference is the default; explicit choices take priority. */
-@media (prefers-color-scheme: light) {
-
-:root:not([data-theme]) {
-  color-scheme: light;
-  --bg-rgb: 239 235 227; --surface-rgb: 255 255 255; --surface-high-rgb: 250 245 235;
-  --border-rgb: 204 194 178; --outline-rgb: 139 122 95;
-  --text-rgb: 42 39 34; --muted-rgb: 86 79 68;
-  --accent-rgb: 137 87 24; --accent-on-rgb: 106 65 16;
-  --bg: #efebe3; --surface: #ffffff; --surface-high: #faf5eb;
-  --border: #ccc2b2; --outline: #8b7a5f; --text: #2a2722; --muted: #564f44;
-  --accent: #895718; --accent-on: #6a4110;
-  --accent-dim: rgba(202, 151, 61, .16); --accent-dim-alpha: .16;
-  --nav-hover: rgba(169, 112, 34, .10);
-  --hero-rest: #453b34; --hero-copper: #9b6045; --hero-gold: #9c753a;
-  --one-glow: rgba(225, 173, 79, .26);
-  --hero-role-paint: var(--spectrum-paint);
-  --hero-role-size: 400% 100%;
-  --hero-role-animation: hero-spectrum-pass 1.6s cubic-bezier(.4,0,.2,1) .42s both;
-  --search-shadow: 0 20px 56px rgba(42,39,34,.24);
-}
-:root:not([data-theme]) #bg-wallpaper,
-:root:not([data-theme]) #bg-overlay { display: block; }
-:root:not([data-theme]) #bg-wallpaper { background-image: var(--cover-light, url('../resources/th.jpg')); }
-:root:not([data-theme]) #bg-overlay {
-  background: linear-gradient(90deg,
-    rgba(242,236,225,.97) 0%, rgba(242,236,225,.94) 28%,
-    rgba(242,236,225,.90) 49%, rgba(242,236,225,.73) 61%,
-    rgba(242,236,225,.24) 82%, rgba(242,236,225,.12) 100%);
-}
-:root:not([data-theme]) #nav-bg-strip { display: none; }
-:root:not([data-theme]) .content-surface { box-shadow: 0 -1px 0 #ccc2b2; }
-:root:not([data-theme]) .content-surface::before,
-:root:not([data-theme]) .content-surface::after { content: none; }
-:root:not([data-theme]) main h1 { color: var(--text); }
-:root:not([data-theme]) main [data-i18n="hero-greeting"] { color: #75501e; }
-:root:not([data-theme]) main [data-i18n="hero-greeting"]::before { background-color: #b17a25; }
-:root:not([data-theme]) main .ripple-primary { background-color: #e1ad4f; color: #302313; box-shadow: inset 0 0 0 1px #b5802c, 0 3px 8px rgba(93,65,21,.13); }
-:root:not([data-theme]) main .ripple-primary:hover { background-color: #d7a042; }
-:root:not([data-theme]) .frosted-cta { background: rgba(255,255,255,.88); color: #403729; box-shadow: inset 0 0 0 1px #b4a68f, 0 3px 8px rgba(65,53,33,.08); }
-:root:not([data-theme]) .frosted-cta:hover { background: #fff9ec; color: #302313; }
-:root:not([data-theme]) #scroll-down { background: rgba(255,255,255,.88); color: #5c4c35; box-shadow: inset 0 0 0 1px #b4a68f; }
-:root:not([data-theme]) #scroll-down:hover { background: #fff9ec; color: #302313; }
-:root:not([data-theme]) .content-surface :is(.m3-card, .info-card) { box-shadow: 0 3px 10px rgba(53,44,29,.06); }
-:root:not([data-theme]) .info-card { outline: 1px solid var(--border); outline-offset: -1px; }
-:root:not([data-theme]) .content-surface .m3-card:hover { box-shadow: 0 4px 14px rgba(53,44,29,.12); border-color: #a68b5f; }
-:root:not([data-theme]) #licenses > p { color: var(--muted); }
-:root:not([data-theme]) footer.over-wallpaper { background: #e7e0d4 !important; box-shadow: inset 0 1px 0 #c8bda9; }
-:root:not([data-theme]) footer.over-wallpaper::before { content: none; }
-:root:not([data-theme]) footer [data-i18n-html="bg-credit"] { color: var(--muted); }
-:root:not([data-theme]) #navbar::before {
-  background-color: rgba(250,248,242,.97);
-  box-shadow: 0 1px 0 #c9bda6;
-  backdrop-filter: blur(14px); -webkit-backdrop-filter: blur(14px);
-}
-:root:not([data-theme]) #brand-dropdown-btn .b-page,
-:root:not([data-theme]) #brand-dropdown-icon { color: var(--muted); }
-:root:not([data-theme]) .b-dot { background-image: linear-gradient(90deg, var(--accent), var(--accent-on)); }
-:root:not([data-theme]) #brand-dropdown-btn:hover,
-:root:not([data-theme]) #lang-toggle:hover,
-:root:not([data-theme]) #github-btn:hover,
-:root:not([data-theme]) #search-btn:hover,
-:root:not([data-theme]) #theme-btn:hover { background: var(--nav-hover); }
-:root:not([data-theme]) #brand-dropdown-menu { box-shadow: 0 8px 24px rgba(53,44,29,.16); }
-:root:not([data-theme]) .ripple { background-color: rgba(137,87,24,.10); }
-:root:not([data-theme]) .ripple-surface-variant .ripple { background-color: rgba(137,87,24,.06); }
-:root:not([data-theme]) .ripple-primary .ripple { background-color: rgba(48,35,19,.12); }
-
-}
-
-:root[data-theme="light"] {
-  color-scheme: light;
-  --bg-rgb: 239 235 227; --surface-rgb: 255 255 255; --surface-high-rgb: 250 245 235;
-  --border-rgb: 204 194 178; --outline-rgb: 139 122 95;
-  --text-rgb: 42 39 34; --muted-rgb: 86 79 68;
-  --accent-rgb: 137 87 24; --accent-on-rgb: 106 65 16;
-  --bg: #efebe3; --surface: #ffffff; --surface-high: #faf5eb;
-  --border: #ccc2b2; --outline: #8b7a5f; --text: #2a2722; --muted: #564f44;
-  --accent: #895718; --accent-on: #6a4110;
-  --accent-dim: rgba(202, 151, 61, .16); --accent-dim-alpha: .16;
-  --nav-hover: rgba(169, 112, 34, .10);
-  --hero-rest: #453b34; --hero-copper: #9b6045; --hero-gold: #9c753a;
-  --one-glow: rgba(225, 173, 79, .26);
-  --hero-role-paint: var(--spectrum-paint);
-  --hero-role-size: 400% 100%;
-  --hero-role-animation: hero-spectrum-pass 1.6s cubic-bezier(.4,0,.2,1) .42s both;
-  --search-shadow: 0 20px 56px rgba(42,39,34,.24);
-}
-:root[data-theme="light"] #bg-wallpaper,
-:root[data-theme="light"] #bg-overlay { display: block; }
-:root[data-theme="light"] #bg-wallpaper { background-image: var(--cover-light, url('../resources/th.jpg')); }
-:root[data-theme="light"] #bg-overlay {
-  background: linear-gradient(90deg,
-    rgba(242,236,225,.97) 0%, rgba(242,236,225,.94) 28%,
-    rgba(242,236,225,.90) 49%, rgba(242,236,225,.73) 61%,
-    rgba(242,236,225,.24) 82%, rgba(242,236,225,.12) 100%);
-}
-:root[data-theme="light"] #nav-bg-strip { display: none; }
-:root[data-theme="light"] .content-surface { box-shadow: 0 -1px 0 #ccc2b2; }
-:root[data-theme="light"] .content-surface::before,
-:root[data-theme="light"] .content-surface::after { content: none; }
-:root[data-theme="light"] main h1 { color: var(--text); }
-:root[data-theme="light"] main [data-i18n="hero-greeting"] { color: #75501e; }
-:root[data-theme="light"] main [data-i18n="hero-greeting"]::before { background-color: #b17a25; }
-:root[data-theme="light"] main .ripple-primary { background-color: #e1ad4f; color: #302313; box-shadow: inset 0 0 0 1px #b5802c, 0 3px 8px rgba(93,65,21,.13); }
-:root[data-theme="light"] main .ripple-primary:hover { background-color: #d7a042; }
-:root[data-theme="light"] .frosted-cta { background: rgba(255,255,255,.88); color: #403729; box-shadow: inset 0 0 0 1px #b4a68f, 0 3px 8px rgba(65,53,33,.08); }
-:root[data-theme="light"] .frosted-cta:hover { background: #fff9ec; color: #302313; }
-:root[data-theme="light"] #scroll-down { background: rgba(255,255,255,.88); color: #5c4c35; box-shadow: inset 0 0 0 1px #b4a68f; }
-:root[data-theme="light"] #scroll-down:hover { background: #fff9ec; color: #302313; }
-:root[data-theme="light"] .content-surface :is(.m3-card, .info-card) { box-shadow: 0 3px 10px rgba(53,44,29,.06); }
-:root[data-theme="light"] .info-card { outline: 1px solid var(--border); outline-offset: -1px; }
-:root[data-theme="light"] .content-surface .m3-card:hover { box-shadow: 0 4px 14px rgba(53,44,29,.12); border-color: #a68b5f; }
-:root[data-theme="light"] #licenses > p { color: var(--muted); }
-:root[data-theme="light"] footer.over-wallpaper { background: #e7e0d4 !important; box-shadow: inset 0 1px 0 #c8bda9; }
-:root[data-theme="light"] footer.over-wallpaper::before { content: none; }
-:root[data-theme="light"] footer [data-i18n-html="bg-credit"] { color: var(--muted); }
-:root[data-theme="light"] #navbar::before {
-  background-color: rgba(250,248,242,.97);
-  box-shadow: 0 1px 0 #c9bda6;
-  backdrop-filter: blur(14px); -webkit-backdrop-filter: blur(14px);
-}
-:root[data-theme="light"] #brand-dropdown-btn .b-page,
-:root[data-theme="light"] #brand-dropdown-icon { color: var(--muted); }
-:root[data-theme="light"] .b-dot { background-image: linear-gradient(90deg, var(--accent), var(--accent-on)); }
-:root[data-theme="light"] #brand-dropdown-btn:hover,
-:root[data-theme="light"] #lang-toggle:hover,
-:root[data-theme="light"] #github-btn:hover,
-:root[data-theme="light"] #search-btn:hover,
-:root[data-theme="light"] #theme-btn:hover { background: var(--nav-hover); }
-:root[data-theme="light"] #brand-dropdown-menu { box-shadow: 0 8px 24px rgba(53,44,29,.16); }
-:root[data-theme="light"] .ripple { background-color: rgba(137,87,24,.10); }
-:root[data-theme="light"] .ripple-surface-variant .ripple { background-color: rgba(137,87,24,.06); }
-:root[data-theme="light"] .ripple-primary .ripple { background-color: rgba(48,35,19,.12); }
-
-@media (max-width: 767px) {
-  :root[data-theme="light"] #bg-overlay { background: linear-gradient(180deg, rgba(242,236,225,.94), rgba(242,236,225,.89) 65%, rgba(242,236,225,.60)); }
-}
-@media (prefers-color-scheme: light) and (max-width: 767px) {
-  :root:not([data-theme]) #bg-overlay { background: linear-gradient(180deg, rgba(242,236,225,.94), rgba(242,236,225,.89) 65%, rgba(242,236,225,.60)); }
-}
-
-/* One-click appearance cycle; A marks system-following mode. */
-#theme-btn:focus-visible { outline: 2px solid var(--accent); outline-offset: 3px; }
-#theme-btn .theme-auto {
-  display: none; position: absolute;
-  left: calc(50% + 3px); top: calc(50% + 3px); width: 7px; height: 8px;
-  font-family: Arial, sans-serif; font-size: 8px; font-weight: 700; line-height: 8px;
-  text-align: center; pointer-events: none;
-}
-:root[data-theme-mode="system"] #theme-btn svg {
-  width: 16px; height: 16px; transform: translate(-2px, -2px);
-}
-:root[data-theme-mode="system"] #theme-btn .theme-auto { display: block; }
-#theme-btn .theme-sun { display: none; }
-:root[data-theme="light"] #theme-btn .theme-sun { display: block; }
-:root[data-theme="light"] #theme-btn .theme-moon { display: none; }
-@media (max-width: 960px) {
-  #nav-links { display: none !important; }
-  #menu-btn { display: inline-flex !important; }
-}
-/* Phones keep the brand exactly as the blog shows it (18px, its own
-   padding and tracking); room for the icons comes from the margins,
-   the brand's unseen right padding and the gaps, narrowest last. */
-@media (max-width: 413px) {
-  #navbar { padding-inline: 16px 12px; }
-  #brand-dropdown-btn { padding-right: 6px; }
-}
-@media (max-width: 374px) {
-  #navbar { padding-inline: 12px 8px; }
-  #brand-dropdown-icon { margin-left: 4px; }
-  .nav-right { gap: 0 !important; }
-}
-@media (max-width: 359px) {
-  #navbar { padding-inline: 8px; }
-  #brand-dropdown-btn { padding-inline: 6px; font-size: 16px; letter-spacing: 0; }
-  #brand-dropdown-icon { margin-left: 2px; }
-}
-
-/* Give the frequent mobile actions full touch targets; GitHub lives in the menu. */
-#mobile-github { display: none; }
-@media (max-width: 767px) {
-  #github-btn, .nav-right > .nav-divider { display: none; }
-  .nav-right { gap: 2px; flex-shrink: 0; }
-  #brand-dropdown-btn { min-height: 44px; }
-  #search-btn, #theme-btn, #lang-toggle, #menu-btn {
-    width: 44px; height: 44px; flex: 0 0 44px; padding: 0;
-  }
-  #search-btn svg, #theme-btn svg, #lang-toggle svg, #menu-btn svg {
-    width: 20px; height: 20px;
-  }
-  #mobile-github {
-    display: flex; align-items: center; justify-content: space-between;
-    margin-top: 6px; border-top: 1px solid var(--border);
-  }
-}
-
-/* Keep the headline and the English CTA within small phone gutters. */
-@media (max-width: 359px) {
-  main > h1.text-5xl { font-size: 2.625rem; }
-  main > h1.hero-title { font-size: 3.25rem; }
-  main .ripple-primary, main .frosted-cta { font-size: 14px; padding-inline: 12px; }
+  html { scroll-behavior: auto; }
+  .ripple { display: none; }
+  .dropdown, .mobile-menu, .brand-btn .chevron, .site-header,
+  .btn, .ghost, .dd-item, .mm-item, .row { transition: none; }
+  :root[data-sprite] .stage-figure { animation: none; }
 }
