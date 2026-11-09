@@ -88,7 +88,6 @@
           <a href="#projects" class="ghost nav-link ripple-surface">Projects</a>
           <a href="#social" class="ghost nav-link ripple-surface">Social</a>
           <a href="#links" class="ghost nav-link ripple-surface">Friends</a>
-          <a href="#licenses" class="ghost nav-link ripple-surface">Licenses</a>
         </nav>
         <span class="nav-divider" aria-hidden="true"></span>
         <button id="search-btn" class="ghost icon-btn ripple-surface" type="button" onclick="window.LouieSearch && LouieSearch.open()" aria-label="Search">
@@ -106,8 +105,8 @@
           <span class="theme-auto" aria-hidden="true">A</span>
         </button>
         <button id="lang-toggle" class="ghost icon-btn ripple-surface" type="button" onclick="toggleLang()">
-          <!-- Lucide `languages` (ISC) -->
-          <svg class="icon" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m5 8 6 6"/><path d="m4 14 6-6 2-3"/><path d="M2 5h12"/><path d="M7 2h1"/><path d="m22 22-5-10-5 10"/><path d="M14 18h6"/></svg>
+          <!-- 文 and A in HarmonyOS Sans, set like the usual language icon. -->
+          <span class="lang-mark" aria-hidden="true"><span class="lm-zh">文</span><span class="lm-en">A</span></span>
           <span id="lang-label">EN ⇄ 文</span>
         </button>
         <button id="menu-btn" class="ghost icon-btn ripple-surface" type="button" aria-label="Menu" aria-controls="mobile-menu" aria-expanded="false">
@@ -122,7 +121,6 @@
       <a href="#projects" class="mm-item ripple-surface">Projects</a>
       <a href="#social" class="mm-item ripple-surface">Social</a>
       <a href="#links" class="mm-item ripple-surface">Friends</a>
-      <a href="#licenses" class="mm-item ripple-surface">Licenses</a>
       <div class="mm-sep" aria-hidden="true"></div>
       <a id="mobile-github" href="https://github.com/MrTangLuyao/homepage" target="_blank" rel="noopener" class="mm-item ripple-surface">
         <span>GitHub</span>
@@ -361,7 +359,7 @@
                 <li>
                   <a href="https://developer.huawei.com/consumer/cn/design/resource/" target="_blank" rel="noopener" class="row ripple-surface" title="© 2021 Huawei Device Co., Ltd.">
                     <!-- The typeface's own sample, set in that typeface. -->
-                    <span class="row-icon font-mark mark-hm" lang="zh-CN" aria-hidden="true">文</span>
+                    <span class="row-icon font-mark mark-hm" aria-hidden="true">Aa</span>
                     <span class="row-main">
                       <span class="row-title">HarmonyOS Sans</span>
                       <span class="row-desc">HarmonyOS Sans Fonts License</span>
@@ -411,16 +409,23 @@
   </main>
 
   <footer class="site-footer band">
-    <div class="container">
+    <!-- Behind What's next: a Bing daily wallpaper (credit below). -->
+    <img class="footer-bg" src="lib/resources/scene/rose-island-1280.webp"
+         srcset="lib/resources/scene/rose-island-1280.webp 1280w, lib/resources/scene/rose-island-2560.webp 2560w, lib/resources/scene/rose-island-3840.webp 3840w"
+         sizes="100vw" width="3840" height="1757" loading="lazy" decoding="async" alt="">
+    <div class="container footer-inner">
       <div class="section-grid">
         <h2 class="footer-title" lang="en" data-i18n="footer-title">What’s next?</h2>
         <div class="section-body">
           <p class="footer-desc" data-i18n="contact-desc">我的收件箱始终敞开。无论是有项目合作、技术交流，还是简单地打个招呼，我都会尽量回复。</p>
           <!-- Birthdays: the day's cover credit. -->
           <p class="footer-credit" id="daily-credit" hidden></p>
-          <p class="footer-copy"><span id="footer-year"></span> Louie</p>
         </div>
       </div>
+      <p class="scene-caption">
+        <span class="scene-credit" data-i18n="scene-credit">玫瑰岛航拍图，巴哈马 © Abstract Aerial Art / Getty Images，来自必应每日壁纸（2026 年 11 月 10 日）</span>
+        <span class="footer-copy"><span id="footer-year"></span> Louie</span>
+      </p>
     </div>
   </footer>
 
@@ -530,7 +535,8 @@
         'links-cohen-name': 'Cohen 的主页',
         'links-jimmyxue-name': 'JimmyXue 的主页',
         'contact-desc': '我的收件箱始终敞开。无论是有项目合作、技术交流，还是简单地打个招呼，我都会尽量回复。',
-        'footer-title': 'What’s next?'
+        'footer-title': 'What’s next?',
+        'scene-credit': '玫瑰岛航拍图，巴哈马 © Abstract Aerial Art / Getty Images，来自必应每日壁纸（2026 年 11 月 10 日）'
       },
       en: {
         'hero-blog-btn': 'Blog',
@@ -553,7 +559,8 @@
         'links-cohen-name': 'Cohen’s Homepage',
         'links-jimmyxue-name': 'JimmyXue’s Homepage',
         'contact-desc': 'Fancy a chat about tech, AI, or life down under? Or just want to say hi? My inbox is always open, and I’ll get back to you.',
-        'footer-title': 'What’s next?'
+        'footer-title': 'What’s next?',
+        'scene-credit': 'Rose Island from the air, Bahamas © Abstract Aerial Art / Getty Images, via Bing’s daily wallpaper (10 Nov 2026)'
       }
     };
 
