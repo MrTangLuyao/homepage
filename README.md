@@ -16,7 +16,7 @@
 .
 ├── index.html, 95.html   ← 入口页面
 ├── lib/
-│   ├── design/      ← louie.css（主页的全部样式和颜色变量）、theme.js（浅色 / 深色）、scrollbar.js（滚动条）、字体（smiley/ 得意黑、harmony/ 鸿蒙、JetBrains Mono）；95 页用的 Tailwind
+│   ├── design/      ← louie.css（主页的全部样式和颜色变量）、theme.js（浅色 / 深色）、scrollbar.js（滚动条）、字体（smiley/ 得意黑、harmony/ 鸿蒙简体、harmony-tc/ 鸿蒙繁体、JetBrains Mono）；95 页用的 Tailwind
 │   ├── daily/       ← 生日：daily.js（日历）、party.js（像素烟花）+ 每人一个文件夹
 │   ├── search/      ← ⌘K 搜索 SDK（其他 louie.* 站点也在用）
 │   ├── icons/       ← Lucide 图标
@@ -36,6 +36,7 @@
 - **得意黑（Smiley Sans）**：大标题和各节标题，只用到英文，所以只放了它的两个小分块（`lib/design/smiley/`）。
 - **JetBrains Mono**：其余所有英文和界面文字（常规和粗体两个文件）。
 - **鸿蒙（HarmonyOS Sans SC 2.040）**：所有中文和中文标点（，。：；（）），用的是华为开发者网站上的官方可变字体，固定成 Medium 一个字重（`lib/design/harmony/`）。`site.woff2` 收了网站上出现的每一个汉字和标点，正常访问只下载这一个文件（约 20 KB）；其余的字按 512 个码位一组放在别的小文件里，以后加了新字、还没重新生成时，浏览器只补下新字所在的那一组。这些文件由 `tools/harmony-split.py` 生成（用上全部 CPU 核心，几秒钟），它会顺便改写 `louie.css` 里 `harmony:start` 和 `harmony:end` 之间的那段，页面上加了中文就重跑一次：`python tools/harmony-split.py 下载的/HarmonyOS_Sans_SC.ttf`（需要 `pip install "fonttools[woff]" skia-pathops`）。字形直接从官方 TTF 裁出来，不经过别的格式转换，渲染和原版逐像素一致；版权信息都保留着，许可证放在同一文件夹的 `LICENSE.txt`。
+- **鸿蒙繁体（HarmonyOS Sans TC 2.00）**：繁體中文页面的中文，字形和居中的标点按台湾的规范；做法和简体完全一样，放在 `lib/design/harmony-tc/`，用 `python tools/harmony-split.py 下载的/HarmonyOS_Sans_TC.ttf --script tc` 生成。简体的文件不收繁体文案里的字，选了繁体才会下载繁体的文件。
 
 中文从不让浏览器自己加粗（`font-synthesis: none`），层次靠字号和颜色。
 
@@ -81,7 +82,7 @@ Source code for my personal homepage.
 .
 ├── index.html, 95.html   ← entry points
 ├── lib/
-│   ├── design/      ← louie.css (all homepage styles and colour tokens), theme.js (light / dark), scrollbar.js (the scrollbar), fonts (smiley/ Smiley Sans, harmony/ HarmonyOS Sans, JetBrains Mono); Tailwind for the 95 page
+│   ├── design/      ← louie.css (all homepage styles and colour tokens), theme.js (light / dark), scrollbar.js (the scrollbar), fonts (smiley/ Smiley Sans, harmony/ HarmonyOS Sans SC, harmony-tc/ HarmonyOS Sans TC, JetBrains Mono); Tailwind for the 95 page
 │   ├── daily/       ← birthdays: daily.js (calendar), party.js (pixel fireworks) + one folder per person
 │   ├── search/      ← the ⌘K search SDK (also used by the other louie.* sites)
 │   ├── icons/       ← Lucide icons
@@ -101,6 +102,7 @@ A white canvas and deep navy ink; colour goes only on actions (blue) and state, 
 - **Smiley Sans (得意黑)**: the headline and the section heads. They are Latin only, so just two small chunks of it ship (`lib/design/smiley/`).
 - **JetBrains Mono**: all other Latin and the interface (Regular and Bold).
 - **HarmonyOS Sans SC 2.040**: all Chinese and its punctuation (，。：；（）), cut from the official variable font on Huawei's developer site and fixed at one weight, Medium (`lib/design/harmony/`). `site.woff2` holds every character the site shows, so a normal visit downloads only that file (about 20 KB); the rest of the font sits in small files of 512 code points each, so text added before the next run still renders and costs only the files its new characters fall in. `tools/harmony-split.py` makes them (on every CPU core, in a few seconds) and rewrites the block between `harmony:start` and `harmony:end` in `louie.css`; rerun it whenever the page gains Chinese text: `python tools/harmony-split.py path/to/HarmonyOS_Sans_SC.ttf` (needs `pip install "fonttools[woff]" skia-pathops`). The outlines come straight from the official TTF, never through another format, and render pixel for pixel like the original; the copyright notices stay in, and the licence is `LICENSE.txt` beside the files.
+- **HarmonyOS Sans TC 2.00**: the Chinese on the 繁體中文 page, with Taiwan's standard character forms and centred punctuation; made the same way into `lib/design/harmony-tc/` by `python tools/harmony-split.py path/to/HarmonyOS_Sans_TC.ttf --script tc`. The simplified files leave out the Traditional text, and only a visitor who picks Traditional downloads these.
 
 The browser never draws Chinese bolder than the font (`font-synthesis: none`); hierarchy comes from size and colour.
 

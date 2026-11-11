@@ -1,14 +1,19 @@
 """Split HarmonyOS Sans SC into web font files for this site.
 
     python tools/harmony-split.py <HarmonyOS_Sans_SC.ttf> [--weight 500] [--jobs N]
+    python tools/harmony-split.py <HarmonyOS_Sans_TC.ttf> --script tc
 
 Takes the official variable font (HarmonyOS Sans SC 2.x, from Huawei's
-developer site) and writes lib/design/harmony/:
+developer site) and writes lib/design/harmony/; with --script tc it takes
+HarmonyOS Sans TC instead, for the Traditional Chinese page, and writes
+lib/design/harmony-tc/ the same way:
 
   site.woff2    every Han character and CJK punctuation mark the site
                 shows (index.html, lib/daily), plus the "Aa" the licences
                 list draws in this face. A normal visit loads only this
-                file.
+                file. The simplified file leaves out the Traditional text
+                (the zh-Hant translations and 'zh-Hant' strings), which
+                only the Traditional file needs.
   4e00.woff2 …  the rest of U+4E00-9FFF in 512 code point windows, so
                 text added later still renders before the next run, at
                 the cost of one window per new character.
@@ -23,7 +28,8 @@ name record (copyright included) is kept, and the licence goes next to
 the files.
 
 It then rewrites the HarmonyOS block in lib/design/louie.css between the
-/* harmony:start */ and /* harmony:end */ markers. Rerun it whenever the
+/* harmony:start */ and /* harmony:end */ markers (harmony-tc:start and
+harmony-tc:end for the Traditional face). Rerun it whenever the
 site gains new Chinese text. The work is spread over every CPU core.
 
 Needs fontTools with brotli and skia-pathops:
@@ -38,9 +44,12 @@ import time
 from concurrent.futures import ProcessPoolExecutor, as_completed
 
 ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
-OUT = os.path.join(ROOT, 'lib', 'design', 'harmony')
 CSS = os.path.join(ROOT, 'lib', 'design', 'louie.css')
-FAMILY = 'HarmonyOS Sans SC'
+# Per face: family name, folder (under lib/design) and CSS marker.
+SCRIPTS = {
+    'sc': ('HarmonyOS Sans SC', 'harmony', 'harmony'),
+    'tc': ('HarmonyOS Sans TC', 'harmony-tc', 'harmony-tc'),
+}
 
 # What the HarmonyOS files cover; Latin and everything else is left to
 # JetBrains Mono.
@@ -52,8 +61,8 @@ WINDOW = 512
 SAMPLE = 'Aa'
 
 
-def site_text():
-    """All text the page can show in the HarmonyOS family."""
+def site_text(script):
+    """All text the page can show in this face."""
     files = [os.path.join(ROOT, 'index.html')]
     for base, _, names in os.walk(os.path.join(ROOT, 'lib', 'daily')):
         files += [os.path.join(base, n) for n in names if n.endswith('.js')]
@@ -61,6 +70,9 @@ def site_text():
     for p in sorted(files):
         with open(p, encoding='utf-8') as f:
             text += f.read()
+    if script == 'sc':
+        text = re.sub(r'/\* zh-Hant:start.*?zh-Hant:end \*/', '', text, flags=re.S)
+        text = re.sub(r"""'zh-Hant':\s*(['"`])(?:\\.|(?!\1).)*\1""", '', text)
     return text
 
 
@@ -81,11 +93,12 @@ def ranges_css(cps):
     return ', '.join(out)
 
 
-def plan(src):
+def plan(src, script):
     from fontTools.ttLib import TTFont
     cmap = TTFont(src, lazy=True).getBestCmap()
     have = {cp for cp in cmap if covered(cp)}
-    site = sorted(({ord(c) for c in site_text()} & have) | {ord(c) for c in SAMPLE if ord(c) in cmap})
+    sample = {ord(c) for c in SAMPLE if ord(c) in cmap} if script == 'sc' else set()
+    site = sorted(({ord(c) for c in site_text(script)} & have) | sample)
     rest = have - set(site)
     jobs = [('site', site)]
     for start in range(0x4E00, 0xA000, WINDOW):
@@ -123,20 +136,22 @@ def build(src, name, cps, weight, out):
     return name, len(cps), os.path.getsize(path)
 
 
-def write_css(jobs):
+def write_css(jobs, script):
+    family, folder, mark = SCRIPTS[script]
     rules = []
     for name, cps in jobs:
         rules.append(
             "@font-face { font-family: '%s'; font-weight: 100 900; "
-            "font-display: swap; src: url('harmony/%s.woff2') format('woff2'); "
-            "unicode-range: %s; }" % (FAMILY, name, ranges_css(cps)))
-    block = '/* harmony:start (written by tools/harmony-split.py) */\n' + \
-        '\n'.join(rules) + '\n/* harmony:end */'
+            "font-display: swap; src: url('%s/%s.woff2') format('woff2'); "
+            "unicode-range: %s; }" % (family, folder, name, ranges_css(cps)))
+    how = 'tools/harmony-split.py' + (' --script tc' if script == 'tc' else '')
+    block = '/* %s:start (written by %s) */\n' % (mark, how) + \
+        '\n'.join(rules) + '\n/* %s:end */' % mark
     with open(CSS, encoding='utf-8', newline='') as f:
         css = f.read()
-    pat = re.compile(r'/\* harmony:start.*?harmony:end \*/', re.S)
+    pat = re.compile(r'/\* %s:start.*?%s:end \*/' % (re.escape(mark), re.escape(mark)), re.S)
     if not pat.search(css):
-        sys.exit('louie.css has no harmony:start / harmony:end markers')
+        sys.exit('louie.css has no %s:start / %s:end markers' % (mark, mark))
     css = pat.sub(lambda m: block, css, count=1)
     with open(CSS, 'w', encoding='utf-8', newline='') as f:
         f.write(css)
@@ -144,13 +159,15 @@ def write_css(jobs):
 
 def main():
     ap = argparse.ArgumentParser(description=__doc__.split('\n')[0])
-    ap.add_argument('src', help='HarmonyOS_Sans_SC.ttf (the variable font)')
+    ap.add_argument('src', help='HarmonyOS_Sans_SC.ttf or _TC.ttf (the variable font)')
+    ap.add_argument('--script', choices=sorted(SCRIPTS), default='sc')
     ap.add_argument('--weight', type=float, default=500)
     ap.add_argument('--jobs', type=int, default=os.cpu_count())
     a = ap.parse_args()
 
     t0 = time.time()
-    jobs = plan(a.src)
+    jobs = plan(a.src, a.script)
+    OUT = os.path.join(ROOT, 'lib', 'design', SCRIPTS[a.script][1])
     os.makedirs(OUT, exist_ok=True)
     keep = {n + '.woff2' for n, _ in jobs} | {'LICENSE.txt'}
     for f in os.listdir(OUT):
@@ -174,7 +191,7 @@ def main():
         shutil.copyfile(lic, os.path.join(OUT, 'LICENSE.txt'))
     else:
         print('note: no LICENSE-update.txt beside the font; copy the licence into %s yourself' % OUT)
-    write_css(jobs)
+    write_css(jobs, a.script)
     print('site.woff2 %.1f KB, all files %.1f KB, %.0f s' % (
         sizes['site'] / 1024, sum(sizes.values()) / 1024, time.time() - t0))
 

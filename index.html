@@ -104,11 +104,23 @@
           <svg class="icon theme-moon" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 3a6 6 0 0 0 9 9 9 9 0 1 1-9-9Z"/></svg>
           <span class="theme-auto" aria-hidden="true">A</span>
         </button>
-        <button id="lang-toggle" class="ghost icon-btn ripple-surface" type="button" onclick="toggleLang()">
-          <!-- 文 and A in HarmonyOS Sans, set like the usual language icon. -->
-          <span class="lang-mark" aria-hidden="true"><span class="lm-zh">文</span><span class="lm-en">A</span></span>
-          <span id="lang-label">EN ⇄ 文</span>
-        </button>
+        <!-- The language picker, laid out as on developer.android.com: the
+             mark, the language in use, a chevron; it opens a list of the
+             languages, each named in itself. -->
+        <div class="lang">
+          <button id="lang-btn" class="ghost lang-btn ripple-surface" type="button" aria-haspopup="menu" aria-expanded="false" aria-controls="lang-menu">
+            <!-- 文 and A in HarmonyOS Sans, set like the usual language icon. -->
+            <span class="lang-mark" aria-hidden="true"><span class="lm-zh">文</span><span class="lm-en">A</span></span>
+            <span id="lang-label">简体中文</span>
+            <!-- Lucide `chevron-down` (ISC) -->
+            <svg class="icon chevron" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m6 9 6 6 6-6"/></svg>
+          </button>
+          <div id="lang-menu" class="dropdown lang-menu" role="menu">
+            <button type="button" class="dd-item ripple-surface" role="menuitemradio" aria-checked="false" data-lang="en" lang="en">English</button>
+            <button type="button" class="dd-item ripple-surface" role="menuitemradio" aria-checked="true" data-lang="zh" lang="zh-CN">简体中文</button>
+            <button type="button" class="dd-item ripple-surface" role="menuitemradio" aria-checked="false" data-lang="zh-Hant" lang="zh-Hant">繁體中文</button>
+          </div>
+        </div>
         <button id="menu-btn" class="ghost icon-btn ripple-surface" type="button" aria-label="Menu" aria-controls="mobile-menu" aria-expanded="false">
           <!-- Lucide `menu` (ISC) -->
           <svg class="icon" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 12h16"/><path d="M4 18h16"/><path d="M4 6h16"/></svg>
@@ -149,11 +161,19 @@
             <span id="daily-note-text"></span>
           </p>
         </div>
-        <!-- Every day but a birthday: the avatar; a click reloads the
-             page. -->
-        <button type="button" class="portrait ripple-surface" data-i18n-label="avatar-reload" title="刷新页面" aria-label="刷新页面" onclick="location.reload()">
-          <img src="lib/resources/po.svg" width="44" height="45" alt="Louie 的头像" data-i18n-alt="hero-avatar-alt" decoding="async">
-        </button>
+        <!-- Every day but a birthday: the avatar. The figure can be pulled
+             a little way out of its frame, and goes back when let go. -->
+        <div class="portrait-slot">
+          <div class="portrait">
+            <img class="figure" src="lib/resources/po.svg" width="44" height="45" alt="Louie 的头像" data-i18n-alt="hero-avatar-alt" decoding="async" draggable="false">
+          </div>
+          <div class="figure-lift" aria-hidden="true">
+            <img class="figure" src="lib/resources/po.svg" width="44" height="45" alt="" decoding="async" draggable="false">
+          </div>
+          <!-- On top of both: takes the press and the drag. The press's
+               ripple is drawn in the frame, under the figure. -->
+          <div class="portrait-touch" aria-hidden="true"></div>
+        </div>
         <!-- Birthdays: the animated avatar takes its place, with party.js
              fireworks behind it. -->
         <div class="stage" id="party-stage" aria-hidden="true">
@@ -275,7 +295,7 @@
                     <!-- Lucide `book-open` (ISC) -->
                     <svg class="icon-lg row-icon" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 7v14"/><path d="M3 18a1 1 0 0 1-1-1V4a1 1 0 0 1 1-1h5a4 4 0 0 1 4 4 4 4 0 0 1 4-4h5a1 1 0 0 1 1 1v13a1 1 0 0 1-1 1h-6a3 3 0 0 0-3 3 3 3 0 0 0-3-3z"/></svg>
                     <span class="row-main">
-                      <span class="row-title" lang="zh-CN">小红书</span>
+                      <span class="row-title" lang="zh-CN" data-i18n="social-xhs" data-zh-script>小红书</span>
                       <span class="row-handle" lang="zh-CN">@古怪的路易</span>
                     </span>
                     <svg class="icon row-arrow" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M7 7h10v10"/><path d="M7 17 17 7"/></svg>
@@ -401,7 +421,7 @@
     <!-- Behind What's next: a Bing daily wallpaper (credit below). -->
     <img class="footer-bg" src="lib/resources/scene/rose-island-1280.webp"
          srcset="lib/resources/scene/rose-island-1280.webp 1280w, lib/resources/scene/rose-island-2560.webp 2560w, lib/resources/scene/rose-island-3840.webp 3840w"
-         sizes="100vw" width="3840" height="1757" loading="lazy" decoding="async" alt="">
+         sizes="100vw" width="3840" height="1757" loading="lazy" decoding="async" alt="" draggable="false">
     <div class="container footer-inner">
       <div class="section-grid">
         <h2 class="footer-title" lang="en" data-i18n="footer-title">What’s next?</h2>
@@ -458,6 +478,48 @@
     window.addEventListener('scroll', updateHeader, { passive: true });
     updateHeader();
 
+    // The avatar. A press in the circle ripples, grey on the cream and
+    // under the figure; a drag pulls the figure out of its frame. What comes out is what the
+    // circle showed, nothing more, and it rides a rubber band, as the
+    // windows on the old homepage did: it follows a drag less and less
+    // the further it goes, never past 15% of the circle, and springs
+    // home when let go. The pictures never leave the page by drag and drop.
+    document.querySelectorAll('.figure, .footer-bg').forEach(img =>
+      img.addEventListener('dragstart', (e) => e.preventDefault()));
+    (() => {
+      const slot = document.querySelector('.portrait-slot');
+      const portrait = slot && slot.querySelector('.portrait-touch');
+      const frame = slot && slot.querySelector('.portrait');
+      if (!portrait || !frame || !window.PointerEvent) return;
+      let drag = null, home = 0;
+      const place = (x, y) => {
+        slot.style.setProperty('--drag-x', x + 'px');
+        slot.style.setProperty('--drag-y', y + 'px');
+      };
+      portrait.addEventListener('pointerdown', (e) => {
+        if (drag || e.button !== 0) return;
+        createRipple({ currentTarget: frame, clientX: e.clientX, clientY: e.clientY });
+        clearTimeout(home);
+        drag = { id: e.pointerId, x: e.clientX, y: e.clientY, reach: portrait.clientWidth * .15 };
+        portrait.setPointerCapture(e.pointerId);
+        slot.classList.add('is-lifted', 'is-dragging');
+      });
+      portrait.addEventListener('pointermove', (e) => {
+        if (!drag || e.pointerId !== drag.id) return;
+        const band = (d) => d / (1 + Math.abs(d) / drag.reach);
+        place(band(e.clientX - drag.x), band(e.clientY - drag.y));
+      });
+      const letGo = (e) => {
+        if (!drag || e.pointerId !== drag.id) return;
+        drag = null;
+        slot.classList.remove('is-dragging');
+        place(0, 0);
+        // Back in the frame once the spring (louie.css, .45 s) is done.
+        home = setTimeout(() => slot.classList.remove('is-lifted'), 480);
+      };
+      ['pointerup', 'pointercancel', 'lostpointercapture'].forEach(t => portrait.addEventListener(t, letGo));
+    })();
+
     const brandBtn = document.getElementById('brand-dropdown-btn');
     const brandMenu = document.getElementById('brand-dropdown-menu');
     function setBrandMenu(open) {
@@ -469,7 +531,28 @@
     brandBtn.addEventListener('click', (e) => {
       e.stopPropagation();
       setMobileMenu(false);
+      setLangMenu(false);
       setBrandMenu(!brandMenu.classList.contains('is-open'));
+    });
+
+    const langBtn = document.getElementById('lang-btn');
+    const langMenu = document.getElementById('lang-menu');
+    function setLangMenu(open) {
+      langMenu.classList.toggle('is-open', open);
+      langBtn.setAttribute('aria-expanded', String(open));
+    }
+    langBtn.addEventListener('click', (e) => {
+      e.stopPropagation();
+      setBrandMenu(false);
+      setMobileMenu(false);
+      setLangMenu(!langMenu.classList.contains('is-open'));
+    });
+    langMenu.addEventListener('click', (e) => {
+      const item = e.target.closest('[data-lang]');
+      if (!item) return;
+      setLangMenu(false);
+      setLang(item.dataset.lang);
+      langBtn.focus();
     });
 
     const menuBtn = document.getElementById('menu-btn');
@@ -481,6 +564,7 @@
     menuBtn.addEventListener('click', (e) => {
       e.stopPropagation();
       setBrandMenu(false);
+      setLangMenu(false);
       setMobileMenu(!mobileMenu.classList.contains('is-open'));
     });
     mobileMenu.addEventListener('click', (e) => { if (e.target.closest('a')) setMobileMenu(false); });
@@ -494,11 +578,13 @@
     document.addEventListener('click', (e) => {
       if (!brandBtn.contains(e.target) && !brandMenu.contains(e.target)) setBrandMenu(false);
       if (!menuBtn.contains(e.target) && !mobileMenu.contains(e.target)) setMobileMenu(false);
+      if (!langBtn.contains(e.target) && !langMenu.contains(e.target)) setLangMenu(false);
     });
     document.addEventListener('keydown', (e) => {
       if (e.key !== 'Escape') return;
       if (brandMenu.classList.contains('is-open')) { setBrandMenu(false); brandBtn.focus(); }
       if (mobileMenu.classList.contains('is-open')) { setMobileMenu(false); menuBtn.focus(); }
+      if (langMenu.classList.contains('is-open')) { setLangMenu(false); langBtn.focus(); }
     });
 
     const MODK = /Mac|iPhone|iPad/.test(navigator.platform) ? '⌘' : 'Ctrl';
@@ -506,11 +592,11 @@
       zh: {
         'hero-blog-btn': '我的博客',
         'hero-avatar-alt': 'Louie 的头像',
-        'avatar-reload': '刷新页面',
         'section-about': 'About',
         'section-projects': 'Projects',
         'section-social': 'Social',
         'social-email': '邮箱',
+        'social-xhs': '小红书',
         'section-links': 'Friend links',
         'section-licenses': 'Open source licenses',
         'about-text': '来自武汉，现旅居颠倒世界墨尔本。',
@@ -527,14 +613,41 @@
         'footer-title': 'What’s next?',
         'scene-credit': '玫瑰岛航拍图，巴哈马 © Abstract Aerial Art / Getty Images，来自必应每日壁纸（2026 年 11 月 10 日）'
       },
+      /* zh-Hant:start (tools/harmony-split.py keeps this out of the
+         simplified font file) */
+      'zh-Hant': {
+        'hero-blog-btn': 'Blog',
+        'hero-avatar-alt': 'Louie 的頭像',
+        'section-about': 'About',
+        'section-projects': 'Projects',
+        'section-social': 'Social',
+        'social-email': '信箱',
+        'social-xhs': '小紅書',
+        'section-links': 'Friend links',
+        'section-licenses': 'Open source licenses',
+        'about-text': '來自武漢，現旅居顛倒世界墨爾本。',
+        'project-btr-name': 'Bilibili 線程撕裂者',
+        'project-btr-desc': '緩解 B 站海外卡頓的外掛',
+        'project-btr-desktop-name': 'BTR 桌面版',
+        'project-btr-desktop-desc': '官方用戶端專用的 BTR 外掛',
+        'project-learn-desc': '線上學習程式設計的平台',
+        'project-primer-desc': 'PCR 引子設計工具的網頁版',
+        'project-opendrop-desc': '仿空投快傳的開源網站',
+        'links-cohen-name': 'Cohen 的首頁',
+        'links-jimmyxue-name': 'JimmyXue 的首頁',
+        'contact-desc': '我的信箱隨時敞開。不論是專案合作、技術交流，還是單純打聲招呼，我都會盡量回覆。',
+        'footer-title': 'What’s next?',
+        'scene-credit': '玫瑰島空拍，巴哈馬 © Abstract Aerial Art / Getty Images，來自 Bing 每日桌布（2026 年 11 月 10 日）'
+      },
+      /* zh-Hant:end */
       en: {
         'hero-blog-btn': 'Blog',
         'hero-avatar-alt': 'Louie’s avatar',
-        'avatar-reload': 'Reload the page',
         'section-about': 'About',
         'section-projects': 'Projects',
         'section-social': 'Social',
         'social-email': 'Email',
+        'social-xhs': '小红书',
         'section-links': 'Friend links',
         'section-licenses': 'Open source licenses',
         'about-text': 'Born in Wuhan, currently residing in Melbourne, the Upside Down.',
@@ -553,13 +666,34 @@
       }
     };
 
-    // A language picked by hand is kept (same key as the blog and the search
-    // overlay), so it survives reloads such as previewing another day.
-    let currentLang = navigator.language.toLowerCase().includes('zh') ? 'zh' : 'en';
+    // A language picked by hand is kept, so it survives reloads such as
+    // previewing another day. The shared key (louie-lang, read by the blog,
+    // the 95 page and the search overlay too) holds only zh or en; which
+    // Chinese is kept in this page's own key (louie-zh: Hans or Hant), so
+    // the other sites still find Chinese, in its simplified form. With
+    // nothing kept, the browser's language decides.
+    const lastChinese = () => {
+      try { return localStorage.getItem('louie-zh') === 'Hant' ? 'zh-Hant' : 'zh'; }
+      catch (e) { return 'zh'; }
+    };
+    const browserLang = navigator.language.toLowerCase();
+    let currentLang = /^zh-(tw|hk|mo|hant)/.test(browserLang) ? 'zh-Hant'
+      : browserLang.includes('zh') ? 'zh' : 'en';
     try {
       const saved = localStorage.getItem('louie-lang');
-      if (saved === 'zh' || saved === 'en') currentLang = saved;
+      if (saved === 'en') currentLang = 'en';
+      else if (saved === 'zh') currentLang = lastChinese();
     } catch (e) { /* no storage: follow the browser */ }
+
+    // The few words outside the text itself: the picker's names, the
+    // spoken names of the icon buttons, and the page's lang.
+    const UI = {
+      zh: { name: '简体中文', html: 'zh-CN', language: '语言', say: '语言：', search: '搜索', github: 'GitHub 仓库', menu: '菜单', sections: '页面导航' },
+      /* zh-Hant:start */
+      'zh-Hant': { name: '繁體中文', html: 'zh-Hant', language: '語言', say: '語言：', search: '搜尋', github: 'GitHub 儲存庫', menu: '選單', sections: '頁面導覽' },
+      /* zh-Hant:end */
+      en: { name: 'English', html: 'en', language: 'Language', say: 'Language: ', search: 'Search', github: 'GitHub repository', menu: 'Menu', sections: 'Sections' }
+    };
 
     function applyLang(lang) {
       const t = translations[lang];
@@ -571,10 +705,6 @@
         const key = el.getAttribute('data-i18n-html');
         if (t[key]) el.innerHTML = t[key];
       });
-      document.querySelectorAll('[data-i18n-label]').forEach(el => {
-        const key = el.getAttribute('data-i18n-label');
-        if (t[key]) { el.title = t[key]; el.setAttribute('aria-label', t[key]); }
-      });
       document.querySelectorAll('[data-i18n-alt]').forEach(el => {
         const key = el.getAttribute('data-i18n-alt');
         if (t[key]) el.alt = t[key];
@@ -582,26 +712,43 @@
       // One-line rows may cut a description short; hovering shows it all.
       document.querySelectorAll('.projects .row-desc').forEach(d => { d.title = d.textContent; });
       if (window.LouieDaily) LouieDaily.render(lang);
-      const langLabel = document.getElementById('lang-label');
-      if (langLabel) langLabel.textContent = lang === 'zh' ? '文 ⇄ EN' : 'EN ⇄ 文';
-      // The visible label names the language button; the hint is a tooltip
-      // (and the name itself on the narrowest phones, which hide the label).
-      document.getElementById('lang-toggle').title = lang === 'zh' ? '切换为英文' : 'Switch to Chinese';
-      document.getElementById('search-btn').setAttribute('aria-label', lang === 'zh' ? '搜索' : 'Search');
-      document.getElementById('github-btn').setAttribute('aria-label', lang === 'zh' ? 'GitHub 仓库' : 'GitHub repository');
-      menuBtn.setAttribute('aria-label', lang === 'zh' ? '菜单' : 'Menu');
+      // The picker shows the language in use, named in itself, and ticks
+      // it in the list; the tooltip and the spoken name say what it is
+      // (the narrowest phones show the mark alone).
+      const ui = UI[lang];
+      document.getElementById('lang-label').textContent = ui.name;
+      langBtn.title = ui.language;
+      langBtn.setAttribute('aria-label', ui.say + ui.name);
+      langMenu.querySelectorAll('[data-lang]').forEach(item =>
+        item.setAttribute('aria-checked', String(item.dataset.lang === lang)));
+      document.getElementById('search-btn').setAttribute('aria-label', ui.search);
+      document.getElementById('github-btn').setAttribute('aria-label', ui.github);
+      menuBtn.setAttribute('aria-label', ui.menu);
       document.querySelectorAll('#nav-links, #mobile-menu').forEach(nav =>
-        nav.setAttribute('aria-label', lang === 'zh' ? '页面导航' : 'Sections'));
-      document.documentElement.lang = lang === 'zh' ? 'zh-CN' : 'en';
+        nav.setAttribute('aria-label', ui.sections));
+      // Chinese names shown in every language take the script in use.
+      document.querySelectorAll('[data-zh-script]').forEach(el => {
+        el.lang = lang === 'zh-Hant' ? 'zh-Hant' : 'zh-CN';
+      });
+      document.documentElement.lang = ui.html;
       bindRipples();
     }
 
-    function toggleLang() {
-      currentLang = currentLang === 'zh' ? 'en' : 'zh';
-      try { localStorage.setItem('louie-lang', currentLang); } catch (e) {}
+    // The search overlay speaks zh and en; a Traditional page gets its zh.
+    const searchLang = () => currentLang === 'en' ? 'en' : 'zh';
+    function setLang(lang) {
+      if (lang === currentLang) return;
+      currentLang = lang;
+      try {
+        localStorage.setItem('louie-lang', lang === 'en' ? 'en' : 'zh');
+        if (lang !== 'en') localStorage.setItem('louie-zh', lang === 'zh-Hant' ? 'Hant' : 'Hans');
+      } catch (e) {}
       applyLang(currentLang);
-      if (window.LouieSearch) LouieSearch.setLang(currentLang);
+      if (window.LouieSearch) LouieSearch.setLang(searchLang());
     }
+    // The overlay's own switch flips Chinese and English; its Chinese is
+    // whichever this page last showed.
+    function toggleLang() { setLang(currentLang === 'en' ? lastChinese() : 'en'); }
 
     applyLang(currentLang);
     document.getElementById('footer-year').textContent = '© ' + new Date().getFullYear();
@@ -612,9 +759,9 @@
     // language action back through toggleLang so both always agree.
     window.addEventListener('DOMContentLoaded', () => {
       if (!window.LouieSearch) return;
-      LouieSearch.setLang(currentLang);
+      LouieSearch.setLang(searchLang());
       LouieSearch.configure({
-        onLangSwitch: (next) => { if (next !== currentLang) toggleLang(); }
+        onLangSwitch: (next) => { if (next !== searchLang()) toggleLang(); }
       });
     });
 
